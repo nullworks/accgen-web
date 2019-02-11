@@ -32,7 +32,7 @@ function on_generate_click() {
 	$("#generate_progress").show("slow")
 	
 	$.ajax({
-		url: "http://35.228.142.240:6969/account",		
+		url: "https://cors.io/?http://35.228.142.240:6969/account",		
 		cache: false
 	}).done(function(resp) {
 		on_generated(JSON.parse(resp))
