@@ -32,7 +32,7 @@ function on_generate_click() {
 	$("#generate_progress").show("slow")
 	
 	$.ajax({
-		url: "https://35.228.142.240:6969/account"
+		url: "https://accgen.inkcat.net:6969/account"
 	}).done(function(resp) {
 		on_generated(JSON.parse(resp))
 	})
