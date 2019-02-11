@@ -34,7 +34,7 @@ function on_generate_click() {
 	$.ajax({
 		url: "https://accgen.inkcat.net:6969/account"
 	}).done(function(resp) {
-		on_generated(JSON.parse(resp))
+		on_generated(resp.responseJSON)
 	})
 }
 
