@@ -12,7 +12,7 @@ function on_generated(acc_data) {
 	
 	if (acc_data.error) {
 		$("#generate_error").show("slow")
-		$("#generate_error_text").text(acc_data.error)
+		$("#generate_error_text").text(acc_data.error + " (Too many accs generated or for using Proxies)")
 		return;
 	}
 	
