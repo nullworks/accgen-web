@@ -8,7 +8,7 @@ function init() {
 }
 
 function on_count_received(resp) {
-	$("#account_count").prop("count", 0).animate({
+	$("#account_count").prop("count", (localStorage.getItem("accounts") || 0)).animate({
 		count: parseInt(resp)
 	}, {
 		duration: 4000,
@@ -17,6 +17,8 @@ function on_count_received(resp) {
 			$("#account_count").text(Math.ceil(now))
 		}
 	})
+	
+	localStorage.setItem("accounts", resp)
 }
 
 function perform_count_check() {
