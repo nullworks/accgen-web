@@ -8,7 +8,15 @@ function init() {
 }
 
 function on_count_received(resp) {
-	console.log(resp)
+	$("#account_count").prop("count", 0).animate({
+		count: parseInt(resp)
+	}, {
+		duration: 4000,
+		easing: 'swing',
+		step: function(now) {
+			$("#account_count").text(Math.ceil(now))
+		}
+	})
 }
 
 function perform_count_check() {
