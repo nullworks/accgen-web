@@ -4,7 +4,21 @@ function init() {
 	$("#generate_error").hide()
 	$("#generate_progress").hide()
 	$("#generated_data").hide()
-	$("#generate_button").text("Generate an account")
+	perform_count_check()
+}
+
+function on_count_received(resp) {
+	console.log(resp)
+}
+
+function perform_count_check() {
+	$.ajax({
+		url: "https://accgen.inkcat.net:6969/count"
+	}).done(function(resp) {
+		on_count_received(resp)
+	})
+	
+	setInterval(perform_count_check, 60000)
 }
 
 function on_generated(acc_data) {
@@ -12,7 +26,7 @@ function on_generated(acc_data) {
 	
 	if (acc_data.error) {
 		$("#generate_error").show("slow")
-		$("#generate_error_text").text(acc_data.error + " for a Proxy or Generate spam.")
+		$("#generate_error_text").text(acc_data.error)
 		return;
 	}
 	
