@@ -28,7 +28,7 @@ function perform_count_check() {
 		on_count_received(resp)
 	})
 	
-	setTimeout(perform_count_check, 60000)
+	setTimeout(perform_count_check, 30000)
 }
 
 function on_generated(acc_data) {
