@@ -5,8 +5,12 @@ function init() {
 	$("#generate_progress").hide()
 	$("#generated_data").hide()
 	perform_count_check()
+}
+
+function captcha_init() {
+	init()
 	
-	grecaptcha.render("generate_button", {
+	grecaptcha.render(document.getElementById("generate_button"), {
 		"sitekey": "6Leuh5EUAAAAALediEIgey5dKbm1_P97zvzxjgvC",
 		"callback": "on_captcha_valid"
 	})
@@ -72,5 +76,5 @@ function on_captcha_valid(token) {
 }
 
 function on_captcha_load() {
-	$(init)
+	$(captcha_init)
 }
