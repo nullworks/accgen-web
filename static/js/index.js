@@ -5,6 +5,11 @@ function init() {
 	$("#generate_progress").hide()
 	$("#generated_data").hide()
 	perform_count_check()
+	
+	grecaptcha.render("generate_button", {
+		"sitekey": "6Leuh5EUAAAAALediEIgey5dKbm1_P97zvzxjgvC",
+		"callback": "on_captcha_valid"
+	})
 }
 
 function on_count_received(resp) {
@@ -49,17 +54,19 @@ function on_generated(acc_data) {
 	$("#generate_button").text("Generate another account")
 }
 
-function on_generate_click() {
+function on_captcha_valid(token) {
 	init()
 	
 	$("#generate_button").hide()
 	$("#generate_progress").show("slow")
 	
 	$.ajax({
-		url: "https://catbot.club:2053/account"
+		url: "https://catbot.club:2053/account/" + token
 	}).done(function(resp) {
 		on_generated(resp)
 	})
 }
 
-$(init)
+function on_captcha_load() {
+	$(init)
+}

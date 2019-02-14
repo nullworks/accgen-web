@@ -12,6 +12,7 @@
 	</head>
 
 	<body>
+		<script src="https://www.google.com/recaptcha/api.js?onload=on_captcha_load&render=explicit" async defer></script>
 		<script src="static/js/jquery.min.js"></script>
 		<script src="static/js/index.js"></script>
 		
@@ -40,7 +41,7 @@
 					</div>
 				</div>
 				
-				<button id="generate_button" type="button" class="btn btn-primary btn-lg btn-block" onclick="on_generate_click()">Generate an account</button>
+				<button id="generate_button" type="button" class="btn btn-primary btn-lg btn-block">Generate an account</button>
 				
 				<div id="generate_progress">
 					<h5>Please wait, generating...</h5>
