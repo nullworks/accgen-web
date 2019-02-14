@@ -71,6 +71,8 @@ function on_captcha_valid(token) {
 			on_generated(resp)
 		})
 		
+		grecaptcha.reset()
+		captcha_init()
 		resolve()
 	})
 }
