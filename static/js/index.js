@@ -23,7 +23,7 @@ function on_count_received(resp) {
 
 function perform_count_check() {
 	$.ajax({
-		url: "https://accgen.inkcat.net:6969/count"
+		url: "https://catbot.club:2053/count"
 	}).done(function(resp) {
 		on_count_received(resp)
 	})
@@ -56,7 +56,7 @@ function on_generate_click() {
 	$("#generate_progress").show("slow")
 	
 	$.ajax({
-		url: "https://accgen.inkcat.net:6969/account"
+		url: "https://catbot.club:2053/account"
 	}).done(function(resp) {
 		on_generated(resp)
 	})
