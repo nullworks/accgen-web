@@ -55,15 +55,19 @@ function on_generated(acc_data) {
 }
 
 function on_captcha_valid(token) {
-	init()
-	
-	$("#generate_button").hide()
-	$("#generate_progress").show("slow")
-	
-	$.ajax({
-		url: "https://catbot.club:2053/account/" + token
-	}).done(function(resp) {
-		on_generated(resp)
+	return new Promise(function(resolve, reject) {
+		init()
+		
+		$("#generate_button").hide()
+		$("#generate_progress").show("slow")
+		
+		$.ajax({
+			url: "https://catbot.club:2053/account/" + token
+		}).done(function(resp) {
+			on_generated(resp)
+		})
+		
+		resolve()
 	})
 }
 
