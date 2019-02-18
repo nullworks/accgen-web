@@ -55,7 +55,6 @@ function on_generated(acc_data) {
 	
 	$("#generated_data").show("slow")
 	$("#generate_button").show("slow")
-	$("#generate_button").text("Generate another account")
 }
 
 function on_captcha_valid(token) {
