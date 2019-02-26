@@ -1,0 +1,138 @@
+<html>
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+<div id="chartdiv"></div>
+<div id="chartdiv2"></div>
+<script>
+    httpGetAsync("https://fapi.cloudaccess.host/data.php",load);
+    function httpGetAsync(theUrl, callback)
+    {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                callback(xmlHttp.responseText);
+        }
+        xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+        xmlHttp.send(null);
+    }
+    
+    function load(data)
+    {
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    
+    
+    // Create chart
+    var chart = am4core.create("chartdiv", am4charts.XYChart);
+    chart.paddingRight = 20;
+    
+    chart.data = generateChartData();
+    
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.baseInterval = {
+      "timeUnit": "minute",
+      "count": 1
+    };
+    dateAxis.tooltipDateFormat = "HH:mm, d MMMM";
+    
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.title.text = "Number of Accounts Generated";
+    
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "generated";
+    series.tooltipText = "Generated: [bold]{valueY}[/]";
+    series.fillOpacity = 0.3;
+    
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "taken";
+    series.tooltipText = "Taken: [bold]{valueY}[/]";
+    
+    
+    
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.lineY.opacity = 0;
+    chart.scrollbarX = new am4charts.XYChartScrollbar();
+    chart.scrollbarX.series.push(series);
+    
+    
+    // Create chart
+    var chart = am4core.create("chartdiv2", am4charts.XYChart);
+    chart.paddingRight = 20;
+    
+    chart.data = generateChartData2();
+    
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.baseInterval = {
+      "timeUnit": "minute",
+      "count": 1
+    };
+    dateAxis.tooltipDateFormat = "HH:mm, d MMMM";
+    
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.disabled = true;
+    valueAxis.title.text = "Number of Accounts Taken";
+    
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "generated";
+    series.tooltipText = "Generated: [bold]{valueY}[/]";
+    series.fillOpacity = 0.3;
+    
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.dateX = "date";
+    series.dataFields.valueY = "taken";
+    series.tooltipText = "Taken: [bold]{valueY}[/]";
+    
+    
+    
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.lineY.opacity = 0;
+    chart.scrollbarX = new am4charts.XYChartScrollbar();
+    chart.scrollbarX.series.push(series);
+    
+    
+    function generateChartData2() {
+        var chartData = [];
+    var arr = JSON.parse(data);
+    
+    arr.forEach(function(element) {
+      chartData.push({ date: eval(element.date), taken: element.taken /*, taken: element.taken*/ });
+    
+    });
+    
+        return chartData;
+    }
+    
+    function generateChartData() {
+        var chartData = [];
+    var arr = JSON.parse(data);
+    
+    arr.forEach(function(element) {
+      chartData.push({ date: eval(element.date), generated: element.generated /*, taken: element.taken*/ });
+    
+    });
+    
+        return chartData;
+    }
+    }
+</script>
+<style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+    
+    body { background-color: #30303d; color: #fff; }
+    #chartdiv {
+      width: 100%;
+      height: 500px;
+    }
+</style>
+
+</html>
