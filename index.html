@@ -1,66 +1,67 @@
 <html lang="en">
-   <head>
-      <meta charset="utf-8">
-      <title>Steam Account Generator</title>
-      <meta name="description" content="Generate Steam accounts for personal usage.">
-      <meta name="author" content="nullworks">
-      <link rel="stylesheet" href="static/css/bootswatch.min.css">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-      <meta name="Description" content="Online Steam Account Generator! Generate Steam accounts instantly! No Registeration required!">
-      <meta name="keywords" content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
-      <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
-   </head>
-   <body>
-      <script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/api2/v1549866690836/recaptcha__en.js"></script><script src="https://www.google.com/recaptcha/api.js?onload=on_captcha_load&amp;render=explicit" async="" defer=""></script> <script src="static/js/jquery.min.js"></script> <script src="static/js/index.js"></script> 
-      <center>
-         <div class="container text-center" style="margin: auto;position: absolute;top: -30%;left: 0;bottom: 0;right: 0;height: 50%;min-width: 200px;">
-            <div class="alert alert-primary"> Join our announcement channel! <a href="https://tele.click/sag_bot" target="_blank">@sag_bot</a><br>Account Generator Statistics: <a href="https://accgen.cathook.club/stats.html" target="_blank">Statistics Page</a></div>
-            <div class="alert alert-primary"> Have an issue or a feature request? <a href="https://github.com/nullworks/accgen-web/issues" target="_blank">Github Issues Page</a> </div>
-            <h1 style=" color: white; ">Steam Account Generator</h1>
-            <h3 style=" color: grey;margin-bottom: -.5rem "><strong id="account_count">0</strong> accounts in database</h3>
-            <br> 
-            <div id="generate_error" class="alert alert-danger" style="display: none;">
-               <strong>An error has occured:</strong> 
-               <div id="generate_error_text"></div>
-            </div>
-            <div id="generated_data" style="display: none;">
-               <div id="generated_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
-                  <div class="card-header">Account information</div>
-                  <div class="card-body">
-                     <h6 id="acc_login" class="card-text">
-                        Login: <strong>niceaccount</strong>
-                        <p></p>
-                     </h6>
-                     <h6 id="acc_pass" class="card-text">
-                        Password: <strong>nicepass</strong>
-                        <p></p>
-                     </h6>
-                     <h6 id="acc_email" class="card-text">
-                        E-Mail address: niceaccount@inboxkitten.com
-                        <p></p>
-                     </h6>
-                  </div>
-               </div>
-            </div>
-            <div>
-               <div class="grecaptcha-badge" data-style="bottomright" data-theme="dark" style="width: 256px; height: 60px; transition: right 0.3s ease 0s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px;">
-                  <div class="grecaptcha-logo"><iframe src="https://www.google.com/recaptcha/api2/anchor?theme=dark&ar=1&amp;k=6LdwH4MUAAAAAJVLvx68dRYlBjFSyegmMGViHwro&amp;co=aHR0cHM6Ly9hc2hlc2gzLmdpdGh1Yi5pbzo0NDM.&amp;hl=en&amp;v=v1549866690836&amp;size=invisible&amp;cb=f1cslc94p71r" width="256" height="60" role="presentation" name="a-e9wbw5r12ihb" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox"></iframe></div>
-                  <div class="grecaptcha-error"></div>
-                  <textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
-               </div>
-            </div>
-            <button id="generate_button" type="button" class="btn btn-primary btn-lg" style=" color: darkgrey; width: 50%; margin-bottom: 2rem;">Generate</button> 
-            <div id="generate_progress" style="display: none;">
-               <h5>Please wait, generating...</h5>
-               <div class="progress">
-                  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+
+<head>
+   <meta charset="utf-8">
+   <title>Steam Account Generator</title>
+   <meta name="description" content="Generate Steam accounts for personal usage.">
+   <meta name="author" content="nullworks">
+   <link rel="stylesheet" href="static/css/bootswatch.min.css">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+   <meta name="Description" content="Online Steam Account Generator! Generate Steam accounts instantly! No Registeration required!">
+   <meta name="keywords" content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
+   <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
+</head>
+
+<body>
+   </script>
+   <script src="static/js/jquery.min.js"></script>
+   <script src="static/js/index.js"></script>
+   <script src="https://www.google.com/recaptcha/api.js?onload=on_captcha_load" async defer></script>
+   <div class="g-recaptcha" data-sitekey="6Leuh5EUAAAAALediEIgey5dKbm1_P97zvzxjgvC" data-callback="on_captcha_valid"
+      data-size="invisible">
+   </div>
+   <center>
+      <div class="container text-center" style="margin: auto;position: absolute;top: -30%;left: 0;bottom: 0;right: 0;height: 50%;min-width: 200px;">
+         <div class="alert alert-primary"> Join our announcement channel! <a href="https://tele.click/sag_bot" target="_blank">@sag_bot</a><br>Account
+            Generator Statistics: <a href="https://accgen.cathook.club/stats.html" target="_blank">Statistics Page</a></div>
+         <div class="alert alert-primary"> Have an issue or a feature request? <a href="https://github.com/nullworks/accgen-web/issues"
+               target="_blank">Github Issues Page</a> </div>
+         <h1 style=" color: white; ">Steam Account Generator</h1>
+         <h3 style=" color: grey;margin-bottom: -.5rem "><strong id="account_count">0</strong> accounts in database</h3>
+         <br>
+         <div id="generate_error" class="alert alert-danger" style="display: none;">
+            <strong>An error has occured:</strong>
+            <div id="generate_error_text"></div>
+         </div>
+         <div id="generated_data" style="display: none;">
+            <div id="generated_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
+               <div class="card-header">Account information</div>
+               <div class="card-body">
+                  <h6 id="acc_login" class="card-text">
+                     Login: <strong>niceaccount</strong>
+                     <p></p>
+                  </h6>
+                  <h6 id="acc_pass" class="card-text">
+                     Password: <strong>nicepass</strong>
+                     <p></p>
+                  </h6>
+                  <h6 id="acc_email" class="card-text">
+                     E-Mail address: niceaccount@inboxkitten.com
+                     <p></p>
+                  </h6>
                </div>
             </div>
          </div>
-      </center>
-      <div style="visibility: hidden; position: absolute; width: 100%; top: -10000px; left: 0px; right: 0px; transition: visibility 0s linear 0.3s, opacity 0.3s linear 0s; opacity: 0;">
-         <div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.5;"></div>
-         <div style="margin: 0px auto; top: 0px; left: 0px; right: 0px; position: absolute; border: 1px solid rgb(204, 204, 204); z-index: 2000000000; background-color: rgb(255, 255, 255); overflow: hidden;"><iframe title="recaptcha challenge" src="https://www.google.com/recaptcha/api2/bframe?hl=en&amp;v=v1549866690836&amp;k=6LdwH4MUAAAAAJVLvx68dRYlBjFSyegmMGViHwro&amp;cb=ype3nheimsbv" name="c-e9wbw5r12ihb" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox" style="width: 100%; height: 100%;" __idm_frm__="749"></iframe></div>
+         <button id="generate_button" type="button" onclick="grecaptcha.execute()" class="btn btn-primary btn-lg" style=" color: darkgrey; width: 50%; margin-bottom: 2rem;">Generate</button>
+         <div id="generate_progress" style="display: none;">
+            <h5>Please wait, generating...</h5>
+            <div class="progress">
+               <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
+                  aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
+         </div>
       </div>
-   </body>
+   </center>
+</body>
+
 </html>
