@@ -22,7 +22,7 @@ function on_count_received(resp) {
 
 function perform_count_check() {
 	$.ajax({
-		url: "https://catbot.club:8080/count"
+		url: "https://catbot.club:2053/count"
 	}).done(function (resp) {
 		on_count_received(resp)
 	})
@@ -55,7 +55,7 @@ function on_captcha_valid(token) {
 		$("#generate_progress").show("slow")
 
 		$.ajax({
-			url: "https://catbot.club:8080/account/" + token
+			url: "https://catbot.club:2053/account/" + token
 		}).done(function (resp) {
 			on_generated(resp)
 		})
