@@ -41,8 +41,11 @@ function on_generated(acc_data) {
 
 	$("#acc_login").html(`Login: <strong>${acc_data.login}</strong>`)
 	$("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
-	$("#acc_email").html(`E-Mail address: <a href="https://inboxkitten.com/inbox/${acc_data.email.split("@")[0]}/list" target="_blank">${acc_data.email}</a>`)
-
+	if(acc_data.email=="not_user_accessible_sorry")
+		$("#acc_email").hide();
+	else
+		$("#acc_email").html(`E-Mail address: <a href="https://inboxkitten.com/inbox/${acc_data.email.split("@")[0]}/list" target="_blank">${acc_data.email}</a>`)
+	
 	$("#generated_data").show("slow")
 	$("#generate_button").show("slow")
 }
