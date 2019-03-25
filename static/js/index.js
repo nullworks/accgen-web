@@ -38,13 +38,12 @@ function on_generated(acc_data) {
 		$("#generate_error_text").text(acc_data.error)
 		return;
 	}
-	
+
 	$("#acc_login").html(`Login: <strong>${acc_data.login}</strong>`)
 	$("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
-	if(acc_data.email=="not_user_accessible_sorry")
+	if (acc_data.email == "not_user_accessible_sorry")
 		$("#acc_email").hide();
-	else
-	{
+	else {
 		$("#acc_email").show();
 		$("#acc_email").html(`E-Mail address: <a href="https://inboxkitten.com/inbox/${acc_data.email.split("@")[0]}/list" target="_blank">${acc_data.email}</a>`)
 	}
@@ -70,7 +69,32 @@ function on_captcha_valid(token) {
 	})
 }
 
-function on_captcha_load() {
+var v3_loaded = false;
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function generate_pressed() {
+	while (!v3_loaded) {
+		await sleep(50)
+	}
+	grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
+		action: 'generate'
+	}).then(res => {
+		grecaptcha.execute()
+	})
+}
+
+function on_v2_load() {
 	init()
 	perform_count_check()
+}
+
+function on_v3_load() {
+	grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
+		action: 'homepage'
+	}).then(res => {
+		v3_loaded = true
+	})
 }
