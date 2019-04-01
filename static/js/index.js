@@ -1,5 +1,7 @@
 "let strict";
 
+var multiple = false;
+
 function init() {
 	$("#generate_error").hide()
 	$("#generate_progress").hide()
@@ -38,7 +40,8 @@ function on_generated(acc_data) {
 		$("#generate_error_text").text(acc_data.error)
 		return;
 	}
-
+	if(!multiple)
+	{
 	$("#acc_login").html(`Login: <strong>${acc_data.login}</strong>`)
 	$("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
 	if (acc_data.email == "not_user_accessible_sorry")
@@ -46,6 +49,13 @@ function on_generated(acc_data) {
 	else {
 		$("#acc_email").show();
 		$("#acc_email").html(`E-Mail address: <a href="https://inboxkitten.com/inbox/${acc_data.email.split("@")[0]}/list" target="_blank">${acc_data.email}</a>`)
+	}
+	}else
+	{
+		$("#acc_login").html(`Logins: <strong>${acc_data.login}</strong>, <strong>${acc_data.login}</strong>`)
+	$("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>, <strong>${acc_data.password}</strong>`)
+	$("#acc_email").hide();
+	
 	}
 	$("#generated_data").show("slow")
 	$("#generate_button").show("slow")
@@ -78,8 +88,16 @@ var v3_loaded = false;
 function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
+async function generate_multiple_pressed(){
+	multiple=true;
+	while (!v3_loaded) {
+		await sleep(50)
+	}
 
+		grecaptcha.execute()
+}
 async function generate_pressed() {
+	multiple=false;
 	while (!v3_loaded) {
 		await sleep(50)
 	}
