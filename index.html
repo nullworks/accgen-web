@@ -41,16 +41,16 @@
 
    <ul class="nav nav-tabs">
       <li class="nav-item">
-         <a class="nav-link active" data-toggle="tab" href="index.html">Generator</a>
+         <a class="nav-link active" data-toggle="tab" href="index.html" onclick="gtag('event', 'homepage link');">Generator</a>
       </li>
       <li class="nav-item">
-         <a class="nav-link" data-toggle="tab" href="stats.html">Stats</a>
+         <a class="nav-link" data-toggle="tab" href="stats.html" onclick="gtag('event', 'stats link');">Stats</a>
       </li>
       <li class="nav-item">
-         <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues">GitHub Issues</a>
+         <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues" onclick="gtag('event', 'Github issues link');">GitHub Issues</a>
       </li>
       <li id="tg_russia" class="nav-item">
-         <a class="nav-link" data-toggle="tab" href="telegram.html">TG Announcement
+         <a class="nav-link" data-toggle="tab" href="telegram.html" onclick="gtag('event', 'telegram channel link');">TG Announcement
             Channel</a>
       </li>
    </ul>
@@ -87,7 +87,7 @@
             </div>
          </div>
       </div>
-      <button id="generate_button" type="button" onclick="generate_pressed()" class="btn btn-primary btn-lg"
+      <button id="generate_button" type="button" onclick="gtag('event', 'generate');generate_pressed();" class="btn btn-primary btn-lg"
          style=" color: darkgrey; width: 50%; margin-bottom: 2rem;">Generate</button>
 
 
