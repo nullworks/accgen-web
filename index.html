@@ -1,6 +1,19 @@
 <html lang="en">
 
 <head>
+   <!-- Google Analytics -->
+   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137480510-1"></script>
+   <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+         dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-137480510-1');
+   </script>
+
    <meta charset="utf-8">
    <title>Steam Account Generator</title>
    <meta name="description" content="Generate Steam accounts for personal usage.">
@@ -74,9 +87,9 @@
             </div>
          </div>
       </div>
-     <button id="generate_button" type="button" onclick="generate_pressed()" class="btn btn-primary btn-lg"
+      <button id="generate_button" type="button" onclick="generate_pressed()" class="btn btn-primary btn-lg"
          style=" color: darkgrey; width: 50%; margin-bottom: 2rem;">Generate</button>
-       
+
 
       <div id="generate_progress" style="display: none;">
          <h5>Please wait, generating...</h5>
