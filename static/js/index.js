@@ -10,7 +10,7 @@ function init() {
 
 function on_count_received(resp) {
 	$("#account_count").prop("count", (localStorage.getItem("accounts") || 0)).animate({
-		count: parseInt(-1*resp)
+		count: parseInt(resp)
 	}, {
 		duration: 4000,
 		easing: 'swing',
