@@ -95,6 +95,7 @@ async function generate_pressed() {
 				$("#generate_button").show("slow")
 				$("#generate_progress").hide()
 				// run v2
+				gtag('event', 'additional verification');
 				grecaptcha.execute()
 			}
 		})
