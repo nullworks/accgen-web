@@ -7,6 +7,7 @@ function init() {
 	$("#generate_progress").hide()
 	$("#generated_data").hide()
 	$("#acc_email").hide()
+	$("#generated_accs_card").hide()
 	
 }
 
