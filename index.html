@@ -91,6 +91,40 @@
             </div>
          </div>
       </div>
+      
+      <div id="generated_data" style="display: none;">
+         <div id="generated_accs_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
+            <div class="card-header">Account information</div>
+            <div class="card-body">
+               <h6 id="acc_login" class="card-text">
+                  Login: <strong>niceaccount</strong>
+                  <p></p>
+               </h6>
+               <h6 id="acc_pass" class="card-text">
+                  Password: <strong>nicepass</strong>
+                  <p></p>
+               </h6>
+               <h6 id="acc_email" class="card-text" style="display: none;">
+                  E-Mail address: niceaccount@inboxkitten.com
+                  <p></p>
+               </h6>
+            </div>
+         </div>
+      </div>
+<div id="generated_accs_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
+         <table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Username</th>
+      <th scope="col">Password</th>
+      <th scope="col">email</th>
+      <th scope="col">steamID</th>
+    </tr>
+  </thead>
+  <tbody id="genned_accs">
+   
+  </tbody></table></div>
+      
       <button id="generate_button" type="button" onclick="gtag('event', 'generate');generate_pressed();"
          class="btn btn-primary btn-lg" style=" color: darkgrey; width: 50%; margin-bottom: 2rem;">Generate</button>
 
