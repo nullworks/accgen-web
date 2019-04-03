@@ -38,7 +38,7 @@ function history_pressed() {
     $("#generated_accs_table_card").show();
     if (localStorage.getItem("genned_account") != null) {
 
-        $.each(JSON.parse(localStorage.getItem("genned_account")), function(i, item) {
+        $.each((JSON.parse(localStorage.getItem("genned_account"))).reverse(), function(i, item) {
             $('<tr class="table-primary">').html(
                 "<td>" + item.login + "</td><td>" + item.password + "</td>").appendTo('#genned_accs');
         })
