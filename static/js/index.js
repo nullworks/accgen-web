@@ -7,10 +7,11 @@ function init() {
 	$("#generate_progress").hide()
 	$("#generated_data").hide()
 	$("#acc_email").hide()
+	
 }
 
 function on_count_received(resp) {
-	$("#account_count").prop("count", (localStorage.getItem("accounts") || 0)).animate({
+	$("#account_count").prop("count", (localStorage.getItem("account_count") || 0)).animate({
 		count: parseInt(resp)
 	}, {
 		duration: 4000,
@@ -20,7 +21,7 @@ function on_count_received(resp) {
 		}
 	})
 
-	localStorage.setItem("accounts", resp)
+	localStorage.setItem("account_count", resp)
 }
 
 function perform_count_check() {
@@ -39,6 +40,13 @@ function on_generated(acc_data) {
 		$("#generate_error_text").text(acc_data.error)
 		return;
 	}
+	if(localStorage.getItem("genned_account") == null)
+	{
+		localStorage.setItem("genned_account",JSON.stringify([]))
+
+	}
+	localStorage.setItem("genned_account",JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
+	
 	$("#acc_login").html(`Login: <strong>${acc_data.login}</strong>`)
 	$("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
 	$("#generated_data").show("slow")
