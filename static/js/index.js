@@ -73,6 +73,9 @@ function on_generated(acc_data) {
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow")
     $("#generate_button").show("slow")
+      if (localStorage.getItem("genned_account") != null) {
+        $('#history_button').show();
+    }
 }
 
 function on_captcha_valid(token) {
