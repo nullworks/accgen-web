@@ -1,7 +1,5 @@
 "let strict";
 
-var multiple = false;
-
 function init() {
     $("#generated_accs_table_card").hide()
     $("#generate_error").hide()
@@ -103,14 +101,7 @@ var v2_loaded = false;
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-async function generate_multiple_pressed() {
-    multiple = true;
-    while (!v3_loaded) {
-        await sleep(50)
-    }
 
-    grecaptcha.execute()
-}
 async function generate_pressed() {
     $("#generated_accs_table_card").hide();
     while (!v3_loaded || !v2_loaded) {
