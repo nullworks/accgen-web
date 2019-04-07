@@ -61,6 +61,10 @@ function on_generated(acc_data) {
     if (acc_data.error) {
         $("#generate_error").show("slow")
         $("#generate_error_text").text(acc_data.error)
+        $("#generate_button").show("slow")
+        if (localStorage.getItem("genned_account") != null) {
+            $('#history_button').show();
+        }
         return;
     }
     if (localStorage.getItem("genned_account") == null) {
