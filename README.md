@@ -1,0 +1,1 @@
+Source code for accgen.cathook.club. Original repository located at https://github.com/nullworks/accgen-web.
