@@ -47,7 +47,7 @@ function history_pressed() {
 
 function perform_count_check() {
     $.ajax({
-        url: "https://catbot.club:2053/count"
+        url: "https://catbot.club/count"
     }).done(function(resp) {
         on_count_received(resp)
     })
@@ -87,7 +87,7 @@ function on_captcha_valid(token) {
     $("#generate_progress").show("slow")
 
     $.ajax({
-        url: "https://catbot.club:2053/acc/v2/" + token
+        url: "https://catbot.club/acc/v2/" + token
     }).done(function(resp) {
         on_generated(resp)
     })
@@ -116,7 +116,7 @@ async function generate_pressed() {
         $("#generate_progress").show("slow")
 
         $.ajax({
-            url: "https://catbot.club:2053/acc/v3/" + res
+            url: "https://catbot.club/acc/v3/" + res
         }).done(function(resp) {
             if (!resp.v2)
                 on_generated(resp)
