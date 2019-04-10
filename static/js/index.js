@@ -18,7 +18,7 @@ function on_count_received(resp) {
     }, {
         duration: 4000,
         easing: 'swing',
-        step: function(now) {
+        step: function (now) {
             $("#account_count").text(Math.ceil(now))
         }
     })
@@ -36,7 +36,7 @@ function history_pressed() {
     $("#generated_accs_table_card").show();
     if (localStorage.getItem("genned_account") != null) {
 
-        $.each((JSON.parse(localStorage.getItem("genned_account"))).reverse(), function(i, item) {
+        $.each((JSON.parse(localStorage.getItem("genned_account"))).reverse(), function (i, item) {
             $('<tr class="table-primary">').html(
                 "<td>" + item.login + "</td><td>" + item.password + "</td>").appendTo('#genned_accs');
         })
@@ -47,8 +47,8 @@ function history_pressed() {
 
 function perform_count_check() {
     $.ajax({
-        url: "https://accgen.cathook.club/count"
-    }).done(function(resp) {
+        url: "https://accgen.cathook.club/api/v1/count"
+    }).done(function (resp) {
         on_count_received(resp)
     })
 }
@@ -75,7 +75,7 @@ function on_generated(acc_data) {
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow")
     $("#generate_button").show("slow")
-      if (localStorage.getItem("genned_account") != null) {
+    if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
 }
@@ -87,8 +87,8 @@ function on_captcha_valid(token) {
     $("#generate_progress").show("slow")
 
     $.ajax({
-        url: "https://accgen.cathook.club/acc/v2/" + token
-    }).done(function(resp) {
+        url: "https://accgen.cathook.club/userapi/acc/v2/" + token
+    }).done(function (resp) {
         on_generated(resp)
     })
 
@@ -110,14 +110,14 @@ async function generate_pressed() {
     // run v3
     grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
         action: 'generate'
-    }).then(function(res) {
+    }).then(function (res) {
         init()
         $("#generate_button").hide()
         $("#generate_progress").show("slow")
 
         $.ajax({
-            url: "https://accgen.cathook.club/acc/v3/" + res
-        }).done(function(resp) {
+            url: "https://accgen.cathook.club/userapi/acc/v3/" + res
+        }).done(function (resp) {
             if (!resp.v2)
                 on_generated(resp)
             else {
