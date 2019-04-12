@@ -64,7 +64,12 @@
       <div class="alert alert-primary">Need to get accounts automatically?<br>Request an API key by sending
          <code>/request
             [reason]</code> to <a href="telegram.html#bot" target="_blank"
-            onclick="gtag('event', 'sagbot link');">@sag_stats_bot</a></div>
+            onclick="gtag('event', 'sagbot link');">@sag_stats_bot</a>
+      </div>
+      <div class="alert alert-primary">We are doing a giveaway of 100k accounts!<br>Join the giveaway by entering through <a href="https://gleam.io/YzH0i/steam-accounts-giveaway" target="_blank"
+            onclick="gtag('event', 'sagbot link');">this page.</a>
+      </div>
+
       <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
       <h3 style=" color: grey;margin-bottom: -.5rem "><strong id="account_count">0</strong> accounts in database</h3>
       <br>
@@ -91,7 +96,7 @@
             </div>
          </div>
       </div>
-      
+
       <div id="generated_data" style="display: none;">
          <div id="generated_accs_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
             <div class="card-header">Account information</div>
@@ -111,20 +116,29 @@
             </div>
          </div>
       </div>
-<div id="generated_accs_table_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;display: none;">
+      <div id="generated_accs_table_card" class="card border-dark mb-3"
+         style="max-width: 33rem;margin:auto;display: none;">
          <table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col">Username</th>
-      <th scope="col">Password</th>
-    </tr>
-  </thead>
-  <tbody id="genned_accs">
-   
-  </tbody></table></div>
-      
-      <button id="generate_button" type="button" onclick="gtag('event', 'generate');generate_pressed();" class="btn btn-primary btn-lg" style="color: darkgrey;  margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;" data-darkreader-inline-color="">Generate</button>
-<button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();" class="btn btn-primary btn-lg" style="display: none;color: darkgrey; margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;" data-darkreader-inline-color="">History</button>
+            <thead>
+               <tr>
+                  <th scope="col">Username</th>
+                  <th scope="col">Password</th>
+               </tr>
+            </thead>
+            <tbody id="genned_accs">
+
+            </tbody>
+         </table>
+      </div>
+
+      <button id="generate_button" type="button" onclick="gtag('event', 'generate');generate_pressed();"
+         class="btn btn-primary btn-lg"
+         style="color: darkgrey;  margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;"
+         data-darkreader-inline-color="">Generate</button>
+      <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
+         class="btn btn-primary btn-lg"
+         style="display: none;color: darkgrey; margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;"
+         data-darkreader-inline-color="">History</button>
 
 
       <div id="generate_progress" style="display: none;">
