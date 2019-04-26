@@ -49,7 +49,7 @@
         },
         "theme": "edgeless",
         "content": {
-          "message": "We use cookies to store your login info for patreon."
+          "message": "This website uses cookies to ensure you get the best experience on our website."
         }
       })
       onload();
@@ -67,7 +67,14 @@
       <h5><a href='https://accgen.cathook.club/patreon/login'>Sign into patreon!</a></h5>
       <strong><a href='https://www.patreon.com/steam_acc'>Not a patron yet?</a></strong>
     </div>
-
+    <div id="patreon_pay" class="alert alert-warning" style="display: none;">
+      <h4 class="alert-heading">You are not a patron yet!</h4>
+      <strong><a href='https://www.patreon.com/steam_acc'>Click here to get access!</a></strong>
+    </div>
+     <div id="patreon_error" class="alert alert-warning" style="display: none;">
+      <h4 class="alert-heading">An Unknown Error has occured!</h4>
+    </div>
+    
     <div id="generate_acc_form" style="color: rgb(205, 199, 188); text-align: center;">
       <div id="generate_acc_form_card" class="card border-dark mb-3"
         style="background-color: rgb(58, 62, 65); margin: auto; max-width: 33rem; border-color: rgb(95, 105, 117) !important;">
