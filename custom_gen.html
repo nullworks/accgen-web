@@ -33,6 +33,35 @@
   <script src="static/js/custom_gen.js"></script>
   <style data-styled="" data-styled-version="4.2.0"></style>
 
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="index.html" onclick="gtag('event', 'homepage link');">Generator</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
+        Accounts</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="stats.html" onclick="gtag('event', 'stats link');">Stats</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues"
+        onclick="gtag('event', 'Github issues link');">GitHub Issues</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="telegram.html" onclick="gtag('event', 'telegram channel link');">TG
+        Announcement
+        Channel</a>
+    </li>
+    <li class="nav-item">
+      <div style="line-height: 0;"><a href="https://patreon.com/steam_acc"
+          onclick="gtag('event', 'Become patreon button');"><img
+            src="https://i1.wp.com/spectraartspace.com/wp-content/uploads/2019/04/Become_a_patron_button.png"
+            style="height: 2.5rem;"></a>
+      </div>
+    </li>
+  </ul>
+
   <link rel="stylesheet" type="text/css"
     href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
   <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
@@ -47,10 +76,7 @@
             "background": "#14a7d0"
           }
         },
-        "theme": "edgeless",
-        "content": {
-          "message": "This website uses cookies to ensure you get the best experience on our website."
-        }
+        "theme": "edgeless"
       })
       onload();
     });
@@ -71,10 +97,10 @@
       <h4 class="alert-heading">You are not a patron yet!</h4>
       <strong><a href='https://www.patreon.com/steam_acc'>Click here to get access!</a></strong>
     </div>
-     <div id="patreon_error" class="alert alert-warning" style="display: none;">
+    <div id="patreon_error" class="alert alert-warning" style="display: none;">
       <h4 class="alert-heading">An Unknown Error has occured!</h4>
     </div>
-    
+
     <div id="generate_acc_form" style="color: rgb(205, 199, 188); text-align: center;">
       <div id="generate_acc_form_card" class="card border-dark mb-3"
         style="background-color: rgb(58, 62, 65); margin: auto; max-width: 33rem; border-color: rgb(95, 105, 117) !important;">
