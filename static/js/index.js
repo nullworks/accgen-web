@@ -104,6 +104,7 @@ function sleep(ms) {
 
 async function generate_pressed() {
     $("#generated_accs_table_card").hide();
+    $("#generate_button").hide();
     while (!v3_loaded || !v2_loaded) {
         await sleep(50)
     }
@@ -112,7 +113,6 @@ async function generate_pressed() {
         action: 'generate'
     }).then(function (res) {
         init()
-        $("#generate_button").hide()
         $("#generate_progress").show("slow")
 
         $.ajax({

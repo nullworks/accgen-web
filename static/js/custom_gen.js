@@ -5,7 +5,7 @@ function on_generated(acc_data) {
 
     if (acc_data.error) {
         $("#generate_error").show("slow")
-        $("#generate_error_text").text(acc_data.error)
+        $("#generate_error_text").text(acc_data.error);
         $("#generate_button").show("slow")
         if (localStorage.getItem("genned_account") != null) {
             $('#history_button').show();
@@ -29,11 +29,11 @@ function on_generated(acc_data) {
 
 function custom_gen() {
     $("#generate_progress").show("slow");
-    $("#generate_button")[0].disabled = true;
+    $("#generated_data").hide();
+    $("#generate_button").hide();
+    $("#generate_error").hide();
+
     var img_url = $("input[name=acc_profileimage]").val();
-    if (img_url == "")
-        img_url =
-        "https://steamuserimages-a.akamaihd.net/ugc/885384897182110030/F095539864AC9E94AE5236E04C8CA7C2725BCEFF/";
     $.ajax({
         url: 'https://accgen.cathook.club/userapi/patreon/customacc',
         type: 'POST',
@@ -50,14 +50,9 @@ function custom_gen() {
         }),
         dataType: 'json'
     }).done(function (data) {
-        $("#generate_button")[0].disabled = false;
-        $("#generate_progress").hide()
-        on_generated(data)
+        on_generated(data);
     }).fail(function (xhr, status, error) {
-        $("#generate_error").show("slow")
-        $("#generate_error_text").text(xhr.responseText)
-        $("#generate_button")[0].disabled = false;
-
+        on_generated(JSON.parse(xhr.responseText));
     });
 }
 
@@ -91,6 +86,5 @@ function onload() {
                 break;
 
         }
-
     });
 }
