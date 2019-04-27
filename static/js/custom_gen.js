@@ -86,5 +86,10 @@ function onload() {
                 break;
 
         }
+    }).fail(function()
+    {
+        $('#patreon_error').show();
+        $('#generate_acc_form').hide();
+        $("#generate_button").hide();
     });
 }
