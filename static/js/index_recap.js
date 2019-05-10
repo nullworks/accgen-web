@@ -21,7 +21,7 @@ eventer(messageEvent, function (e) {
   $.ajax({
             url: "https://accgen.cathook.club/userapi/addtask/"+e.data
         }).done(function (resp) {
-                on_generated(resp.responseJSON)
+                on_generated(resp)
         }).fail(function(resp){
              on_generated(resp.responseJSON)  })
         
