@@ -1,5 +1,9 @@
 "let strict";
 
+function stringifyQueryString(params) {
+	return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+}
+
 function registerevents() {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
     var eventer = window[eventMethod];
@@ -16,7 +20,6 @@ function registerevents() {
         $.ajax({
             url: 'https://accgen.cathook.club/userapi/recaptcha/getemail'
         }).done(function (emailresp) {
-            emailresp = JSON.parse(emailresp);
             $.ajax({
                 url: "https://store.steampowered.com/join/"
             }).done(function (resp) {
@@ -24,14 +27,14 @@ function registerevents() {
                 $.ajax({
                     url: "https://store.steampowered.com/join/ajaxverifyemail",
                     method: 'POST',
-                    data: JSON.stringify({
+                    data: stringifyQueryString({
                         email: emailresp.email,
                         captchagid: gid,
                         captcha_text: e.data
                     })
                 }).done(function (resp) {
-                    resp = JSON.parse(resp);
-                    switch (resp.status) {
+                    console.log(emailresp.email, gid, e.data);
+                    switch (resp.success) {
                         case 17:
                             on_generated({
                                 error: 'Email Domain banned.. Please wait for us to update it'
@@ -44,14 +47,16 @@ function registerevents() {
                             break;
                         case 1:
                             $.ajax({
-                                url: "https://accgen.cathook.club/userapi/addtask/" + emailresp.email
+                                url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email
                             }).done(function (resp) {
                                 on_generated(resp)
+                                console.log(resp);
                             }).fail(function (resp) {
                                 on_generated(resp.responseJSON)
                             })
                             break;
                         default:
+                            console.log(resp.success);
                             on_generated({
                                 error: 'Unknown error during registration.'
                             });
