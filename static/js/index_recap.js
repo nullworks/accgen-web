@@ -1,7 +1,7 @@
 "let strict";
 
 function stringifyQueryString(params) {
-	return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
 }
 
 function registerevents() {
@@ -12,10 +12,9 @@ function registerevents() {
     eventer(messageEvent, function (e) {
         if (e.data == "recaptcha-setup")
             return;
-        console.log("Got Recap Key: " + e.data);
-        $("#generate_button").hide()
-        $("#generate_progress").show("slow")
-        $("#recap_steam").hide()
+        $("#generate_button").hide();
+        $("#generate_progress").show("slow");
+        $("#recap_steam").hide();
 
         $.ajax({
             url: 'https://accgen.cathook.club/userapi/recaptcha/getemail'
@@ -33,7 +32,6 @@ function registerevents() {
                         captcha_text: e.data
                     })
                 }).done(function (resp) {
-                    console.log(emailresp.email, gid, e.data);
                     switch (resp.success) {
                         case 17:
                             on_generated({
@@ -164,10 +162,20 @@ function init() {
     setInterval(perform_count_check, 10000);
     perform_count_check();
     registerevents();
+
+    // Check if addon installed
+    $.ajax({
+        url: "https://store.steampowered.com/join/"
+    }).fail(function (resp) {
+        $("#addon_dl").show();
+        $("#accgen_ui").hide();
+    });
 }
 
-async function generate_pressed() {
+function generate_pressed() {
     $("#generated_accs_table_card").hide();
     $("#generate_button").hide();
     $("#recap_steam").show();
+    $("#generated_data").hide();
+    $("#generate_error").hide();
 }
