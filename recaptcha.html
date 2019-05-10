@@ -28,16 +28,6 @@
 
    <script src="static/js/jquery.min.js"></script>
    <script src="static/js/index_recap.js"></script>
-   <!--V3-->
-   <script
-      src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM&onload=on_v3_load">
-   </script>
-   <!--V2-->
-   <script src="https://recaptcha.net/recaptcha/api.js?onload=on_v2_load" async defer></script>
-
-   <div class="g-recaptcha" data-sitekey="6Leuh5EUAAAAALediEIgey5dKbm1_P97zvzxjgvC" data-callback="on_captcha_valid"
-      data-size="invisible" data-theme="dark">
-   </div>
 
    <ul class="nav nav-tabs">
       <li class="nav-item">
@@ -45,7 +35,8 @@
             onclick="gtag('event', 'homepage link');">Generator</a>
       </li>
       <li class="nav-item">
-         <a class="nav-link" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom Accounts</a>
+         <a class="nav-link" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
+            Accounts</a>
       </li>
       <li class="nav-item">
          <a class="nav-link" data-toggle="tab" href="stats.html" onclick="gtag('event', 'stats link');">Stats</a>
@@ -137,9 +128,10 @@
             </tbody>
          </table>
       </div>
-<div id="recap_steam">
-	<iframe id="innerdiv" height="700px" width="400px" src="https://store.steampowered.com/join/" scrolling="no" frameborder="0"></iframe>
-		 </div>
+      <div id="recap_steam">
+         <iframe id="innerdiv" height="700px" width="400px" src="https://store.steampowered.com/join/" scrolling="no"
+            frameborder="0"></iframe>
+      </div>
       <button id="generate_button" type="button" onclick="gtag('event', 'generate');generate_pressed();"
          class="btn btn-primary btn-lg"
          style="color: darkgrey;  margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;"

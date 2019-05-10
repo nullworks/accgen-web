@@ -10,28 +10,76 @@ function init() {
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
-var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-var eventer = window[eventMethod];
-var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+    var eventer = window[eventMethod];
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
-eventer(messageEvent, function (e) {
-  if(e.data == "recaptcha-setup")
-    return;
-       console.log("Got Recap Key: "+e.data);
-             $("#generate_button").hide()
-    $("#generate_progress").show("slow")
+    eventer(messageEvent, function (e) {
+        if (e.data == "recaptcha-setup")
+            return;
+        console.log("Got Recap Key: " + e.data);
+        $("#generate_button").hide()
+        $("#generate_progress").show("slow")
         $("#recap_steam").hide()
 
-  $.ajax({
-            url: "https://accgen.cathook.club/userapi/addtask/"+e.data
-        }).done(function (resp) {
-                on_generated(resp)
-        }).fail(function(resp){
-             on_generated(resp.responseJSON)  })
-        
-}, false);    
+        $.ajax({
+            url: 'https://accgen.cathook.club/userapi/recaptcha/getemail'
+        }).done(function (emailresp) {
+            emailresp = JSON.parse(emailresp);
+            $.ajax({
+                url: "https://store.steampowered.com/join/"
+            }).done(function (resp) {
+                var gid = resp.split('id="captchagid" value="')[1].split("\"")[0];
+                $.ajax({
+                    url: "https://store.steampowered.com/join/ajaxverifyemail",
+                    method: 'POST',
+                    data: JSON.stringify({
+                        email: emailresp.email,
+                        captchagid: gid,
+                        captcha_text: e.data
+                    })
+                }).done(function (resp) {
+                    resp = JSON.parse(resp);
+                    switch (resp.status) {
+                        case 17:
+                            on_generated({
+                                error: 'Email Domain banned.. Please wait for us to update it'
+                            })
+                            break;
+                        case 101:
+                            on_generated({
+                                error: 'Recaptcha solution incorrect!'
+                            });
+                            break;
+                        case 1:
+                            $.ajax({
+                                url: "https://accgen.cathook.club/userapi/addtask/" + emailresp.email
+                            }).done(function (resp) {
+                                on_generated(resp)
+                            }).fail(function (resp) {
+                                on_generated(resp.responseJSON)
+                            })
+                            break;
+                        default:
+                            on_generated({
+                                error: 'Unknown error during registration.'
+                            });
+                    }
+                }).fail(function (resp) {
+                    on_generated({
+                        error: 'Unknown error during registration!'
+                    })
+                })
+            }).fail(function (resp) {
+                on_generated({
+                    error: "Failed to fetch Steam's page. You might not have the addon installed"
+                })
+            })
+        })
 
+    }, false);
 }
+
 
 function on_count_received(resp) {
     $("#account_count").prop("count", (localStorage.getItem("account_count") || 0)).animate({
@@ -66,7 +114,6 @@ function history_pressed() {
 
 }
 
-
 function perform_count_check() {
     $.ajax({
         url: "https://accgen.cathook.club/api/v1/count"
@@ -76,10 +123,10 @@ function perform_count_check() {
 }
 
 function on_generated(acc_data) {
-    document.getElementById('innerdiv').src="https://store.steampowered.com/join/";
+    document.getElementById('innerdiv').src = "https://store.steampowered.com/join/";
     $("#generate_progress").hide()
     $("#recap_steam").hide()
-                  
+
 
     if (acc_data.error) {
         $("#generate_error").show("slow")
@@ -105,33 +152,14 @@ function on_generated(acc_data) {
     }
 }
 
-function on_captcha_valid(token) {
-    init()
-
-    $("#generate_button").hide()
-    $("#generate_progress").show("slow")
-
-    $.ajax({
-        url: "https://accgen.cathook.club/userapi/acc/v2/" + token
-    }).done(function (resp) {
-        on_generated(resp)
-    })
-
-    grecaptcha.reset()
-}
-
-var v3_loaded = false;
-var v2_loaded = false;
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function generate_pressed() {
     $("#generated_accs_table_card").hide();
-    
     $("#generate_button").hide();
-    $("#recap_steam").show()
+    $("#recap_steam").show();
 }
 
 function on_v2_load() {
