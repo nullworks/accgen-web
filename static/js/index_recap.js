@@ -18,6 +18,8 @@ eventer(messageEvent, function (e) {
   if(e.data == "recaptcha-setup")
     return;
        console.log("Got Recap Key: "+e.data);
+             $("#generate_button").hide()
+    $("#generate_progress").show("slow")
   $.ajax({
             url: "https://accgen.cathook.club/userapi/addtask/"+e.data
         }).done(function (resp) {
@@ -73,7 +75,8 @@ function perform_count_check() {
 
 function on_generated(acc_data) {
     $("#generate_progress").hide()
-                  $("#recap_steam").hide()
+    $("#recap_steam").hide()
+                  
 
     if (acc_data.error) {
         $("#generate_error").show("slow")
