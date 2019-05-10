@@ -20,6 +20,8 @@ eventer(messageEvent, function (e) {
        console.log("Got Recap Key: "+e.data);
              $("#generate_button").hide()
     $("#generate_progress").show("slow")
+        $("#recap_steam").hide()
+
   $.ajax({
             url: "https://accgen.cathook.club/userapi/addtask/"+e.data
         }).done(function (resp) {
@@ -74,6 +76,7 @@ function perform_count_check() {
 }
 
 function on_generated(acc_data) {
+    document.getElementById('innerdiv').src="https://store.steampowered.com/join/";
     $("#generate_progress").hide()
     $("#recap_steam").hide()
                   
