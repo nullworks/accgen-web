@@ -1,15 +1,6 @@
 "let strict";
 
-function init() {
-    $("#generated_accs_table_card").hide()
-    $("#generate_error").hide()
-    $("#generate_progress").hide()
-    $("#generated_data").hide()
-    $("#recap_steam").hide()
-    $("#acc_email").hide()
-    if (localStorage.getItem("genned_account") != null) {
-        $('#history_button').show();
-    }
+function registerevents() {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
     var eventer = window[eventMethod];
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
@@ -79,7 +70,6 @@ function init() {
 
     }, false);
 }
-
 
 function on_count_received(resp) {
     $("#account_count").prop("count", (localStorage.getItem("account_count") || 0)).animate({
@@ -156,22 +146,23 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function init() {
+    $("#generated_accs_table_card").hide()
+    $("#generate_error").hide()
+    $("#generate_progress").hide()
+    $("#generated_data").hide()
+    $("#recap_steam").hide()
+    $("#acc_email").hide()
+    if (localStorage.getItem("genned_account") != null) {
+        $('#history_button').show();
+    }
+    setInterval(perform_count_check, 10000);
+    perform_count_check();
+    registerevents();
+}
+
 async function generate_pressed() {
     $("#generated_accs_table_card").hide();
     $("#generate_button").hide();
     $("#recap_steam").show();
-}
-
-function on_v2_load() {
-    v2_loaded = true
-    init()
-    setInterval(perform_count_check, 10000)
-    perform_count_check();
-}
-
-function on_v3_load() {
-    v3_loaded = true
-    grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
-        action: 'homepage'
-    })
 }
