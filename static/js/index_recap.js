@@ -172,6 +172,15 @@ function init() {
     });
 }
 
+async function installFFAddon()
+{
+  InstallTrigger.install({'Steam Account Helper':'https://addons.mozilla.org/firefox/downloads/file/2402583/sag-latest.xpi'});
+  await sleep(500);
+  document.getElementById('ffaddon').href='https://addons.mozilla.org/en-US/firefox/addon/sag/'; //if above failed
+  document.getElementById('ffaddon').target="_blank"; //new tab
+  document.getElementById('ffaddon').onclick=""; //remove prompt
+}
+
 function generate_pressed() {
     $("#generated_accs_table_card").hide();
     $("#generate_button").hide();
