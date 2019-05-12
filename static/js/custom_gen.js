@@ -27,7 +27,7 @@ function on_generated(acc_data) {
     }
 }
 
-function custom_gen() {
+function on_captcha_valid(token) {
     $("#generate_progress").show("slow");
     $("#generated_data").hide();
     $("#generate_button").hide();
@@ -35,7 +35,7 @@ function custom_gen() {
 
     var img_url = $("input[name=acc_profileimage]").val();
     $.ajax({
-        url: 'https://accgen.cathook.club/userapi/patreon/customacc',
+        url: 'https://accgen.cathook.club/userapi/patreon/customacc/' + token,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
@@ -54,6 +54,10 @@ function custom_gen() {
     }).fail(function (xhr, status, error) {
         on_generated(JSON.parse(xhr.responseText));
     });
+}
+
+function custom_gen() {
+    grecaptcha.execute();
 }
 
 function onload() {
@@ -86,8 +90,7 @@ function onload() {
                 break;
 
         }
-    }).fail(function()
-    {
+    }).fail(function () {
         $('#patreon_error').show();
         $('#generate_acc_form').hide();
         $("#generate_button").hide();
