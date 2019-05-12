@@ -32,6 +32,7 @@ function on_captcha_valid(token) {
     $("#generated_data").hide();
     $("#generate_button").hide();
     $("#generate_error").hide();
+    grecaptcha.reset();
 
     var img_url = $("input[name=acc_profileimage]").val();
     $.ajax({
