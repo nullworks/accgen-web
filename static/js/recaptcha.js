@@ -12,6 +12,8 @@ function registerevents() {
     eventer(messageEvent, function (e) {
         if (e.data == "recaptcha-setup")
             return;
+        if (typeof e.data !== 'string' || e.data.length < 200)
+            return;
         $("#generate_button").hide();
         $("#generate_progress").show("slow");
         $("#recap_steam").hide();
@@ -209,7 +211,7 @@ function changeText() {
             document.getElementById('ffaddon').href = 'https://chrome.google.com/webstore/detail/sag/piljlfgibadchadlhlcfoecfbpdeiemd';
             document.getElementById('ffaddon').target = "_blank";
             document.getElementById('ffaddon').onclick = "";
-             break;
+            break;
         default:
             return AddonsNotSupported();
     }
