@@ -10,12 +10,18 @@ function registerevents() {
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
     eventer(messageEvent, function (e) {
-        if(e.origin != "https://store.steampowered.com")
+        if (e.origin != "https://store.steampowered.com")
             return
         if (e.data == "recaptcha-setup")
             return;
         if (typeof e.data !== 'string' || e.data.length < 200)
             return;
+        if (e.data.split(";").length != 2) {
+            alert("Invalid data received from steam");
+            return;
+        }
+        var gid = e.data.split(";")[1];
+        var recap_token = e.data.split(";")[0];
         $("#generate_button").hide();
         $("#generate_progress").show("slow");
         $("#recap_steam").hide();
@@ -24,56 +30,49 @@ function registerevents() {
             url: 'https://accgen.cathook.club/userapi/recaptcha/getemail'
         }).done(function (emailresp) {
             $.ajax({
-                url: "https://store.steampowered.com/join/"
-            }).done(function (resp) {
-                var gid = resp.split('id="captchagid" value="')[1].split("\"")[0];
-                $.ajax({
-                    url: "https://store.steampowered.com/join/ajaxverifyemail",
-                    method: 'POST',
-                    data: stringifyQueryString({
-                        email: emailresp.email,
-                        captchagid: gid,
-                        captcha_text: e.data
-                    })
-                }).done(function (resp) {
-                    switch (resp.success) {
-                        case 17:
-                            on_generated({
-                                error: 'Email Domain banned.. Please wait for us to update it'
-                            })
-                            break;
-                        case 101:
-                            on_generated({
-                                error: 'Recaptcha solution incorrect!'
-                            });
-                            break;
-                        case 1:
-                            $.ajax({
-                                url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email
-                            }).done(function (resp) {
-                                on_generated(resp)
-                                console.log(resp);
-                            }).fail(function (resp) {
-                                on_generated(resp.responseJSON)
-                            })
-                            break;
-                        default:
-                            console.log(resp.success);
-                            on_generated({
-                                error: 'Unknown error during registration.'
-                            });
-                    }
-                }).fail(function (resp) {
-                    on_generated({
-                        error: 'Unknown error during registration!'
-                    })
+                url: "https://store.steampowered.com/join/ajaxverifyemail",
+                method: 'POST',
+                data: stringifyQueryString({
+                    email: emailresp.email,
+                    captchagid: gid,
+                    captcha_text: recap_token
                 })
+            }).done(function (resp) {
+                switch (resp.success) {
+                    case 17:
+                        on_generated({
+                            error: 'Email Domain banned.. Please wait for us to update it'
+                        })
+                        break;
+                    case 101:
+                        on_generated({
+                            error: 'Recaptcha solution incorrect!'
+                        });
+                        break;
+                    case 1:
+                        $.ajax({
+                            url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email
+                        }).done(function (resp) {
+                            on_generated(resp)
+                            console.log(resp);
+                        }).fail(function (resp) {
+                            on_generated(resp.responseJSON)
+                        })
+                        break;
+                    default:
+                        console.log(resp.success);
+                        on_generated({
+                            error: 'Unknown error during registration.'
+                        });
+                }
             }).fail(function (resp) {
                 on_generated({
-                    error: "Failed to fetch Steam's page. You might not have the addon installed"
+                    error: 'Unknown error during registration!'
                 })
             })
+
         })
+
 
     }, false);
 }
@@ -262,12 +261,14 @@ function init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function() { $("#generate_button").show();}).fail(function (resp) {
+    }).done(function () {
+        $("#generate_button").show();
+    }).fail(function (resp) {
         $("#addon_dl").show();
         $("#accgen_ui").hide();
-       $("#generate_button").hide();
+        $("#generate_button").hide();
     });
-  
+
 
     changeText();
 }
