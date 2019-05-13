@@ -222,7 +222,7 @@ async function installAddon() {
     switch (GetBrowser()) {
         case "Firefox":
             InstallTrigger.install({
-                'Steam Account Helper': 'https://addons.mozilla.org/firefox/downloads/file/2402583/sag-latest.xpi'
+                'Steam Account Helper': 'https://addons.mozilla.org/firefox/downloads/latest/sag/'
             });
             // Don't redirect to addon page if doubleclicking
             await sleep(500);
