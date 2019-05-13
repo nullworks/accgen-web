@@ -40,11 +40,13 @@ function registerevents() {
             }).done(function (resp) {
                 switch (resp.success) {
                     case 17:
+                        gtag('event', 'email_banned');
                         on_generated({
                             error: 'Email Domain banned.. Please wait for us to update it'
                         })
                         break;
                     case 101:
+                        gtag('event', 'newgen_fail_2');
                         on_generated({
                             error: 'Recaptcha solution incorrect!'
                         });
@@ -53,9 +55,11 @@ function registerevents() {
                         $.ajax({
                             url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email
                         }).done(function (resp) {
+                            gtag('event', 'newgen_success');
                             on_generated(resp)
                             console.log(resp);
                         }).fail(function (resp) {
+                            gtag('event', 'newgen_fail_3');
                             on_generated(resp.responseJSON)
                         })
                         break;
@@ -175,6 +179,7 @@ function GetBrowser() {
         return "Edge";
     if ((!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0)
         return "Opera";
+    gtag('event', 'newgen_unsupported_browser');
     return "Unsupported";
 }
 
