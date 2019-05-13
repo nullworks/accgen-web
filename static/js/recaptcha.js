@@ -262,10 +262,12 @@ function init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).fail(function (resp) {
+    }).done(function() { $("#generate_button").show();}).fail(function (resp) {
         $("#addon_dl").show();
         $("#accgen_ui").hide();
+       $("#generate_button").hide();
     });
+  
 
     changeText();
 }
