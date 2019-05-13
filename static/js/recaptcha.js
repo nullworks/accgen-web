@@ -10,6 +10,7 @@ function registerevents() {
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
     eventer(messageEvent, function (e) {
+        console.log("received a message from :"+e.origin);
         if (e.data == "recaptcha-setup")
             return;
         if (typeof e.data !== 'string' || e.data.length < 200)
