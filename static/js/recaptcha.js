@@ -206,7 +206,7 @@ function changeText() {
             if (isMobile())
                 return AddonsNotSupported();
             document.getElementById("addon_download_text").textContent = "You don't have our Opera addon yet!";
-            document.getElementById('ffaddon').href = 'https://chrome.google.com/webstore/detail/sag/piljlfgibadchadlhlcfoecfbpdeiemd';
+            document.getElementById('ffaddon').href = 'https://addons.opera.com/en/extensions/details/sag/';
             document.getElementById('ffaddon').target = "_blank";
             document.getElementById('ffaddon').onclick = "";
             break;
