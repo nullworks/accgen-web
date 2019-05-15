@@ -241,6 +241,7 @@ async function installAddon() {
 }
 
 function generate_pressed() {
+    $("#innerdiv").show()
     $("#generated_accs_table_card").hide();
     $("#generate_button").hide();
     $("#recap_steam").show();
