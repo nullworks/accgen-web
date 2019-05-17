@@ -4,6 +4,18 @@ function stringifyQueryString(params) {
     return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
 }
 
+function report_email(email) {
+    grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
+        action: 'vote_email'
+    }).then(function (token) {
+        $.ajax({
+            url: 'https://accgen.cathook.club/userapi/recaptcha/bademail/' + token
+        }).done(function (emailresp) {
+            console.log("Log: email reported ban");
+        })
+    })
+}
+
 function registerevents() {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
     var eventer = window[eventMethod];
@@ -41,6 +53,7 @@ function registerevents() {
                 switch (resp.success) {
                     case 17:
                         gtag('event', 'email_banned');
+                        report_email(emailresp.email.split("@")[1]);
                         on_generated({
                             error: 'Email Domain banned.. Please wait for us to update it'
                         })
@@ -52,15 +65,19 @@ function registerevents() {
                         });
                         break;
                     case 1:
-                        $.ajax({
-                            url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email
-                        }).done(function (resp) {
-                            gtag('event', 'newgen_success');
-                            on_generated(resp)
-                            console.log(resp);
-                        }).fail(function (resp) {
-                            gtag('event', 'newgen_fail_3');
-                            on_generated(resp.responseJSON)
+                        grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
+                            action: 'vote_email'
+                        }).then(function (token) {
+                            $.ajax({
+                                url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email + "/" + token
+                            }).done(function (resp) {
+                                gtag('event', 'newgen_success');
+                                on_generated(resp)
+                                console.log(resp);
+                            }).fail(function (resp) {
+                                gtag('event', 'newgen_fail_3');
+                                on_generated(resp.responseJSON)
+                            })
                         })
                         break;
                     default:
