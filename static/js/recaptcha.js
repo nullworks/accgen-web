@@ -1,9 +1,5 @@
 "let strict";
 
-function stringifyQueryString(params) {
-    return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
-}
-
 function report_email(email) {
     grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
         action: 'vote_email'
@@ -21,7 +17,7 @@ function registerevents() {
     var eventer = window[eventMethod];
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
-    eventer(messageEvent, function (e) {
+    eventer(messageEvent, async function (e) {
         if (e.origin != "https://store.steampowered.com")
             return
         if (e.data == "recaptcha-setup")
@@ -38,63 +34,67 @@ function registerevents() {
         $("#generate_progress").show("slow");
         $("#recap_steam").hide();
 
-        $.ajax({
-            url: 'https://accgen.cathook.club/userapi/recaptcha/getemail'
-        }).done(function (emailresp) {
-            $.ajax({
-                url: "https://store.steampowered.com/join/ajaxverifyemail",
-                method: 'POST',
-                data: stringifyQueryString({
-                    email: emailresp.email,
-                    captchagid: gid,
-                    captcha_text: recap_token
-                })
-            }).done(function (resp) {
-                switch (resp.success) {
-                    case 17:
-                        gtag('event', 'email_banned');
-                        report_email(emailresp.email.split("@")[1]);
-                        on_generated({
-                            error: 'Email Domain banned.. Please wait for us to update it'
-                        })
-                        break;
-                    case 101:
-                        gtag('event', 'newgen_fail_2');
-                        on_generated({
-                            error: 'Recaptcha solution incorrect!'
-                        });
-                        break;
-                    case 1:
-                        grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
-                            action: 'vote_email'
-                        }).then(function (token) {
-                            $.ajax({
-                                url: "https://accgen.cathook.club/userapi/recaptcha/addtask/" + emailresp.email + "/" + token
-                            }).done(function (resp) {
-                                gtag('event', 'newgen_success');
-                                on_generated(resp)
-                                console.log(resp);
-                            }).fail(function (resp) {
-                                gtag('event', 'newgen_fail_3');
-                                on_generated(resp.responseJSON)
-                            })
-                        })
-                        break;
-                    default:
-                        console.log(resp.success);
-                        on_generated({
-                            error: 'Unknown error during registration.'
-                        });
-                }
-            }).fail(function (resp) {
+
+        var count = 1;
+        var persistent = {
+            gid: gid,
+            recap: recap_token
+        };
+        var res = undefined;
+        var err = undefined;
+        while (!res || !(res.login || res.error)) {
+            res = await new Promise(function (resolve, reject) {
+                $.ajax({
+                    url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                    method: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        persistent: persistent,
+                        count: count
+                    }),
+                    success: function (returnData) {
+                        resolve(returnData);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr);
+                        // TODO: parse errors
+                        reject();
+                    }
+                });
+            }).catch(function () {
+                err = true;
+            });
+            if (err) {
                 on_generated({
-                    error: 'Unknown error during registration!'
-                })
-            })
-
-        })
-
-
+                    error: 'Error returned by SAG backend! Check console for details!'
+                });
+                break;
+            }
+            persistent = res.persistent;
+            if (res.ajax) {
+                await new Promise(function (resolve, reject) {
+                    $.ajax(
+                        res.ajax
+                    ).done(function (returnData) {
+                        resolve(returnData);
+                    }).fail(function (xhr, status, error) {
+                        console.error(xhr);
+                        reject();
+                    });
+                }).catch(function () {
+                    err = true;
+                });
+                if (err) {
+                    on_generated({
+                        error: 'Error while creating the Steam account! Check console for details!'
+                    });
+                    break;
+                }
+            }
+            count++;
+        }
+        on_generated(res);
     }, false);
 }
 
