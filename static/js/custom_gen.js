@@ -58,10 +58,33 @@ function on_captcha_valid(token) {
 }
 
 function custom_gen() {
+    localStorage.setItem("custom_gen_settings", JSON.stringify({
+        name: $("input[name=acc_username]").val(),
+        realName: $("input[name=acc_realname]").val(),
+        summary: $("textarea[name=acc_bio]").val(),
+        country: $("select[name=acc_country]").val(),
+        state: $("input[name=acc_state]").val(),
+        city: $("input[name=acc_city]").val(),
+        customURL: $("input[name=acc_profileurl]").val(),
+        image: $("input[name=acc_profileimage]").val()
+    }))
     grecaptcha.execute();
 }
 
 function onload() {
+    var data = localStorage.getItem("custom_gen_settings");
+    if (data != null) {
+        data = JSON.parse(data);
+        $("input[name=acc_username]").val(data.name);
+        $("input[name=acc_realname]").val(data.realName);
+        $("textarea[name=acc_bio]").val(data.summary),
+        $("select[name=acc_country]").val(data.country),
+        $("input[name=acc_state]").val(data.state),
+        $("input[name=acc_city]").val(data.city),
+        $("input[name=acc_profileurl]").val(data.customURL),
+        $("input[name=acc_profileimage]").val(data.image);
+    }
+
     $.ajax({
         url: 'https://accgen.cathook.club/patreon/check',
         type: 'GET'
