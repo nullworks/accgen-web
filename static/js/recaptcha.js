@@ -98,7 +98,7 @@ function registerevents() {
     }, false);
 }
 
-function on_count_received(resp) {
+/*function on_count_received(resp) {
     $("#account_count").prop("count", (localStorage.getItem("account_count") || 0)).animate({
         count: parseInt(resp)
     }, {
@@ -110,7 +110,7 @@ function on_count_received(resp) {
     })
 
     localStorage.setItem("account_count", resp)
-}
+}*/
 
 function history_pressed() {
     $('#genned_accs').empty()
@@ -131,13 +131,13 @@ function history_pressed() {
 
 }
 
-function perform_count_check() {
+/*function perform_count_check() {
     $.ajax({
         url: "https://accgen.cathook.club/api/v1/count"
     }).done(function (resp) {
         on_count_received(resp)
     })
-}
+}*/
 
 function on_generated(acc_data) {
     document.getElementById('innerdiv').src = "https://store.steampowered.com/join/";
@@ -277,8 +277,8 @@ function init() {
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
-    setInterval(perform_count_check, 10000);
-    perform_count_check();
+    //setInterval(perform_count_check, 10000);
+    //perform_count_check();
     registerevents();
 
     // Check if addon installed
