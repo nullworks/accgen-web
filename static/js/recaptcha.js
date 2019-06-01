@@ -59,21 +59,26 @@ function registerevents() {
                     error: function (xhr, status, error) {
                         console.error(xhr);
                         // TODO: parse errors
-                        reject();
+                        reject(xhr.responseJSON);
                     }
                 });
-            }).catch(function () {
-                err = true;
+            }).catch(function (error) {
+                err = error ? error : true;
+                console.log(err);
             });
             if (err) {
+                if (err.error) {
+                    on_generated(err);
+                    return;
+                }
                 on_generated({
                     error: 'Error returned by SAG backend! Check console for details!'
                 });
-                break;
+                return;
             }
             persistent = res.persistent;
             if (res.ajax) {
-                await new Promise(function (resolve, reject) {
+                var reply = await new Promise(function (resolve, reject) {
                     $.ajax(
                         res.ajax
                     ).done(function (returnData) {
@@ -85,11 +90,40 @@ function registerevents() {
                 }).catch(function () {
                     err = true;
                 });
+                console.log(reply)
+                if (!err && reply && reply.success) {
+                    switch (reply.success) {
+                        case 84:
+                            on_generated({
+                                error: 'Steam is limitting your account creations. Try again later.'
+                            });
+                            err = 2;
+                            break;
+                        case 101:
+                            on_generated({
+                                error: 'Captcha failed or IP banned by steam (vpn).'
+                            });
+                            err = 2;
+                            break;
+                        case 17:
+                            on_generated({
+                                error: 'Email banned (Please contact us! https://t.me/sag_bot_chat)'
+                            });
+                            err = 2;
+                            break;
+                        case 1:
+                            break;
+                        default:
+                            err = 1;
+                            break;
+                    }
+                }
                 if (err) {
-                    on_generated({
-                        error: 'Error while creating the Steam account! Check console for details!'
-                    });
-                    break;
+                    if (err == 1)
+                        on_generated({
+                            error: 'Error while creating the Steam account! Check console for details!'
+                        });
+                    return;
                 }
             }
             count++;
@@ -98,7 +132,7 @@ function registerevents() {
     }, false);
 }
 
-function on_count_received(resp) {
+/*function on_count_received(resp) {
     $("#account_count").prop("count", (localStorage.getItem("account_count") || 0)).animate({
         count: parseInt(resp)
     }, {
@@ -110,7 +144,7 @@ function on_count_received(resp) {
     })
 
     localStorage.setItem("account_count", resp)
-}
+}*/
 
 function history_pressed() {
     $('#genned_accs').empty()
@@ -131,13 +165,13 @@ function history_pressed() {
 
 }
 
-function perform_count_check() {
+/*function perform_count_check() {
     $.ajax({
         url: "https://accgen.cathook.club/api/v1/count"
     }).done(function (resp) {
         on_count_received(resp)
     })
-}
+}*/
 
 function on_generated(acc_data) {
     document.getElementById('innerdiv').src = "https://store.steampowered.com/join/";
@@ -277,8 +311,8 @@ function init() {
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
-    setInterval(perform_count_check, 10000);
-    perform_count_check();
+    /*setInterval(perform_count_check, 10000);
+    perform_count_check();*/
     registerevents();
 
     // Check if addon installed
