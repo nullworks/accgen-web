@@ -30,10 +30,22 @@ function registerevents() {
         }
         var gid = e.data.split(";")[1];
         var recap_token = e.data.split(";")[0];
-        $("#generate_button").hide();
         $("#generate_progress").show("slow");
-        $("#recap_steam").hide();
+        $('#recap').hide();
+        $('#accgen_ui').hide();
+        $("#generate_error").hide();
+        $("#generated_data").hide();
 
+        localStorage.setItem("custom_gen_settings", JSON.stringify({
+            name: $("input[name=acc_username]").val(),
+            realName: $("input[name=acc_realname]").val(),
+            summary: $("textarea[name=acc_bio]").val(),
+            country: $("select[name=acc_country]").val(),
+            state: $("input[name=acc_state]").val(),
+            city: $("input[name=acc_city]").val(),
+            customURL: $("input[name=acc_profileurl]").val(),
+            image: $("input[name=acc_profileimage]").val()
+        }))
 
         var count = 1;
         var persistent = {
@@ -153,16 +165,18 @@ function registerevents() {
     }, false);
 }
 
-
 function on_generated(acc_data) {
-    $("#generate_progress").hide()
-
+    $("#generate_progress").hide();
+    $("#recap").show();
+    $("#accgen_ui").show();
+    document.getElementById('innerdiv').src = "https://store.steampowered.com/join/";
+   
     if (acc_data.error) {
         $("#generate_error").show("slow")
         $("#generate_error_text").text(acc_data.error);
         $("#generate_button").show("slow")
         if (localStorage.getItem("genned_account") != null) {
-            $('#history_button').show();
+            //$('#history_button').show();
         }
         return;
     }
@@ -177,28 +191,13 @@ function on_generated(acc_data) {
     $("#generated_data").show("slow")
     $("#generate_button").show("slow")
     if (localStorage.getItem("genned_account") != null) {
-        $('#history_button').show();
+        //$('#history_button').show();
     }
 }
 
 function on_captcha_valid(token) {
 
 }
-
-function custom_gen() {
-    localStorage.setItem("custom_gen_settings", JSON.stringify({
-        name: $("input[name=acc_username]").val(),
-        realName: $("input[name=acc_realname]").val(),
-        summary: $("textarea[name=acc_bio]").val(),
-        country: $("select[name=acc_country]").val(),
-        state: $("input[name=acc_state]").val(),
-        city: $("input[name=acc_city]").val(),
-        customURL: $("input[name=acc_profileurl]").val(),
-        image: $("input[name=acc_profileimage]").val()
-    }))
-    grecaptcha.execute();
-}
-
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -308,8 +307,8 @@ function onload() {
         url: 'https://accgen.cathook.club/patreon/check',
         type: 'GET'
     }).done(function (data) {
-        /*  0 - needs to login
-            1 - all good
+        /*  0 - success
+            1 - login
             2 - needs to pledge
             3 - unknown error
         */
@@ -318,24 +317,40 @@ function onload() {
         switch (data) {
             case 1:
                 $('#patreon_signin').show();
-                $('#generate_acc_form').hide();
+                $('#accgen_ui').hide();
+                $('#recap').hide()
                 $("#generate_button").hide();
                 break;
             case 2:
                 $('#patreon_pay').show();
-                $('#generate_acc_form').hide();
+                $('#accgen_ui').hide();
+                $('#recap').hide()
                 $("#generate_button").hide();
                 break;
             case 3:
                 $('#patreon_error').show();
-                $('#generate_acc_form').hide();
+                $('#accgen_ui').hide();
+                $('#recap').hide()
                 $("#generate_button").hide();
                 break;
-
+            case 0:
+                $.ajax({
+                    url: "https://store.steampowered.com/join/"
+                }).done(function () {
+                    $("#generate_button").show();
+                }).fail(function () {
+                    $("#addon_dl").show();
+                    $("#accgen_ui").hide();
+                    $("#recap").hide();
+                    //$("#history_button").hide();
+                });
+                break;
         }
     }).fail(function () {
         $('#patreon_error').show();
         $('#accgen_ui').hide();
-        $("#generate_button").hide();
+        //$("#history_button").hide();
+        return
     });
+
 }
