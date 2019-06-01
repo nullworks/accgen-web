@@ -290,6 +290,7 @@ async function installAddon() {
 
 
 function onload() {
+    registerevents();
     var data = localStorage.getItem("custom_gen_settings");
     if (data != null) {
         data = JSON.parse(data);
