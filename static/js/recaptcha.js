@@ -93,16 +93,33 @@ function registerevents() {
                 console.log(reply)
                 if (!err && reply && reply.success) {
                     switch (reply.success) {
+                        case 13:
+                            on_generated({
+                                error: 'The email chosen by our system was invalid. Please Try again.'
+                            });
+                            err = 2;
+                            break;
+                        case 14:
+                            on_generated({
+                                error: 'The account name our system chose was not available. Please Try again.'
+                            });
+                            err = 2;
+                            break;
                         case 84:
                             on_generated({
-                                error: 'Steam is limitting your account creations. Try again later.'
+                                error: 'Steam is limitting account creations from your IP. Try again later.'
                             });
                             err = 2;
                             break;
                         case 101:
-                            on_generated({
-                                error: 'Captcha failed or IP banned by steam (vpn).'
-                            });
+                            if (reply.details == "Please verify your humanity by re-entering the characters below.")
+                                on_generated({
+                                    error: 'Invalid Captcha'
+                                });
+                            else
+                                on_generated({
+                                    error: 'Steam has banned account creations from this IP (VPN/Proxy)'
+                                });
                             err = 2;
                             break;
                         case 17:
