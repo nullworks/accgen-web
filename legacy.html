@@ -26,19 +26,6 @@
       content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
    <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
 
-   <script src="static/js/jquery.min.js"></script>
-   <script src="static/js/index.js"></script>
-   <!--V3-->
-   <script
-      src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM&onload=on_v3_load">
-   </script>
-   <!--V2-->
-   <script src="https://recaptcha.net/recaptcha/api.js?onload=on_v2_load" async defer></script>
-
-   <div class="g-recaptcha" data-sitekey="6Leuh5EUAAAAALediEIgey5dKbm1_P97zvzxjgvC" data-callback="on_captcha_valid"
-      data-size="invisible" data-theme="dark">
-   </div>
-
    <ul class="nav nav-tabs">
       <li class="nav-item">
          <a class="nav-link active" data-toggle="tab" href="index.html"
@@ -72,91 +59,13 @@
 
 <body>
    <div class="container text-center" style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%">
-      <div class="alert alert-primary">Only browsers with addon support are supported.
-         <a href="https://www.firefox.com/download">Firefox Android and Mobile</a>
-         <a href="https://www.google.com/intl/en_sg/chrome/">Chrome PC</a>
-         <a href="https://www.opera.com/download">Opera PC</a>
-         <a href="https://browser.yandex.com/">Yandex PC</a>
-         and other browsers which support loading Chrome/Firefox addons.
-      </div>
-
       <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
-      <h3 style=" color: grey;margin-bottom: -.5rem "><strong id="account_count">0</strong> accounts in database</h3>
-      <br>
-      <div id="generate_error" class="alert alert-danger" style="display: none;">
-         <strong>An error has occured:</strong>
-         <div id="generate_error_text"></div>
-      </div>   
-      <div id="generated_data" style="display: none;">
-         <div id="generated_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
-            <div class="card-header">Account information</div>
-            <div class="card-body">
-               <h6 id="acc_login" class="card-text">
-                  Login: <strong>niceaccount</strong>
-                  <p></p>
-               </h6>
-               <h6 id="acc_pass" class="card-text">
-                  Password: <strong>nicepass</strong>
-                  <p></p>
-               </h6>
-               <h6 id="acc_email" class="card-text">
-                  E-Mail address: niceaccount@inboxkitten.com
-                  <p></p>
-               </h6>
-            </div>
-         </div>
-      </div>
-
-      <div id="generated_data" style="display: none;">
-         <div id="generated_accs_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
-            <div class="card-header">Account information</div>
-            <div class="card-body">
-               <h6 id="acc_login" class="card-text">
-                  Login: <strong>niceaccount</strong>
-                  <p></p>
-               </h6>
-               <h6 id="acc_pass" class="card-text">
-                  Password: <strong>nicepass</strong>
-                  <p></p>
-               </h6>
-               <h6 id="acc_email" class="card-text" style="display: none;">
-                  E-Mail address: niceaccount@inboxkitten.com
-                  <p></p>
-               </h6>
-            </div>
-         </div>
-      </div>
-      <div id="generated_accs_table_card" class="card border-dark mb-3"
-         style="max-width: 33rem;margin:auto;display: none;">
-         <table class="table table-hover">
-            <thead>
-               <tr>
-                  <th scope="col">Username</th>
-                  <th scope="col">Password</th>
-               </tr>
-            </thead>
-            <tbody id="genned_accs">
-
-            </tbody>
-         </table>
-      </div>
-
-      <button id="generate_button" type="button" onclick="gtag('event', 'generate');generate_pressed();"
-         class="btn btn-primary btn-lg"
-         style="color: darkgrey;  margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;"
-         data-darkreader-inline-color="">Generate</button>
-      <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
-         class="btn btn-primary btn-lg"
-         style="display: none;color: darkgrey; margin-bottom: 2rem; --darkreader-inline-color:#ccc6bd;"
-         data-darkreader-inline-color="">History</button>
-
-
-      <div id="generate_progress" style="display: none;">
-         <h5>Please wait, generating...</h5>
-         <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
-               aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-         </div>
+      <div class="alert alert-danger">Only browsers with addon support are supported.
+         <br><a href="https://www.firefox.com/download">Firefox Android and Mobile</a>
+         <br><a href="https://www.google.com/intl/en_sg/chrome/">Chrome PC</a>
+         <br><a href="https://www.opera.com/download">Opera PC</a>
+         <br><a href="https://browser.yandex.com/">Yandex PC</a>
+         <br>and other browsers which support loading Chrome/Firefox addons.
       </div>
    </div>
 </body>
