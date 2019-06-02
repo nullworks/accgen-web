@@ -99,6 +99,7 @@ function registerevents() {
                             });
                             err = 2;
                             break;
+                            
                         case 14:
                             on_generated({
                                 error: 'The account name our system chose was not available. Please Try again.'
