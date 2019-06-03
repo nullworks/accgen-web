@@ -131,13 +131,8 @@ function registerevents() {
                             err = 2;
                             break;
                         case 101:
-                            if (reply.details == "Please verify your humanity by re-entering the characters below.")
                                 on_generated({
-                                    error: 'Invalid Captcha'
-                                });
-                            else
-                                on_generated({
-                                    error: 'Steam has banned account creations from this IP (VPN/Proxy)'
+                                    error: 'Captcha failed or IP banned by steam (vpn?)'
                                 });
                             err = 2;
                             break;
