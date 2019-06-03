@@ -75,7 +75,7 @@
         <div class="card-header">Account information</div>
         <div class="card-body">
           <h6 id="acc_email" class="card-text">
-            Email: <strong>nicepass</strong>
+            Email: <strong>niceemail</strong>
             <p></p>
           </h6>
         </div>
@@ -92,7 +92,7 @@
         <input type="password" id="password" class="form-control" name="password"
           placeholder="Enter Password of the steam account">
       </div>
-      <button type="submit" onclick="submit_clicked()" class="btn btn-primary">Submit</button>
+      <button type="submit" onclick="gtag('event', 'email_recovery');submit_clicked()" class="btn btn-primary">Submit</button>
     </div>
   </div>
 </body>
