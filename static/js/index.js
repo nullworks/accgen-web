@@ -131,9 +131,9 @@ function registerevents() {
                             err = 2;
                             break;
                         case 101:
-                                on_generated({
-                                    error: 'Captcha failed or IP banned by steam (vpn?)'
-                                });
+                            on_generated({
+                                error: 'Captcha failed or IP banned by steam (vpn?)'
+                            });
                             err = 2;
                             break;
                         case 17:
@@ -163,19 +163,14 @@ function registerevents() {
     }, false);
 }
 
-/*function on_count_received(resp) {
-    $("#account_count").prop("count", (localStorage.getItem("account_count") || 0)).animate({
-        count: parseInt(resp)
-    }, {
-        duration: 4000,
-        easing: 'swing',
-        step: function (now) {
-            $("#account_count").text(Math.ceil(now))
-        }
-    })
-
-    localStorage.setItem("account_count", resp)
-}*/
+function on_status_received(resp) {
+    if (resp.status) {
+        document.getElementById("accgen_status_msg").textContent = resp.status;
+        $("#accgen_status").show("slow");
+    } else {
+        $("#accgen_status").hide("slow");
+    }
+}
 
 function history_pressed() {
     $('#genned_accs').empty()
@@ -196,13 +191,13 @@ function history_pressed() {
 
 }
 
-/*function perform_count_check() {
+function perform_status_check() {
     $.ajax({
-        url: "https://accgen.cathook.club/api/v1/count"
+        url: "https://accgen.cathook.club/api/v1/status"
     }).done(function (resp) {
-        on_count_received(resp)
+        on_status_received(resp)
     })
-}*/
+}
 
 function on_generated(acc_data) {
     document.getElementById('innerdiv').src = "https://store.steampowered.com/join/";
@@ -342,8 +337,8 @@ function init() {
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
-    /*setInterval(perform_count_check, 10000);
-    perform_count_check();*/
+    setInterval(perform_status_check, 10000);
+    perform_status_check();
     registerevents();
 
     // Check if addon installed

@@ -28,8 +28,7 @@
 
    <script src="static/js/jquery.min.js"></script>
    <script src="static/js/index.js"></script>
-   <script
-      src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
+   <script src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
    </script>
    <ul class="nav nav-tabs">
       <li class="nav-item">
@@ -68,6 +67,9 @@
 </head>
 
 <body>
+   <div id="accgen_status" style="display: none;" class="alert alert-danger">
+      <strong id="accgen_status_msg">If you see this, it's a bug :)</strong>
+   </div>
 
    <div id="addon_dl" class="container text-center"
       style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%;display: none;">
@@ -82,10 +84,12 @@
       style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%;">
       <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
       <div class="container text-center">
-            <div class="alert alert-info">You can now find the email for the steam accounts you generated before Recaptcha was implemented. This is useful for recovering your suspended steam accounts by contacting Steam support. <a href="recovery.html">Click here for recovery</a>
-            </div>
+         <div class="alert alert-info">You can now find the email for the steam accounts you generated before Recaptcha
+            was implemented. This is useful for recovering your suspended steam accounts by contacting Steam support. <a
+               href="recovery.html">Click here for recovery</a>
          </div>
-         <br>
+      </div>
+      <br>
       <div id="generate_error" class="alert alert-danger" style="display: none;">
          <strong>An error has occured:</strong>
          <div id="generate_error_text"></div>
@@ -144,16 +148,14 @@
          </table>
       </div>
       <div id="recap_steam">
-         <iframe id="innerdiv" height="700px" width="400px" src="https://store.steampowered.com/join/" scrolling="no" style="display: none;padding-left: 3rem;"
-            frameborder="0"></iframe>
+         <iframe id="innerdiv" height="700px" width="400px" src="https://store.steampowered.com/join/" scrolling="no"
+            style="display: none;padding-left: 3rem;" frameborder="0"></iframe>
       </div>
-      <button id="generate_button"  type="button" onclick="gtag('event', 'newgen_gen_clicked');generate_pressed();"
-         class="btn btn-primary btn-lg"
-         style="display: none; color: darkgrey; ; --darkreader-inline-color:#ccc6bd;"
+      <button id="generate_button" type="button" onclick="gtag('event', 'newgen_gen_clicked');generate_pressed();"
+         class="btn btn-primary btn-lg" style="display: none; color: darkgrey; ; --darkreader-inline-color:#ccc6bd;"
          data-darkreader-inline-color="">Generate</button>
       <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
-         class="btn btn-primary btn-lg"
-         style="display: none;color: darkgrey; --darkreader-inline-color:#ccc6bd;"
+         class="btn btn-primary btn-lg" style="display: none;color: darkgrey; --darkreader-inline-color:#ccc6bd;"
          data-darkreader-inline-color="">History</button>
 
 
