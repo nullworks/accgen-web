@@ -140,6 +140,7 @@ function registerevents() {
                             on_generated({
                                 error: 'Email banned (Please contact us! https://t.me/sag_bot_chat)'
                             });
+                            report_email();
                             err = 2;
                             break;
                         case 1:
