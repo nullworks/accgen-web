@@ -205,7 +205,6 @@ function on_generated(acc_data) {
     $("#generate_progress").hide()
     $("#recap_steam").hide()
 
-
     if (acc_data.error) {
         $("#generate_error").show("slow")
         $("#generate_error_text").text(acc_data.error)
@@ -222,6 +221,7 @@ function on_generated(acc_data) {
     localStorage.setItem("genned_account", JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
 
     $("#acc_login").html(`Login: <strong>${acc_data.login}</strong>`)
+    document.getElementById('acc_login').href = `https://steamcommunity.com/profiles/${acc_data.steamid}`
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow")
     $("#generate_button").show("slow")
