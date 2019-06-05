@@ -204,7 +204,7 @@ function on_generated(acc_data) {
     localStorage.setItem("genned_account", JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
 
     $("#acc_login").html(`Login: <strong>${acc_data.login}</strong>`)
-    document.getElementById('acc_login').href = `https://steamcommunity.com/profiles/${acc_data.steamid}`
+    $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow")
     $("#generate_button").show("slow")
