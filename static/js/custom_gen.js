@@ -12,6 +12,10 @@ function report_email(email) {
     })
 }
 
+function stringifyQueryString(params) {
+    return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+}
+
 function registerevents() {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
     var eventer = window[eventMethod];
