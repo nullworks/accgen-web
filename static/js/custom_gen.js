@@ -136,7 +136,7 @@ function registerevents() {
                             break;
                         case 17:
                             on_generated({
-                                error: 'Email banned (Please contact us! https://t.me/sag_bot_chat)'
+                                error: 'Email banned (Please contact us! <a href="https://t.me/sag_bot_chat">https://t.me/sag_bot_chat</a>)'
                             });
                             err = 2;
                             break;
@@ -190,7 +190,7 @@ function on_generated(acc_data) {
 
     if (acc_data.error) {
         $("#generate_error").show("slow")
-        $("#generate_error_text").text(acc_data.error);
+        $("#generate_error_text").html(acc_data.error);
         $("#generate_button").show("slow")
         if (localStorage.getItem("genned_account") != null) {
             //$('#history_button').show();
