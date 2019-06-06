@@ -47,138 +47,245 @@ function registerevents() {
             image: $("input[name=acc_profileimage]").val()
         }))
 
-        var count = 1;
-        var persistent = {
-            gid: gid,
-            recap: recap_token
-        };
-        var res = undefined;
         var err = undefined;
-        while (!res || !(res.login || res.error)) {
-            res = await new Promise(function (resolve, reject) {
-                $.ajax({
-                    url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
-                    method: 'post',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        persistent: persistent,
-                        count: count
-                    }),
-                    success: function (returnData) {
-                        resolve(returnData);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error(xhr);
-                        // TODO: parse errors
-                        reject(xhr.responseJSON);
-                    }
-                });
-            }).catch(function (error) {
-                err = error ? error : true;
-                console.log(err);
-            });
-            if (err) {
-                if (err.error) {
-                    on_generated(err);
-                    return;
-                }
-                on_generated({
-                    error: 'Error returned by SAG backend! Check console for details!'
-                });
-                return;
-            }
-            persistent = res.persistent;
-            if (res.ajax) {
-                var reply = await new Promise(function (resolve, reject) {
-                    $.ajax(
-                        res.ajax
-                    ).done(function (returnData) {
-                        resolve(returnData);
-                    }).fail(function (xhr, status, error) {
-                        console.error(xhr);
-                        reject();
-                    });
-                }).catch(function () {
-                    err = true;
-                });
-                console.log(reply)
-                if (!err && reply && reply.success) {
-                    switch (reply.success) {
-                        case 13:
-                            on_generated({
-                                error: 'The email chosen by our system was invalid. Please Try again.'
-                            });
-                            err = 2;
-                            break;
-                        case 14:
-                            on_generated({
-                                error: 'The account name our system chose was not available. Please Try again.'
-                            });
-                            err = 2;
-                            break;
-                        case 84:
-                            on_generated({
-                                error: 'Steam is limitting account creations from your IP. Try again later.'
-                            });
-                            err = 2;
-                            break;
-                        case 101:
-                            if (reply.details == "Please verify your humanity by re-entering the characters below.")
-                                on_generated({
-                                    error: 'Invalid Captcha'
-                                });
-                            else
-                                on_generated({
-                                    error: 'Steam has banned account creations from this IP (VPN/Proxy)'
-                                });
-                            err = 2;
-                            break;
-                        case 17:
-                            on_generated({
-                                error: 'Email banned (Please contact us! <a href="https://t.me/sag_bot_chat">https://t.me/sag_bot_chat</a>)'
-                            });
-                            err = 2;
-                            break;
-                        case 1:
-                            break;
-                        default:
-                            err = 1;
-                            break;
-                    }
-                }
-                if (err) {
-                    if (err == 1)
-                        on_generated({
-                            error: 'Error while creating the Steam account! Check console for details!'
-                        });
-                    return;
-                }
-            }
-            count++;
-        }
-        if (!res.error) {
+        var data = await new Promise(function (resolve, reject) {
             $.ajax({
-                url: `https://accgen.cathook.club/userapi/patreon/customacc/${res.login}/${res.password}`,
-                type: 'POST',
+                url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                method: 'post',
+                dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    name: $("input[name=acc_username]").val(),
-                    realName: $("input[name=acc_realname]").val(),
-                    summary: $("textarea[name=acc_bio]").val(),
-                    country: $("select[name=acc_country]").val(),
-                    state: $("input[name=acc_state]").val(),
-                    city: $("input[name=acc_city]").val(),
-                    customURL: $("input[name=acc_profileurl]").val(),
-                    image: $("input[name=acc_profileimage]").val()
+                    step: "getdata"
                 }),
-                dataType: 'json'
-            }).done(function (data) {
-                on_generated(data);
-            }).fail(function (xhr, status, error) {
-                on_generated(JSON.parse(xhr.responseText));
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
             });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
+        if (err) {
+            if (err.error) {
+                on_generated(err);
+                return;
+            }
+            on_generated({
+                error: 'Error returned by SAG backend! Check console for details!'
+            });
+            return;
         }
+
+        var ajaxveryemail = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "https://store.steampowered.com/join/ajaxverifyemail",
+                method: 'POST',
+                data: stringifyQueryString({
+                    email: data.email,
+                    captchagid: gid,
+                    captcha_text: recap_token
+                }),
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
+        if (err) {
+            on_generated({
+                error: 'Error while creating the Steam account! Check console for details!'
+            });
+            return;
+        }
+        if (ajaxveryemail && ajaxveryemail.success) {
+            switch (ajaxveryemail.success) {
+                case 13:
+                    on_generated({
+                        error: 'The email chosen by our system was invalid. Please Try again.'
+                    });
+                    break;
+
+                case 14:
+                    on_generated({
+                        error: 'The account name our system chose was not available. Please Try again.'
+                    });
+                    break;
+                case 84:
+                    on_generated({
+                        error: 'Steam is limitting account creations from your IP. Try again later.'
+                    });
+                    break;
+                case 101:
+                    on_generated({
+                        error: 'Captcha failed or IP banned by steam (vpn?)'
+                    });
+                    break;
+                case 17:
+                    on_generated({
+                        error: 'Email banned (Please contact us! https://t.me/sag_bot_chat)'
+                    });
+                    report_email();
+                    break;
+                case 1:
+                    break;
+                default:
+                    on_generated({
+                        error: 'Error while creating the Steam account! Check console for details!'
+                    });
+                    break;
+            }
+        }
+
+        var verifydata = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    step: "getverify",
+                    email: data.email
+                }),
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
+        if (err) {
+            if (err.error) {
+                on_generated(err);
+                return;
+            }
+            on_generated({
+                error: 'Error returned by SAG backend! Check console for details!'
+            });
+            return;
+        }
+
+        await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: verifydata.verifylink,
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
+        if (err) {
+            on_generated({
+                error: 'Error while creating the Steam account! Check console for details!'
+            });
+            return;
+        }
+
+        var createaccount = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "https://store.steampowered.com/join/createaccount",
+                method: 'POST',
+                data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid,
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
+        if (err) {
+            on_generated({
+                error: 'Error while creating the Steam account! Check console for details!'
+            });
+            return;
+        }
+        if (!createaccount.bSuccess) {
+            on_generated({
+                error: 'Error while creating the Steam account! Check console for details!'
+            });
+            return;
+        }
+
+        var account = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    step: "steamguard",
+                    username: data.username,
+                    password: data.password,
+                    email: data.email
+                }),
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
+        if (err) {
+            if (err.error) {
+                on_generated(err);
+                return;
+            }
+            on_generated({
+                error: 'Error returned by SAG backend! Check console for details!'
+            });
+            return;
+        }
+
+        $.ajax({
+            url: `https://accgen.cathook.club/userapi/patreon/customacc/${account.login}/${account.password}`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                name: $("input[name=acc_username]").val(),
+                realName: $("input[name=acc_realname]").val(),
+                summary: $("textarea[name=acc_bio]").val(),
+                country: $("select[name=acc_country]").val(),
+                state: $("input[name=acc_state]").val(),
+                city: $("input[name=acc_city]").val(),
+                customURL: $("input[name=acc_profileurl]").val(),
+                image: $("input[name=acc_profileimage]").val()
+            }),
+            dataType: 'json'
+        }).done(function (data) {
+            on_generated(data);
+        }).fail(function (xhr, status, error) {
+            on_generated(JSON.parse(xhr.responseText));
+        });
     }, false);
 }
 
