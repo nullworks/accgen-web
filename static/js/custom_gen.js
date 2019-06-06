@@ -286,6 +286,7 @@ function registerevents() {
             }),
             dataType: 'json'
         }).done(function (data) {
+            data.steamid = account.steamid;
             on_generated(data);
         }).fail(function (xhr, status, error) {
             on_generated(JSON.parse(xhr.responseText));
