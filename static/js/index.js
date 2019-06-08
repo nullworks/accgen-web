@@ -68,6 +68,10 @@ function registerevents() {
         $("#generate_button").hide();
         $("#generate_progress").show("slow");
         $("#recap_steam").hide();
+        $("#custom_domain_div_parent").hide('slow');
+        $("#mx_error").hide("slow");
+        $("#custom_domain_button").hide();
+        $('#history_button').hide();
 
         var err = undefined;
         var custom_email = undefined;
@@ -332,16 +336,17 @@ function perform_status_check() {
 
 function on_generated(acc_data) {
     document.getElementById('innerdiv').src = "https://store.steampowered.com/join/";
-    $("#generate_progress").hide()
-    $("#recap_steam").hide()
+    $("#generate_progress").hide();
+    $("#recap_steam").hide();
+    $("#custom_domain_button").show();
+    $("#generate_button").show("slow");
+    if (localStorage.getItem("genned_account") != null) {
+        $('#history_button').show();
+    }
 
     if (acc_data.error) {
         $("#generate_error").show("slow")
         $("#generate_error_text").html(acc_data.error)
-        $("#generate_button").show("slow")
-        if (localStorage.getItem("genned_account") != null) {
-            $('#history_button').show();
-        }
         return;
     }
     if (localStorage.getItem("genned_account") == null) {
@@ -354,10 +359,6 @@ function on_generated(acc_data) {
     $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow")
-    $("#generate_button").show("slow")
-    if (localStorage.getItem("genned_account") != null) {
-        $('#history_button').show();
-    }
 }
 
 function sleep(ms) {
@@ -451,6 +452,7 @@ async function installAddon() {
 function custom_domain_pressed() {
     $("#save_settings").text("Save");
     $("#custom_domain_div_parent").toggle('slow');
+    $("#mx_error").hide("slow");
 }
 
 
