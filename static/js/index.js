@@ -531,7 +531,7 @@ function init() {
         url: "https://store.steampowered.com/join/"
     }).done(function () {
         $("#generate_button").show();
-        $("#generate_button").show();
+        $("#custom_domain_button").show();
     }).fail(function (resp) {
         $("#addon_dl").show();
         $("#accgen_ui").hide();
