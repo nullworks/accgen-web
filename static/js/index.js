@@ -16,6 +16,15 @@ function stringifyQueryString(params) {
     return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
 }
 
+function makeid(length) {
+    var result = '';
+    var characters = 'abcdefghijklmnopqrstuvwxyz';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
 
 function registerevents() {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
@@ -61,6 +70,10 @@ function registerevents() {
         $("#recap_steam").hide();
 
         var err = undefined;
+        var custom_email = undefined;
+
+        if ($("#settings_custom_domain").val() != "")
+            custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
         var data = await new Promise(function (resolve, reject) {
             $.ajax({
                 url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
@@ -98,7 +111,7 @@ function registerevents() {
                 url: "https://store.steampowered.com/join/ajaxverifyemail",
                 method: 'POST',
                 data: stringifyQueryString({
-                    email: data.email,
+                    email: custom_email ? custom_email : data.email,
                     captchagid: gid,
                     captcha_text: recap_token
                 }),
@@ -167,7 +180,7 @@ function registerevents() {
                 contentType: 'application/json',
                 data: JSON.stringify({
                     step: "getverify",
-                    email: data.email
+                    email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
                 }),
                 success: function (returnData) {
                     resolve(returnData);
@@ -254,7 +267,7 @@ function registerevents() {
                     step: "steamguard",
                     username: data.username,
                     password: data.password,
-                    email: data.email
+                    email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
                 }),
                 success: function (returnData) {
                     resolve(returnData);
@@ -307,7 +320,6 @@ function history_pressed() {
         })
 
     }
-
 }
 
 function perform_status_check() {
@@ -436,6 +448,34 @@ async function installAddon() {
     }
 }
 
+function custom_domain_pressed() {
+    $("#save_settings").text("Save");
+    $("#custom_domain_div_parent").toggle('slow');
+}
+
+
+function save_settings() {
+    $('input[type="text"]').each(function () {
+        var id = $(this).attr('id');
+        var value = $(this).val();
+        localStorage.setItem(id, value);
+    });
+    $("#save_settings").text("Saved!");
+    $("#custom_domain_div_parent").toggle('slow');
+}
+
+function settings_help() {
+    window.open("https://i.imgur.com/zxBii8n.png");
+}
+
+function load_settings() {
+    $('input[type="text"]').each(function () {
+        var id = $(this).attr('id');
+        var value = localStorage.getItem(id);
+        $(this).val(value);
+    });
+}
+
 function generate_pressed() {
     $("#innerdiv").show()
     $("#generated_accs_table_card").hide();
@@ -445,8 +485,34 @@ function generate_pressed() {
     $("#generate_error").hide();
 }
 
+async function isvalidmx(domain) {
+    var res = await new Promise(function (resolve, reject) {
+        $.ajax({
+            url: "https://accgen.cathook.club/userapi/isvalidmx/" + domain,
+            success: function (returnData) {
+                resolve(returnData);
+            },
+            error: function () {
+                reject();
+            }
+        });
+    }).catch(function () {
+        console.error('DNS lookup failed!');
+    })
+    if (!res || !res.valid)
+        return false;
+    return true;
+}
 
 function init() {
+    $('#settings_form').submit(function () {
+        gtag('event', 'settings_saved');
+        if (isvalidmx($("#settings_custom_domain").val())) {
+            save_settings();
+            $("#mx_error").hide("slow");
+        } else
+            $("#mx_error").show("slow");
+    });
     $("#generated_accs_table_card").hide()
     $("#generate_error").hide()
     $("#generate_progress").hide()
@@ -465,12 +531,12 @@ function init() {
         url: "https://store.steampowered.com/join/"
     }).done(function () {
         $("#generate_button").show();
+        $("#generate_button").show();
     }).fail(function (resp) {
         $("#addon_dl").show();
         $("#accgen_ui").hide();
         $("#generate_button").hide();
     });
-
-
+    load_settings()
     changeText();
 }
