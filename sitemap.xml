@@ -7,22 +7,17 @@
 
 <url>
   <loc>https://accgen.cathook.club/</loc>
-  <lastmod>2019-04-03T11:59:58+00:00</lastmod>
+  <lastmod>2019-06-08T21:41:33+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://accgen.cathook.club/index.html</loc>
-  <lastmod>2019-04-03T11:59:58+00:00</lastmod>
+  <loc>https://accgen.cathook.club/custom_gen.html</loc>
+  <lastmod>2019-06-05T10:14:19+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://accgen.cathook.club/stats.html</loc>
-  <lastmod>2019-04-03T11:59:58+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://accgen.cathook.club/telegram.html</loc>
-  <lastmod>2019-04-03T11:59:58+00:00</lastmod>
+  <loc>https://accgen.cathook.club/recovery.html</loc>
+  <lastmod>2019-06-04T08:48:49+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 

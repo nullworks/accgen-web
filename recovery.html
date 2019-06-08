@@ -16,12 +16,11 @@
 
   <meta charset="utf-8">
   <title>SAG - Email Recovery</title>
-  <meta name="description" content="Generate Steam accounts for personal usage.">
+  <meta name="description" content="Restore Steam accounts that were generated before recaptcha was added to Steam">
   <meta name="author" content="nullworks">
   <link rel="stylesheet" href="static/css/bootswatch.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="Description"
-    content="Online Steam Account Generator! Generate Steam accounts instantly! No Registeration required!">
+  <meta name="Description" content="Restore Steam accounts that were generated before recaptcha was added to Steam">
   <meta name="keywords"
     content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
   <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
@@ -30,15 +29,15 @@
   </script>
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="index.html"
-        onclick="gtag('event', 'homepage link');">Generator</a>
+      <a class="nav-link" data-toggle="tab" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
         Accounts</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="stats.html" onclick="gtag('event', 'stats link');">Stats</a>
+      <a class="nav-link active" data-toggle="tab" href="recovery.html" onclick="gtag('event', 'stats link');">Account
+        Recovery</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues"
@@ -92,7 +91,8 @@
         <input type="password" id="password" class="form-control" name="password"
           placeholder="Enter Password of the steam account">
       </div>
-      <button type="submit" onclick="gtag('event', 'email_recovery');submit_clicked()" class="btn btn-primary">Submit</button>
+      <button type="submit" onclick="gtag('event', 'email_recovery');submit_clicked()"
+        class="btn btn-primary">Submit</button>
     </div>
   </div>
 </body>

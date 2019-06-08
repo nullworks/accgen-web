@@ -20,30 +20,31 @@
   </script>
   <meta charset="utf-8">
   <title>Steam Account Generator</title>
-  <meta name="description" content="Generate Steam accounts for personal usage.">
+  <meta name="description" content="Generate Steam accounts with custom profile settings">
   <meta name="author" content="nullworks">
   <link rel="stylesheet" href="static/css/bootswatch.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="Description"
-    content="Online Steam Account Generator! Generate custom accounts using your patreon subscription!">
+  <meta name="Description" content="Generate Steam accounts with custom profile settings! Requires Patreon donation.">
   <meta name="keywords"
     content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
   <link href="static/favicon.ico" rel="icon" type="image/x-icon">
-  <script src="static/js/jquery.min.js"></script>
-  <script src="static/js/custom_gen.js"></script>
-  <style data-styled="" data-styled-version="4.2.0"></style>
 
+  <script defer src="static/js/jquery.min.js"></script>
+  <script defer src="static/js/common.js"></script>
+  <script defer src="static/js/custom_gen.js"></script>
+  <style data-styled="" data-styled-version="4.2.0"></style>
 
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="index.html" onclick="gtag('event', 'homepage link');">Generator</a>
+      <a class="nav-link" data-toggle="tab" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
     </li>
     <li class="nav-item">
       <a class="nav-link active" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
         Accounts</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="stats.html" onclick="gtag('event', 'stats link');">Stats</a>
+      <a class="nav-link" data-toggle="tab" href="recovery.html" onclick="gtag('event', 'stats link');">Account
+        Recovery</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues"
@@ -404,7 +405,7 @@
     <span style="color: rgb(205, 199, 188); text-align: center;">&nbsp;</span>
 
     <span style="color: rgb(205, 199, 188); text-align: center;">&nbsp;</span>
-  
+
     <div id="generate_progress" style="display: none;">
       <h5>Please wait, generating...</h5>
       <div class="progress">

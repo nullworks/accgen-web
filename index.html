@@ -16,7 +16,7 @@
 
    <meta charset="utf-8">
    <title>Steam Account Generator</title>
-   <meta name="description" content="Generate Steam accounts for personal usage.">
+   <meta name="description" content="Generate Steam accounts for personal usage">
    <meta name="author" content="nullworks">
    <link rel="stylesheet" href="static/css/bootswatch.min.css">
    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -26,21 +26,22 @@
       content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
    <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
 
-   <script src="static/js/jquery.min.js"></script>
-   <script src="static/js/index.js"></script>
-   <script src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
+   <script defer src="static/js/jquery.min.js"></script>
+   <script defer src="static/js/common.js"></script>
+   <script defer src="static/js/index.js"></script>
+   <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
    </script>
    <ul class="nav nav-tabs">
       <li class="nav-item">
-         <a class="nav-link active" data-toggle="tab" href="index.html"
-            onclick="gtag('event', 'homepage link');">Generator</a>
+         <a class="nav-link active" data-toggle="tab" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
       </li>
       <li class="nav-item">
          <a class="nav-link" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
             Accounts</a>
       </li>
       <li class="nav-item">
-         <a class="nav-link" data-toggle="tab" href="stats.html" onclick="gtag('event', 'stats link');">Stats</a>
+         <a class="nav-link" data-toggle="tab" href="recovery.html" onclick="gtag('event', 'stats link');">Account
+            Recovery</a>
       </li>
       <li class="nav-item">
          <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues"
@@ -87,13 +88,6 @@
          <strong>Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings might
             take hours to propagate.</strong>
       </div>
-
-      <div class="container text-center">
-         <div class="alert alert-info">You can now find the email for the steam accounts you generated before Recaptcha
-            was implemented. This is useful for recovering your suspended steam accounts by contacting Steam support. <a
-               href="recovery.html">Click here for recovery</a>
-         </div>
-      </div>
       <br>
       <div id="generate_error" class="alert alert-danger" style="display: none;">
          <strong>An error has occured:</strong>
@@ -126,8 +120,7 @@
                   <h6 id="acc_login" class="card-text">
                      Custom Domain: <input type="text" id="settings_custom_domain" class="form-control"
                         placeholder="Enter your custom domain" autocomplete="off"><br>
-                     <button id="save_settings" type="button" class="btn btn-primary btn-lg"
-                        onclick="save_clicked()"
+                     <button id="save_settings" type="button" class="btn btn-primary btn-lg" onclick="save_clicked()"
                         style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
                         Settings</button>
                      <button id="help_button" type="button" onclick="settings_help()" class="btn btn-primary btn-lg"
