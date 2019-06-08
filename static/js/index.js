@@ -486,6 +486,9 @@ function generate_pressed() {
 }
 
 async function isvalidmx(domain) {
+    var patt = new RegExp("^([a-z0-9]+([\-a-z0-9]*[a-z0-9]+)?\.){0,}([a-z0-9]+([\-a-z0-9]*[a-z0-9]+)?){1,63}(\.[a-z0-9]{2,7})+$");
+    if (!patt.test(domain))
+        return false;
     var res = await new Promise(function (resolve, reject) {
         $.ajax({
             url: "https://accgen.cathook.club/userapi/isvalidmx/" + domain,
@@ -504,15 +507,26 @@ async function isvalidmx(domain) {
     return true;
 }
 
+
+async function save_clicked() {
+    gtag('event', 'settings_saved');
+    if ($("#settings_custom_domain").val() == "") {
+        save_settings();
+        $("#mx_error").hide("slow");
+        return;
+    }
+
+    if (await isvalidmx($("#settings_custom_domain").val())) {
+        save_settings();
+        $("#mx_error").hide("slow");
+    } else {
+        $("#mx_error").show("slow");
+        $("#settings_custom_domain").val("")
+    }
+}
+
+
 function init() {
-    $('#settings_form').submit(function () {
-        gtag('event', 'settings_saved');
-        if (isvalidmx($("#settings_custom_domain").val())) {
-            save_settings();
-            $("#mx_error").hide("slow");
-        } else
-            $("#mx_error").show("slow");
-    });
     $("#generated_accs_table_card").hide()
     $("#generate_error").hide()
     $("#generate_progress").hide()

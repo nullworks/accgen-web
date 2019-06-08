@@ -83,7 +83,7 @@
    <div id="accgen_ui" class="container text-center"
       style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%;">
       <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
-      <div id="mx_error" class="alert alert-error" style="display: none">
+      <div id="mx_error" class="alert alert-warning" style="display: none">
          <strong>Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings might
             take hours to propogate.</strong>
       </div>
@@ -124,11 +124,10 @@
             <div class="card-body">
                <form id="settings_form" action="#">
                   <h6 id="acc_login" class="card-text">
-                     Custom Domain: <input type="text"
-                        pattern="^([a-z0-9]+([\-a-z0-9]*[a-z0-9]+)?\.){0,}([a-z0-9]+([\-a-z0-9]*[a-z0-9]+)?){1,63}(\.[a-z0-9]{2,7})+$"
-                        id="settings_custom_domain" class="form-control" placeholder="Enter your custom domain"
-                        autocomplete="off"><br>
-                     <button id="save_settings" type="submit" class="btn btn-primary btn-lg"
+                     Custom Domain: <input type="text" id="settings_custom_domain" class="form-control"
+                        placeholder="Enter your custom domain" autocomplete="off"><br>
+                     <button id="save_settings" type="button" class="btn btn-primary btn-lg"
+                        onclick="save_clicked()"
                         style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
                         Settings</button>
                      <button id="help_button" type="button" onclick="settings_help()" class="btn btn-primary btn-lg"
