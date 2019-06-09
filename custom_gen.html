@@ -31,11 +31,6 @@
   <script defer src="static/js/custom_gen.js"></script>
   <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
   </script>
-  <style>
-    .card-text {
-      display: grid;
-    }
-  </style>
 
   <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -78,7 +73,8 @@
     <strong id="accgen_status_msg">If you see this, it's a bug :)</strong>
   </div>
 
-  <div class="container text-center" style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%">
+  <div class="container text-center"
+    style="margin: auto;height: 50%;min-width: 200px; padding-top: 2%; padding-bottom: 7%">
 
     <div id="addon_dl" class="container text-center" style="display: none;">
       <div id="addon_download" class="alert alert-warning">
@@ -133,16 +129,16 @@
         </div>
 
         <div class="card-body">
-          <h6 class="card-text">Display Name: <input name="acc_username" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">Display Name: <input name="acc_username" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
           </h6>
-          <h6 class="card-text">Real Name: <input name="acc_realname" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">Real Name: <input name="acc_realname" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
           </h6>
-          <h6 class="card-text">Profile Picture: <input name="acc_profileimage" placeholder="URL for the image"
-              autocomplete="off"
+          <h6 class="card-text" style="display: grid;">Profile Picture: <input name="acc_profileimage"
+              placeholder="URL for the image" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);"></h6>
-          <h6 class="card-text">
+          <h6 class="card-text" style="display: grid;">
             <span style="font-family: inherit; font-size: 0.9375rem; --darkreader-inline-color: inherit;">Country:
             </span>
             <select name="acc_country" id="country" class="card-text" style="width: 100%">
@@ -399,16 +395,16 @@
               <option value="ZW">Zimbabwe</option>
             </select>
           </h6>
-          <h6 class="card-text">State: <input name="acc_state" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">State: <input name="acc_state" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250); ">
           </h6>
-          <h6 class="card-text">City:<input name="acc_city" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">City:<input name="acc_city" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);">
           </h6>
-          <h6 class="card-text">Custom URL: <input name="acc_profileurl" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">Custom URL: <input name="acc_profileurl" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);">
           </h6>
-          <h6 class="card-text">Profile Bio: <textarea name="acc_bio" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">Profile Bio: <textarea name="acc_bio" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);"></textarea>
           </h6>
         </div>
