@@ -1,13 +1,8 @@
 <html lang="en">
 
 <head>
-  <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script>
-  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-137480510-1"></script>
-  <style>
-    .card-text {
-      display: grid;
-    }
-  </style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137480510-1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -18,6 +13,7 @@
 
     gtag('config', 'UA-137480510-1');
   </script>
+
   <meta charset="utf-8">
   <title>Steam Account Generator</title>
   <meta name="description" content="Generate Steam accounts with custom profile settings">
@@ -29,17 +25,24 @@
     content="Steam account generator, generate steam accounts, steam accounts, free steam accounts, generator steam, steam autoreg">
   <link href="static/favicon.ico" rel="icon" type="image/x-icon">
 
-  <script defer src="static/js/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script defer src="static/js/common.js"></script>
   <script defer src="static/js/custom_gen.js"></script>
-  <style data-styled="" data-styled-version="4.2.0"></style>
+  <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
+  </script>
+  <style>
+    .card-text {
+      display: grid;
+    }
+  </style>
 
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
+      <a class="nav-link active" data-toggle="tab" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
+      <a class="nav-link" data-toggle="tab" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
         Accounts</a>
     </li>
     <li class="nav-item">
@@ -63,35 +66,21 @@
       </div>
     </li>
   </ul>
-
-  <link rel="stylesheet" type="text/css"
-    href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
-  <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
   <script>
     window.addEventListener("load", function () {
-      window.cookieconsent.initialise({
-        "palette": {
-          "popup": {
-            "background": "#252e39"
-          },
-          "button": {
-            "background": "#14a7d0"
-          }
-        },
-        "theme": "edgeless"
-      })
-      onload();
+      init();
     });
   </script>
 </head>
 
 <body>
-  <div>
-    <br>
+  <div id="accgen_status" style="display: none;" class="alert alert-danger">
+    <strong id="accgen_status_msg">If you see this, it's a bug :)</strong>
   </div>
+
   <div class="container text-center" style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%">
-    <div id="addon_dl" class="container text-center"
-      style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%;display: none;">
+
+    <div id="addon_dl" class="container text-center" style="display: none;">
       <div id="addon_download" class="alert alert-warning">
         <h4 class="alert-heading" id="addon_download_text">You don't have our addon yet!</h4>
         <h5><a id="ffaddon" href='#' onclick="installAddon()">Download the SAG addon!</a>
@@ -115,11 +104,34 @@
     </div>
 
     <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center;">
-      <div id="generate_acc_form_card" class="card border-dark mb-3"
+      <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
+      <div id="mx_error" class="alert alert-warning" style="display: none">
+        <strong>Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings might
+          take hours to propagate.</strong>
+      </div>
+      <br>
+
+      <div class="container text-center">
+        <div class="alert alert-info">You can now find the email for the steam accounts you generated <b>(Even for
+            accounts
+            generated with our addon!)</b>. This is useful for recovering your suspended steam accounts by contacting
+          Steam
+          support. <a href="recovery.html">Click here for recovery</a>
+        </div>
+      </div>
+      <br>
+
+      <div id="generate_error" class="alert alert-danger" style="display: none;">
+        <strong>An error has occured:</strong>
+        <div id="generate_error_text"></div>
+      </div>
+
+      <div id="custom_gen_form" class="card border-dark mb-3"
         style="background-color: rgb(58, 62, 65); margin: auto; max-width: 33rem; border-color: rgb(95, 105, 117) !important;">
         <div class="card-header"
           style="background-color: rgb(70, 75, 77); border-bottom-color: rgba(112, 112, 112, 0.6);">Account information
         </div>
+
         <div class="card-body">
           <h6 class="card-text">Display Name: <input name="acc_username" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
@@ -401,44 +413,101 @@
           </h6>
         </div>
       </div>
-    </div>
-    <span style="color: rgb(205, 199, 188); text-align: center;">&nbsp;</span>
 
-    <span style="color: rgb(205, 199, 188); text-align: center;">&nbsp;</span>
-
-    <div id="generate_progress" style="display: none;">
-      <h5>Please wait, generating...</h5>
-      <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
-          aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-      </div>
-    </div>
-    <div id="generate_error" class="alert alert-danger" style="display: none;">
-      <strong>An error has occured:</strong>
-      <div id="generate_error_text"></div>
-    </div>
-
-    <div id="generated_data" style="display: none;">
-      <div id="generated_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
-        <div class="card-header">Account information</div>
-        <div class="card-body">
-          <h6 id="acc_login" style="display: inherit;" class="card-text">
-            Login: <a id="acc_link"><strong>niceaccount</strong></a>
-            <p></p>
-          </h6>
-          <h6 id="acc_pass" style="display: inherit;" class="card-text">
-            Password: <strong>nicepass</strong>
-            <p></p>
-          </h6>
+      <div id="generated_data" style="display: none;">
+        <div id="generated_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
+          <div class="card-header">Account information</div>
+          <div class="card-body">
+            <h6 id="acc_login" class="card-text">
+              Login: <a id="acc_link"><strong>niceaccount</strong></a>
+              <p></p>
+            </h6>
+            <h6 id="acc_pass" class="card-text">
+              Password: <strong>nicepass</strong>
+              <p></p>
+            </h6>
+          </div>
         </div>
       </div>
+
+      <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto; display: none;">
+        <div class="card-header">Settings</div>
+        <div class="card-body">
+          <form id="settings_form" action="#">
+            <h6 id="acc_login" class="card-text">
+              Custom Domain: <input type="text" id="settings_custom_domain" class="form-control"
+                placeholder="Enter your custom domain" autocomplete="off"><br>
+              <button id="save_settings" type="button" class="btn btn-primary btn-lg" onclick="save_clicked()"
+                style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
+                Settings</button>
+              <button id="help_button" type="button" onclick="settings_help()" class="btn btn-primary btn-lg"
+                style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
+                data-darkreader-inline-color="">Help</button>
+            </h6>
+          </form>
+        </div>
+      </div>
+
+      <div id="generated_data" style="display: none;">
+        <div id="generated_accs_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
+          <div class="card-header">Account information</div>
+          <div class="card-body">
+            <h6 id="acc_login" class="card-text">
+              Login: <strong>niceaccount</strong>
+              <p></p>
+            </h6>
+            <h6 id="acc_pass" class="card-text">
+              Password: <strong>nicepass</strong>
+              <p></p>
+            </h6>
+            <h6 id="acc_email" class="card-text" style="display: none;">
+              E-Mail address: niceaccount@inboxkitten.com
+              <p></p>
+            </h6>
+          </div>
+        </div>
+      </div>
+
+      <div id="history_list" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;display: none;">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Username</th>
+              <th scope="col">Password</th>
+            </tr>
+          </thead>
+          <tbody id="genned_accs">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="control_buttons">
+        <button id="generate_button" type="button" onclick="gtag('event', 'newgen_gen_clicked');generate_pressed();"
+          class="btn btn-primary btn-lg" style="color: darkgrey; ; --darkreader-inline-color:#ccc6bd;"
+          data-darkreader-inline-color="">Generate</button>
+        <button id="custom_domain_button" type="button"
+          onclick="gtag('event', 'custom_domain_button');custom_domain_pressed();" class="btn btn-primary btn-lg"
+          style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Use Custom
+          Domain</button>
+        <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
+          class="btn btn-primary btn-lg" style="display: none;color: darkgrey; --darkreader-inline-color:#ccc6bd;"
+          data-darkreader-inline-color="">History</button>
+      </div>
+
+      <div id="steam_iframe" style="display: none;">
+        <iframe id="steam_iframe_innerdiv" height="700px" width="400px" scrolling="no" style="padding-left: 3rem;"
+          frameborder="0"></iframe>
+      </div>
+
+      <div id="generate_progress" style="display: none;">
+        <h5>Please wait, generating...</h5>
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
+            aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+        </div>
+      </div>
+
     </div>
-    <!-- Recaptcha goes here -->
-    <div id="recap">
-      <iframe id="innerdiv" height="700px" width="400px" src="https://store.steampowered.com/join/" scrolling="no"
-        style="padding-left: 3rem; padding-bottom: 3rem;" frameborder="0"></iframe>
-    </div>
-    <!-- Recaptcha ends -->
   </div>
 </body>
 
