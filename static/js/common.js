@@ -490,7 +490,7 @@ function common_init() {
 function history_pressed() {
     if ($("#history_list").is(":hidden")) {
         change_visibility(2);
-        $("#genned_accs").html();
+        $("#genned_accs").empty();
         if (localStorage.getItem("genned_account") != null) {
             $.each((JSON.parse(localStorage.getItem("genned_account"))).reverse(), function (i, item) {
                 $('<tr class="table-primary">').html(
