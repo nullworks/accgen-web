@@ -26,11 +26,11 @@ function registerevents() {
         // get a fresh gid instead
         gid = await new Promise(function (resolve, reject) {
             $.ajax({
-                url: "https://store.steampowered.com/join/"
+                url: "https://store.steampowered.com/join/refreshcaptcha/"
             }).fail(function () {
                 resolve()
             }).done(function (resp) {
-                resolve(resp.split('id="captchagid" value="')[1].split("\"")[0]);
+                resolve(JSON.parse(resp).gid);
             });
         });
 
