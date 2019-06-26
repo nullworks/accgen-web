@@ -135,8 +135,9 @@ function registerevents() {
                     break;
                 case 17:
                     display_data({
-                        error: 'Email banned (Please contact us! https://t.me/sag_bot_chat)'
+                        error: 'Steam has banned the domain. Please use Gmail or Custom domain'
                     });
+                    custom_domain_pressed();
                     report_email();
                     break;
                 case 1:
