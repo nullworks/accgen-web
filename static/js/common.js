@@ -137,7 +137,7 @@ function registerevents() {
                     display_data({
                         error: 'Steam has banned the domain. Please use Gmail or Custom domain'
                     });
-                    custom_domain_pressed();
+                    $("#custom_domain_div").show('slow');
                     report_email();
                     break;
                 case 1:
