@@ -133,14 +133,17 @@
             <div class="card-body">
                <form id="settings_form" action="#">
                   <h6 id="acc_login" class="card-text">
-                     Custom Domain: <input type="text" id="settings_custom_domain" class="form-control"
-                        placeholder="Enter your custom domain" autocomplete="off"><br>
+                     Custom Domain/Gmail address: <input type="text" id="settings_custom_domain" class="form-control"
+                        placeholder="Enter your custom domain or gmail address" autocomplete="off"><br>
                      <button id="save_settings" type="button" class="btn btn-primary btn-lg" onclick="save_clicked()"
                         style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
-                        Settings</button>
-                     <button id="help_button" type="button" onclick="settings_help()" class="btn btn-primary btn-lg"
+                        Settings</button><br>
+                     <button id="help_button" type="button" onclick="settings_help('mx')" class="btn btn-primary btn-lg"
                         style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
-                        data-darkreader-inline-color="">Help</button>
+                        data-darkreader-inline-color="">Custom domain Help</button>
+                        <button id="help_button" type="button" onclick="settings_help('gmail')" class="btn btn-primary btn-lg"
+                        style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
+                        data-darkreader-inline-color="">Gmail Setup Help</button>
                   </h6>
                </form>
             </div>
@@ -186,7 +189,7 @@
             <button id="custom_domain_button" type="button"
                onclick="gtag('event', 'custom_domain_button');custom_domain_pressed();" class="btn btn-primary btn-lg"
                style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Use Custom
-               Domain</button>
+               Domain/Gmail</button>
             <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
                class="btn btn-primary btn-lg" style="display: none;color: darkgrey; --darkreader-inline-color:#ccc6bd;"
                data-darkreader-inline-color="">History</button>

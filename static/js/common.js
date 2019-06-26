@@ -45,8 +45,12 @@ function registerevents() {
         var err = undefined;
         var custom_email = undefined;
 
-        if ($("#settings_custom_domain").val() != "")
-            custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
+        if ($("#settings_custom_domain").val() != "") {
+            if ($("#settings_custom_domain").val().includes("@"))
+                custom_email = $("#settings_custom_domain").val();
+            else
+                custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
+        }
         var data = await new Promise(function (resolve, reject) {
             $.ajax({
                 url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
@@ -476,13 +480,13 @@ function common_init() {
     registerevents();
 
     // Check if addon installed
-    $.ajax({
-        url: "https://store.steampowered.com/join/"
-    }).done(function () {}).fail(function (resp) {
-        $("#addon_dl").show();
-        $("#accgen_ui").hide();
-        $("#generate_button").hide();
-    });
+     $.ajax({
+         url: "https://store.steampowered.com/join/"
+     }).done(function () {}).fail(function (resp) {
+         $("#addon_dl").show();
+         $("#accgen_ui").hide();
+         $("#generate_button").hide();
+     });
     load_settings()
     changeText();
 }
@@ -517,8 +521,19 @@ function save_settings() {
     $("#custom_domain_div").toggle('slow');
 }
 
-function settings_help() {
-    window.open("https://i.imgur.com/zxBii8n.png");
+function settings_help(page) {
+    switch (page) {
+        case "gmail":
+            window.open("https://github.com/nullworks/accgen-web/wiki/Using-Your-Gmail-address-with-Steam-Account-Generator");
+            break;
+        case "mx":
+            window.open("https://i.imgur.com/zxBii8n.png");
+            break;
+        default:
+            console.log("Invalid settings page");
+            break;
+
+    }
 }
 
 function load_settings() {
@@ -536,12 +551,14 @@ async function save_clicked() {
         $("#mx_error").hide("slow");
         return;
     }
-
-    if (await isvalidmx($("#settings_custom_domain").val())) {
+    if (!$("#settings_custom_domain").val().includes("@"))
+        if (await isvalidmx($("#settings_custom_domain").val())) {
+            save_settings();
+            $("#mx_error").hide("slow");
+        } else {
+            $("#mx_error").show("slow");
+            $("#settings_custom_domain").val("")
+        }
+    else
         save_settings();
-        $("#mx_error").hide("slow");
-    } else {
-        $("#mx_error").show("slow");
-        $("#settings_custom_domain").val("")
-    }
 }
