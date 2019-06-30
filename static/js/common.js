@@ -528,7 +528,7 @@ function settings_help(page) {
             window.open("https://github.com/nullworks/accgen-web/wiki/Using-Your-Gmail-address-with-Steam-Account-Generator");
             break;
         case "mx":
-            window.open("https://i.imgur.com/zxBii8n.png");
+            window.open("https://i.imgur.com/Vc25ROf.png");
             break;
         default:
             console.log("Invalid settings page");
