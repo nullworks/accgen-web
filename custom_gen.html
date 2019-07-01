@@ -45,7 +45,7 @@
         Recovery</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues"
+      <a target="_blank" class="nav-link" data-toggle="tab" href="https://github.com/nullworks/accgen-web/issues"
         onclick="gtag('event', 'Github issues link');">GitHub Issues</a>
     </li>
     <li class="nav-item">
@@ -415,7 +415,7 @@
           <div class="card-header">Account information</div>
           <div class="card-body">
             <h6 id="acc_login" class="card-text">
-              Login: <a id="acc_link"><strong>niceaccount</strong></a>
+              Login: <a target="_blank" id="acc_link"><strong>niceaccount</strong></a>
               <p></p>
             </h6>
             <h6 id="acc_pass" class="card-text">
@@ -431,8 +431,8 @@
         <div class="card-body">
           <form id="settings_form" action="#">
             <h6 id="acc_login" class="card-text">
-              Custom Domain: <input type="text" id="settings_custom_domain" class="form-control"
-                placeholder="Enter your custom domain" autocomplete="off"><br>
+              Custom Domain/Gmail <input type="text" id="settings_custom_domain" class="form-control"
+                placeholder="Enter your custom domain/Gmail address" autocomplete="off"><br>
               <button id="save_settings" type="button" class="btn btn-primary btn-lg" onclick="save_clicked()"
                 style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
                 Settings</button>
