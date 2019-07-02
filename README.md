@@ -1,1 +1,1 @@
-Source code for accgen.cathook.club. Original repository located at https://github.com/nullworks/accgen-web.
+Source code for https://accgen.cathook.club. Primary repository located at https://gitlab.com/nullworks/accgen/accgen-web.
