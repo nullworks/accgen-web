@@ -14,7 +14,7 @@ function submit_clicked() {
         return;
     }*/
     $.ajax({
-        url: 'https://accgen.cathook.club/userapi/retrieveemail',
+        url: '/userapi/retrieveemail',
         method: 'POST',
         dataType: 'json',
         contentType: 'application/json',

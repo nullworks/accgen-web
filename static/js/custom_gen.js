@@ -2,7 +2,7 @@
 
 function on_generated(account) {
     $.ajax({
-        url: `https://accgen.cathook.club/userapi/patreon/customacc/${account.login}/${account.password}`,
+        url: `/userapi/patreon/customacc/${account.login}/${account.password}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
@@ -51,7 +51,7 @@ function init() {
     }
 
     $.ajax({
-        url: 'https://accgen.cathook.club/patreon/check',
+        url: '/patreon/check',
         type: 'GET'
     }).done(function (data) {
         /*  0 - success

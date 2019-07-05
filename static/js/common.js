@@ -53,7 +53,7 @@ function registerevents() {
         }
         var data = await new Promise(function (resolve, reject) {
             $.ajax({
-                url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                url: '/userapi/recaptcha/addtask',
                 method: 'post',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -152,7 +152,7 @@ function registerevents() {
 
         var verifydata = await new Promise(function (resolve, reject) {
             $.ajax({
-                url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                url: '/userapi/recaptcha/addtask',
                 method: 'post',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -237,7 +237,7 @@ function registerevents() {
 
         var account = await new Promise(function (resolve, reject) {
             $.ajax({
-                url: 'https://accgen.cathook.club/userapi/recaptcha/addtask',
+                url: '/userapi/recaptcha/addtask',
                 method: 'post',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -278,7 +278,7 @@ function report_email(email) {
         action: 'vote_email'
     }).then(function (token) {
         $.ajax({
-            url: 'https://accgen.cathook.club/userapi/recaptcha/bademail/' + token
+            url: '/userapi/recaptcha/bademail/' + token
         }).done(function (emailresp) {
             console.log("Log: email reported ban");
         })
@@ -310,7 +310,7 @@ function on_status_received(resp) {
 
 function perform_status_check() {
     $.ajax({
-        url: "https://accgen.cathook.club/api/v1/status"
+        url: "/api/v1/status"
     }).done(function (resp) {
         on_status_received(resp)
     })
@@ -456,7 +456,7 @@ async function isvalidmx(domain) {
         return false;
     var res = await new Promise(function (resolve, reject) {
         $.ajax({
-            url: "https://accgen.cathook.club/userapi/isvalidmx/" + domain,
+            url: "/userapi/isvalidmx/" + domain,
             success: function (returnData) {
                 resolve(returnData);
             },
