@@ -45,7 +45,8 @@
             Recovery</a>
       </li>
       <li class="nav-item">
-         <a target="_blank" class="nav-link" data-toggle="tab" href="https://gitlab.com/nullworks/accgen/accgen-web/issues"
+         <a target="_blank" class="nav-link" data-toggle="tab"
+            href="https://gitlab.com/nullworks/accgen/accgen-web/issues"
             onclick="gtag('event', 'Gitlab issues link');">Gitlab Issues</a>
       </li>
       <li class="nav-item">
@@ -86,24 +87,17 @@
       </div>
 
       <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center;">
+         <div class="container text-center">
+            <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't recommend
+               storing valuable items on the accounts.</div>
+         </div>
+         <br>
+
          <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
          <div id="mx_error" class="alert alert-warning" style="display: none">
             <strong>Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings
                might
                take hours to propagate.</strong>
-         </div>
-         <br>
-
-         <div class="container text-center">
-            <div class="alert alert-info">You can now find the email for the steam accounts you generated <b>(Even for
-                  accounts
-                  generated with our addon!)</b>. This is useful for recovering your suspended steam accounts by
-               contacting
-               Steam
-               support. <a href="recovery.html">Click here for recovery</a>
-            </div>
-            <br>
-            <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't recommend storing valuable items on the accounts.</div>
          </div>
          <br>
 
@@ -141,8 +135,8 @@
                      <button id="help_button" type="button" onclick="settings_help('mx')" class="btn btn-primary btn-lg"
                         style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
                         data-darkreader-inline-color="">Custom domain Help</button>
-                        <button id="help_button" type="button" onclick="settings_help('gmail')" class="btn btn-primary btn-lg"
-                        style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
+                     <button id="help_button" type="button" onclick="settings_help('gmail')"
+                        class="btn btn-primary btn-lg" style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
                         data-darkreader-inline-color="">Gmail Setup Help</button>
                   </h6>
                </form>
