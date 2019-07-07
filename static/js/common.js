@@ -507,6 +507,30 @@ function history_pressed() {
     $("#history_list").toggle('slow');
 }
 
+//https://stackoverflow.com/a/45831280
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+    document.body.removeChild(element);
+}
+
+function history_download_pressed() {
+    var s = "";
+    var accounts = JSON.parse(localStorage.getItem("genned_account"));
+    for (var i = 0; i < accounts.length; i++) {
+        s += (accounts[i].login + ":" + accounts[i].password) + "\n";
+    }
+
+    var date = new Date();
+    download(`accounts–${date.getFullYear()}-${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.txt`, s);
+}
+
 function custom_domain_pressed() {
     if ($("#custom_domain_div").is(":hidden"))
         change_visibility(2);
