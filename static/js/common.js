@@ -481,15 +481,15 @@ function common_init() {
     registerevents();
 
     // Check if addon installed
-     $.ajax({
-         url: "https://store.steampowered.com/join/"
-     }).done(function () {}).fail(function (resp) {
-         $("#addon_dl").show();
-         $("#accgen_ui").hide();
-         $("#generate_button").hide();
-     });
+    $.ajax({
+        url: "https://store.steampowered.com/join/"
+    }).done(function () {}).fail(function (resp) {
+        changeText();
+        $("#addon_dl").show();
+        $("#accgen_ui").hide();
+        $("#generate_button").hide();
+    });
     load_settings()
-    changeText();
 }
 
 function history_pressed() {
