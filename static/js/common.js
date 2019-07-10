@@ -26,28 +26,33 @@ function extend(obj, src) {
     return obj;
 }
 
-function httpRequest(options, proxy) {
+function httpRequest(options, proxy, cookies) {
     return new Promise(function (resolve, reject) {
-        if (typeof axios == "undefined" || !proxy)
+        if (typeof axios == "undefined")
             $.ajax(extend({
                 success: function (returnData) {
                     resolve(returnData);
                 },
                 error: function (xhr, status, error) {
-                    console.error(xhr);
+                    console.error(xhr, error);
                     reject(xhr);
                 }
             }, options));
         else {
-            var agent = new httpsProxyAgent(`http://${proxy.ip}:${proxy.port}`);
+            var agent = undefined;
+            if (proxy)
+                agent = new httpsProxyAgent(`http://${proxy.ip}:${proxy.port}`);
             axios(
                 extend({
-                    httpsAgent: agent
+                    httpsAgent: agent,
+                    jar: cookies,
+                    withCredentials: true,
                 }, options)
             ).then(function (res) {
                 resolve(res.data);
             }, function (err) {
-                reject(err.response);
+                console.error(err);
+                reject(err.response, err);
             })
         }
     });
@@ -83,6 +88,10 @@ function registerevents() {
             }
         }
 
+        var cookies = undefined;
+        if (typeof toughCookie != "undefined")
+            cookies = new toughCookie.CookieJar();
+
         change_visibility(true);
 
         var gid = e.data.split(";")[1];
@@ -91,7 +100,7 @@ function registerevents() {
         // get a fresh gid instead
         gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy).catch(function () {});
+        }, proxy, cookies).catch(function () {});
 
         // no gid? error out
         if (!gid) {
@@ -100,7 +109,14 @@ function registerevents() {
             });
             return;
         }
-        gid = JSON.parse(gid).gid;
+        console.log(gid);
+
+        if (gid.gid)
+            gid = gid.gid
+        else
+            gid = JSON.parse(gid).gid;
+
+        console.log(gid)
 
         var err = undefined;
         var custom_email = undefined;
@@ -151,7 +167,7 @@ function registerevents() {
                 captchagid: gid,
                 captcha_text: recap_token
             })
-        }, proxy).catch(function () {
+        }, proxy, cookies).catch(function () {
             err = error ? error : true;
             console.log(err);
         });
@@ -237,7 +253,7 @@ function registerevents() {
 
         await httpRequest({
             url: verifydata.verifylink
-        }, proxy).catch(function () {
+        }, proxy, cookies).catch(function () {
             err = error ? error : true;
             console.log(err);
         });
@@ -252,7 +268,7 @@ function registerevents() {
             url: "https://store.steampowered.com/join/createaccount",
             method: 'POST',
             data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid
-        }).catch(function (error) {
+        }, proxy, cookies).catch(function (error) {
             err = error ? error : true;
             console.log(err);
         });
@@ -633,7 +649,7 @@ async function save_clicked() {
             return;
         }
         var res = await httpRequest({
-            url: "/api/v1/status"
+            url: "https://store.steampowered.com/join/refreshcaptcha/"
         }, {
             ip: split[0],
             port: split[1]
