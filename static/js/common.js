@@ -74,18 +74,23 @@ function registerevents() {
         var recap_token = e.data.split(";")[0];
 
         // get a fresh gid instead
-        gid = (await axios({
-            url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }));
+        gid = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "https://store.steampowered.com/join/refreshcaptcha/"
+            }).fail(function () {
+                resolve()
+            }).done(function (resp) {
+                resolve(JSON.parse(resp).gid);
+            });
+        });
 
         // no gid? error out
-        if (!gid || !gid.data.gid) {
+        if (!gid) {
             display_data({
                 error: "Invalid data recieved from steam!"
             });
             return;
         }
-        gid = gid.data.gid;
 
         var err = undefined;
         var custom_email = undefined;
@@ -128,25 +133,33 @@ function registerevents() {
             return;
         }
 
-        var ajaxveryemail = (await axios({
-            url: "https://store.steampowered.com/join/ajaxverifyemail",
-            method: 'POST',
-            data: stringifyQueryString({
-                email: custom_email ? custom_email : data.email,
-                captchagid: gid,
-                captcha_text: recap_token
-            })
+        var ajaxveryemail = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "https://store.steampowered.com/join/ajaxverifyemail",
+                method: 'POST',
+                data: stringifyQueryString({
+                    email: custom_email ? custom_email : data.email,
+                    captchagid: gid,
+                    captcha_text: recap_token
+                }),
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
         }).catch(function (error) {
             err = error ? error : true;
             console.log(err);
-        }));
+        });
         if (err) {
             display_data({
                 error: 'Error while creating the Steam account! Check console for details!'
             });
             return;
         }
-        ajaxveryemail = ajaxveryemail.data;
         if (ajaxveryemail && ajaxveryemail.success) {
             switch (ajaxveryemail.success) {
                 case 13:
@@ -220,8 +233,17 @@ function registerevents() {
             return;
         }
 
-        await axios({
-            url: verifydata.verifylink
+        await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: verifydata.verifylink,
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
         }).catch(function (error) {
             err = error ? error : true;
             console.log(err);
@@ -233,22 +255,29 @@ function registerevents() {
             return;
         }
 
-        var createaccount =
-            await (axios({
+        var createaccount = await new Promise(function (resolve, reject) {
+            $.ajax({
                 url: "https://store.steampowered.com/join/createaccount",
                 method: 'POST',
-                data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid
-            }).catch(function (error) {
-                err = error ? error : true;
-                console.log(err);
-            }));
+                data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid,
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
+        });
         if (err) {
             display_data({
                 error: 'Error while creating the Steam account! Check console for details!'
             });
             return;
         }
-        createaccount = createaccount.data;
         if (!createaccount.bSuccess) {
             display_data({
                 error: 'Error while creating the Steam account! Check console for details!'
@@ -493,8 +522,7 @@ async function isvalidmx(domain) {
     return true;
 }
 
-async function common_init() {
-    if (isElectron()) {}
+function common_init() {
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
