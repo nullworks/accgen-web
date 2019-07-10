@@ -86,7 +86,7 @@
          </div>
       </div>
 
-      <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center;">
+      <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center; padding-bottom: 3%">
          <div class="container text-center">
             <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't recommend
                storing valuable items on the accounts.</div>
@@ -98,6 +98,10 @@
             <strong>Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings
                might
                take hours to propagate.</strong>
+         </div>
+         <br>
+         <div id="proxy_error" class="alert alert-warning" style="display: none">
+            <strong>The proxy doesn't answer requests. (Only http and https proxies are supported)</strong>
          </div>
          <br>
 
@@ -123,21 +127,25 @@
          </div>
 
          <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto; display: none;">
-            <div class="card-header">Settings</div>
+            <div class="card-header">Preferences</div>
             <div class="card-body">
                <form id="settings_form" action="#">
                   <h6 id="acc_login" class="card-text">
                      Custom Domain/Gmail address: <input type="text" id="settings_custom_domain" class="form-control"
                         placeholder="Enter your custom domain or gmail address" autocomplete="off"><br>
-                     <button id="save_settings" type="button" class="btn btn-primary btn-lg" onclick="save_clicked()"
-                        style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
-                        Settings</button><br>
                      <button id="help_button" type="button" onclick="settings_help('mx')" class="btn btn-primary btn-lg"
                         style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
                         data-darkreader-inline-color="">Custom domain Help</button>
                      <button id="help_button" type="button" onclick="settings_help('gmail')"
                         class="btn btn-primary btn-lg" style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
-                        data-darkreader-inline-color="">Gmail Setup Help</button>
+                        data-darkreader-inline-color="">Gmail setup Help</button>
+                  </h6>
+                  <h6 id="proxy-settings" class="card-text" style="display: none;">
+                     Proxy settings: <input type="text" id="settings_proxy" class="form-control"
+                        placeholder="ip:port (http/https proxies only)" autocomplete="off"><br>
+                     <button id="save_settings" type="button" class="btn btn-primary btn-lg" onclick="save_clicked()"
+                        style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Save
+                        Settings</button><br>
                   </h6>
                </form>
             </div>
@@ -186,8 +194,8 @@
                data-darkreader-inline-color="">Generate</button>
             <button id="custom_domain_button" type="button"
                onclick="gtag('event', 'custom_domain_button');custom_domain_pressed();" class="btn btn-primary btn-lg"
-               style="color: darkgrey; --darkreader-inline-color:#cdc7bc;" data-darkreader-inline-color="">Use Custom
-               Domain/Gmail</button>
+               style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
+               data-darkreader-inline-color="">Preferences</button>
             <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
                class="btn btn-primary btn-lg" style="display: none;color: darkgrey; --darkreader-inline-color:#ccc6bd;"
                data-darkreader-inline-color="">History</button>

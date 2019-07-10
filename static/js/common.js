@@ -26,28 +26,31 @@ function extend(obj, src) {
     return obj;
 }
 
-async function httpRequest(options, proxy) {
-    if (typeof axios == "undefined" || !proxy)
-        return new Promise(function (resolve, reject) {
+function httpRequest(options, proxy) {
+    return new Promise(function (resolve, reject) {
+        if (typeof axios == "undefined" || !proxy)
             $.ajax(extend({
                 success: function (returnData) {
                     resolve(returnData);
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr);
-                    reject(xhr.responseJSON);
+                    reject(xhr);
                 }
             }, options));
-        });
-    else {
-        var agent = new httpsProxyAgent(`http://${proxy.ip}:${proxy.port}`);
-        return axios({
-            method: "get",
-            url: options.url,
-            timeout: 10000,
-            httpsAgent: agent
-        });
-    }
+        else {
+            var agent = new httpsProxyAgent(`http://${proxy.ip}:${proxy.port}`);
+            axios(
+                extend({
+                    httpsAgent: agent
+                }, options)
+            ).then(function (res) {
+                resolve(res.data);
+            }, function (err) {
+                reject(err.response);
+            })
+        }
+    });
 }
 
 function registerevents() {
@@ -68,26 +71,32 @@ function registerevents() {
             return;
         }
 
+        // Configure proxy
+        var proxy = undefined;
+        if ($("#settings_proxy").val() != "") {
+            var split = $("#settings_proxy").val().split(":");
+            if (split.length == 2) {
+                proxy = {
+                    ip: split[0],
+                    port: split[1]
+                };
+            }
+        }
+
         change_visibility(true);
 
         var gid = e.data.split(";")[1];
         var recap_token = e.data.split(";")[0];
 
         // get a fresh gid instead
-        gid = await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: "https://store.steampowered.com/join/refreshcaptcha/"
-            }).fail(function () {
-                resolve()
-            }).done(function (resp) {
-                resolve(JSON.parse(resp).gid);
-            });
-        });
+        gid = await httpRequest({
+            url: "https://store.steampowered.com/join/refreshcaptcha/"
+        }, proxy).catch(function () {});
 
         // no gid? error out
         if (!gid) {
             display_data({
-                error: "Invalid data recieved from steam!"
+                error: !proxy ? "Invalid data recieved from steam!" : "Proxy couldn't contact Steam!"
             });
             return;
         }
@@ -133,27 +142,19 @@ function registerevents() {
             return;
         }
 
-        var ajaxveryemail = await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: "https://store.steampowered.com/join/ajaxverifyemail",
-                method: 'POST',
-                data: stringifyQueryString({
-                    email: custom_email ? custom_email : data.email,
-                    captchagid: gid,
-                    captcha_text: recap_token
-                }),
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr);
-                    reject(xhr.responseJSON);
-                }
-            });
-        }).catch(function (error) {
+        var ajaxveryemail = await httpRequest({
+            url: "https://store.steampowered.com/join/ajaxverifyemail",
+            method: 'POST',
+            data: stringifyQueryString({
+                email: custom_email ? custom_email : data.email,
+                captchagid: gid,
+                captcha_text: recap_token
+            })
+        }, proxy).catch(function () {
             err = error ? error : true;
             console.log(err);
         });
+
         if (err) {
             display_data({
                 error: 'Error while creating the Steam account! Check console for details!'
@@ -233,18 +234,9 @@ function registerevents() {
             return;
         }
 
-        await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: verifydata.verifylink,
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr);
-                    reject(xhr.responseJSON);
-                }
-            });
-        }).catch(function (error) {
+        await httpRequest({
+            url: verifydata.verifylink
+        }, proxy).catch(function () {
             err = error ? error : true;
             console.log(err);
         });
@@ -255,19 +247,10 @@ function registerevents() {
             return;
         }
 
-        var createaccount = await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: "https://store.steampowered.com/join/createaccount",
-                method: 'POST',
-                data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid,
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr);
-                    reject(xhr.responseJSON);
-                }
-            });
+        var createaccount = await httpRequest({
+            url: "https://store.steampowered.com/join/createaccount",
+            method: 'POST',
+            data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid
         }).catch(function (error) {
             err = error ? error : true;
             console.log(err);
@@ -464,6 +447,7 @@ function common_generate_pressed() {
 function common_change_visibility(pre_generate) {
     if (pre_generate) {
         $('#mx_error').hide("slow");
+        $('#proxy_error').hide("slow");
         $('#generate_error').hide("slow");
         $('#generated_data').hide("slow");
         $('#custom_domain_div').hide("slow");
@@ -523,6 +507,11 @@ async function isvalidmx(domain) {
 }
 
 function common_init() {
+    // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
+    window.setImmediate = typeof setImmediate === 'function' ? setImmediate : (...args) => {
+        args.splice(1, 0, 0);
+        setTimeout(...args);
+    };
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
@@ -617,23 +606,45 @@ function load_settings() {
         var value = localStorage.getItem(id);
         $(this).val(value);
     });
+    if (isElectron())
+        $("#proxy-settings").show();
 }
 
 async function save_clicked() {
     gtag('event', 'settings_saved');
     if ($("#settings_custom_domain").val() == "") {
-        save_settings();
         $("#mx_error").hide("slow");
-        return;
+    } else {
+        if (!$("#settings_custom_domain").val().includes("@"))
+            if (await isvalidmx($("#settings_custom_domain").val())) {
+                $("#mx_error").hide("slow");
+            } else {
+                $("#mx_error").show("slow");
+                $("#settings_custom_domain").val("");
+                return;
+            }
     }
-    if (!$("#settings_custom_domain").val().includes("@"))
-        if (await isvalidmx($("#settings_custom_domain").val())) {
-            save_settings();
-            $("#mx_error").hide("slow");
-        } else {
-            $("#mx_error").show("slow");
-            $("#settings_custom_domain").val("")
+
+    if ($("#settings_proxy").val() != "") {
+        var split = $("#settings_proxy").val().split(":");
+        if (split.length != 2) {
+            $("#proxy_error").show("slow");
+            return;
         }
-    else
-        save_settings();
+        var res = await httpRequest({
+            url: "/api/v1/status"
+        }, {
+            ip: split[0],
+            port: split[1]
+        }).catch(function (e) {
+            console.log(e)
+        })
+        if (!res) {
+            $("#proxy_error").show("slow");
+            $("#settings_proxy").val("")
+            return;
+        }
+    } else
+        $("#proxy_error").hide("slow");
+    save_settings();
 }
