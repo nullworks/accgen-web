@@ -100,7 +100,7 @@ function registerevents() {
             });
             return;
         }
-        gid = gid.gid;
+        gid = JSON.parse(gid).gid;
 
         var err = undefined;
         var custom_email = undefined;
