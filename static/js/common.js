@@ -35,7 +35,7 @@ function httpRequest(options, proxy, cookies) {
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr, error);
-                    reject(xhr);
+                    reject(xhr, error);
                 }
             }, options));
         else {
@@ -648,15 +648,19 @@ function load_settings() {
 async function save_clicked() {
     gtag('event', 'settings_saved');
     if ($("#settings_twocap").val() != "") {
-        $.ajax({
+        var res = await httpRequest({
             url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
-        }).done(function (resp) {
-            if (resp == "ERROR_KEY_DOES_NOT_EXIST") {
-                $("#twocap_error").show("slow");
-                $("#settings_2cap").val("");
-                return;
-            }
-        })
+        }).catch(function (err_response, error) {
+            $("#twocap_error").show("slow");
+            $("#settings_2cap").val("");
+        });
+        if (!res)
+            return;
+        if (res == "ERROR_KEY_DOES_NOT_EXIST") {
+            $("#twocap_error").show("slow");
+            $("#settings_2cap").val("");
+            return;
+        }
     }
     if ($("#settings_custom_domain").val() == "") {
         $("#mx_error").hide("slow");
