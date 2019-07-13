@@ -467,7 +467,6 @@ function common_change_visibility(pre_generate) {
         $('#proxy_error').hide("slow");
         $('#generate_error').hide("slow");
         $('#generated_data').hide("slow");
-        $('#custom_domain_div').hide("slow");
         $('#history_list').hide("slow");
         $('#steam_iframe').hide("slow");
 
