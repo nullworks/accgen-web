@@ -100,7 +100,7 @@ function registerevents() {
         // get a fresh gid instead
         gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () {});
+        }, proxy, cookies).catch(function () { });
 
         // no gid? error out
         if (!gid) {
@@ -539,7 +539,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () {}).fail(function (resp) {
+    }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
@@ -587,19 +587,13 @@ function history_download_pressed() {
     download(`accounts–${date.getFullYear()}-${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.txt`, s);
 }
 
-function custom_domain_pressed() {
-    if ($("#custom_domain_div").is(":hidden"))
-        change_visibility(2);
-    $("#custom_domain_div").toggle('slow');
-}
-
 function save_settings() {
     $('input[type="text"]').each(function () {
         var id = $(this).attr('id');
         var value = $(this).val();
         localStorage.setItem(id, value);
+        $("#saved_success").show('slow')
     });
-    $("#custom_domain_div").toggle('slow');
 }
 
 function settings_help(page) {
@@ -651,11 +645,11 @@ async function save_clicked() {
         var res = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
         }, {
-            ip: split[0],
-            port: split[1]
-        }).catch(function (e) {
-            console.log(e)
-        })
+                ip: split[0],
+                port: split[1]
+            }).catch(function (e) {
+                console.log(e)
+            })
         if (!res) {
             $("#proxy_error").show("slow");
             $("#settings_proxy").val("")
