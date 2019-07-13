@@ -123,7 +123,7 @@ function registerevents() {
 
         if ($("#settings_custom_domain").val() != "") {
             if ($("#settings_custom_domain").val().includes("@"))
-                custom_email = $("#settings_custom_domain").val();
+                custom_email = $("#settings_custom_domain").val().toLowerCase();
             else
                 custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
         }
