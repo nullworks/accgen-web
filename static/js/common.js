@@ -464,6 +464,7 @@ function common_generate_pressed() {
 function common_change_visibility(pre_generate) {
     if (pre_generate) {
         $('#mx_error').hide("slow");
+        $('#saved_success').hide("slow");
         $('#proxy_error').hide("slow");
         $('#generate_error').hide("slow");
         $('#generated_data').hide("slow");
