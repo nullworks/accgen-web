@@ -100,7 +100,7 @@ function registerevents() {
         // get a fresh gid instead
         gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () { });
+        }, proxy, cookies).catch(function () {});
 
         // no gid? error out
         if (!gid) {
@@ -349,7 +349,19 @@ function makeid(length) {
     return result;
 }
 
+var electronStatusOnly;
+
 function on_status_received(resp) {
+    if (resp.electron) {
+        if (resp.status)
+            electronStatusOnly = true;
+        else
+            electronStatusOnly = false;
+    } else {
+        if (electronStatusOnly)
+            return;
+    }
+
     if (resp.status) {
         document.getElementById("accgen_status_msg").textContent = resp.status;
         $("#accgen_status").show("slow");
@@ -524,11 +536,20 @@ async function isvalidmx(domain) {
 }
 
 function common_init() {
-    // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
-    window.setImmediate = typeof setImmediate === 'function' ? setImmediate : (...args) => {
-        args.splice(1, 0, 0);
-        setTimeout(...args);
-    };
+    if (isElectron()) {
+        if (typeof ipc != "undefined") {
+            ipc.on('alert-msg', (event, arg) => {
+                on_status_received(arg);
+            })
+            ipc.send("ready");
+            console.log("Ready sent!");
+        }
+        // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
+        window.setImmediate = typeof setImmediate === 'function' ? setImmediate : (...args) => {
+            args.splice(1, 0, 0);
+            setTimeout(...args);
+        };
+    }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
     }
@@ -539,7 +560,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () { }).fail(function (resp) {
+    }).done(function () {}).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
@@ -645,11 +666,11 @@ async function save_clicked() {
         var res = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
         }, {
-                ip: split[0],
-                port: split[1]
-            }).catch(function (e) {
-                console.log(e)
-            })
+            ip: split[0],
+            port: split[1]
+        }).catch(function (e) {
+            console.log(e)
+        })
         if (!res) {
             $("#proxy_error").show("slow");
             $("#settings_proxy").val("")
