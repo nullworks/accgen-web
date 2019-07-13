@@ -649,7 +649,7 @@ async function save_clicked() {
     gtag('event', 'settings_saved');
     if ($("#settings_twocap").val() != "") {
         $.ajax({
-            url: `https://2captcha.com/res.php?key=${$("#settings_2cap").val()}&action=getbalance&header_acao=1`
+            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
         }).done(function (resp) {
             if (resp == "ERROR_KEY_DOES_NOT_EXIST") {
                 $("#twocap_error").show("slow");
