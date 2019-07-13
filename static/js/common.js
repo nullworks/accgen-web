@@ -647,6 +647,7 @@ function load_settings() {
 
 async function save_clicked() {
     gtag('event', 'settings_saved');
+    if($("#settings_2cap").val() != )
     if ($("#settings_custom_domain").val() == "") {
         $("#mx_error").hide("slow");
     } else {
