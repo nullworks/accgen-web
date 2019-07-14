@@ -555,11 +555,11 @@ async function mass_generate_clicked() {
     console.log(valid_accounts);
     change_visibility(0);
     change_visibility(2);
+    displayhistorylist(valid_accounts);
+    change_gen_status_text(undefined, 1);
     if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14) {
         displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.");
     }
-    displayhistorylist(valid_accounts);
-    change_gen_status_text(undefined, 1);
     if ($("#down_check:checked").val())
         download_account_list(valid_accounts);
     return;
