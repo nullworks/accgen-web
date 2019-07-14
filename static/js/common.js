@@ -469,6 +469,43 @@ async function installAddon() {
     }
 }
 
+/*Automatic generation*/
+
+async function getRecaptchaSolution() {
+    var res = await httpRequest({
+        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&json=1`
+    });
+
+    if (!res.request)
+        throw new Error("2Captcha sent invalid json!");
+    console.log("2captcha requestid: " + res.request);
+    await sleep(10000);
+    for (var i = 0; i < 20; i++) {
+        await sleep(5000);
+        var ans_res = await httpRequest({
+            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=get&id=${res.request}&json=1`
+        })
+        console.log(ans_res)
+        // Status could be error, 0 = not yet ready
+        if (ans_res.status == 0)
+            continue;
+        res = ans_res;
+        break;
+    }
+    if (res.status != 1)
+        return res.request;
+    else
+        throw new Error("2Captcha error!");
+    //{"status":1,"request":"61926718398"}
+    //loop every 10 secs for max 10 times
+    //now get https://2captcha.com/res.php?key=KEY&action=get&id=IDfromABOVE
+    //SUCCESS: {"status":1,"request":"SOLUTION_FOR_RECAP"}
+    //need to wait: {"status":0,"request":"CAPCHA_NOT_READY"}
+
+}
+
+/*Automatic generation end*/
+
 function common_generate_pressed() {
     if ($("#steam_iframe").is(":hidden"))
         change_visibility(2);
@@ -652,13 +689,13 @@ async function save_clicked() {
             url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
         }).catch(function (err_response, error) {
             $("#twocap_error").show("slow");
-            $("#settings_2cap").val("");
+            $("#settings_twocap").val("");
         });
         if (!res)
             return;
         if (res == "ERROR_KEY_DOES_NOT_EXIST") {
             $("#twocap_error").show("slow");
-            $("#settings_2cap").val("");
+            $("#settings_twocap").val("");
             return;
         }
     }
