@@ -705,7 +705,10 @@ async function save_clicked() {
             $("#settings_twocap").val("");
             return;
         }
-    }
+        $("#twocap_error").hide("slow");
+    } else
+        $("#twocap_error").hide("slow");
+        
     if ($("#settings_custom_domain").val() == "") {
         $("#mx_error").hide("slow");
     } else {
