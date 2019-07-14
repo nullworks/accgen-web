@@ -80,6 +80,9 @@ function displayerror(errortext) {
         $("#generic_error").hide("slow");
 }
 
+// stores last error returned by https://store.steampowered.com/join/ajaxverifyemail
+var last_gen_error = 1;
+
 async function generateaccount(recaptcha_solution) {
     // Configure proxy
     var proxy = undefined;
@@ -542,6 +545,8 @@ async function mass_generate_clicked() {
         if (result)
             valid_accounts.push(result);
         else {
+            if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14)
+                break;
             change_gen_status_text(`(${i}/${max_count}) Account generation failed! Skipping!`, 1);
             await sleep(3000);
         }
@@ -549,6 +554,9 @@ async function mass_generate_clicked() {
     console.log(valid_accounts);
     change_visibility(0);
     change_visibility(2);
+    if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14) {
+        displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.");
+    }
     displayhistorylist(valid_accounts);
     change_gen_status_text(undefined, 1);
     if ($("#down_check:checked").val())
