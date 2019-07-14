@@ -545,7 +545,12 @@ async function mass_generate_clicked() {
         var result = await generateaccount(recap_key);
         if (result)
             valid_accounts.push(result);
-        on_generated(result);
+        if (result)
+            on_generated(result);
+        else {
+            change_gen_status_text(`(${i}/${max_count}) Account generation failed! Skipping!`, 1);
+            await sleep(3000);
+        }
     }
     console.log(valid_accounts);
     change_visibility(2);
