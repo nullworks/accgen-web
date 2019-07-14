@@ -75,6 +75,7 @@ async function generateaccount(recaptcha_solution) {
     if (typeof toughCookie != "undefined")
         cookies = new toughCookie.CookieJar();
 
+    $("#generate_status").text("Starting...");
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
@@ -324,6 +325,7 @@ function registerevents() {
             return;
         }
 
+        $("#generate_status").text("Starting...");
         change_visibility(true);
 
         var recap_token = e.data.split(";")[0];
