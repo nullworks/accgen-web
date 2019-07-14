@@ -794,7 +794,7 @@ async function save_clicked() {
     }
 
     if ($("#settings_proxy").val() != "") {
-        var proxy = $("#settings_proxy").val().split(":");
+        var proxy = $("#settings_proxy").val();
         var res = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
         }, proxy).catch(function (e) {
