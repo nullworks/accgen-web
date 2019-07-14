@@ -506,7 +506,7 @@ async function getRecaptchaSolution() {
 
 /*Automatic generation end*/
 
-function common_generate_pressed() {
+async function common_generate_pressed() {
     if ($("#settings_twocap").val() != "") //2captcha key is set
     {
         change_visibility(true);
