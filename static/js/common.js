@@ -105,6 +105,8 @@ async function generateaccount(recaptcha_solution) {
         else
             custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
     }
+
+    $("generate_status").text("Getting registration data...");
     var data = await new Promise(function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
@@ -137,6 +139,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
+    $("generate_status").text("Waiting for steam confirmation...");
     var ajaxveryemail = await httpRequest({
         url: "https://store.steampowered.com/join/ajaxverifyemail",
         method: 'POST',
@@ -195,6 +198,7 @@ async function generateaccount(recaptcha_solution) {
         }
     }
 
+    $("generate_status").text("Getting email from email server...");
     var verifydata = await new Promise(function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
@@ -228,6 +232,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
+    $("generate_status").text("Verifying email...");
     await httpRequest({
         url: verifydata.verifylink
     }, proxy, cookies).catch(function () {
@@ -241,6 +246,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
+    $("generate_status").text("Creating account...");
     var createaccount = await httpRequest({
         url: "https://store.steampowered.com/join/createaccount",
         method: 'POST',
@@ -262,6 +268,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
+    $("generate_status").text("Disabling steam guard, adding CS:GO...");
     var account = await new Promise(function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
@@ -508,8 +515,10 @@ async function getRecaptchaSolution() {
 async function common_generate_pressed() {
     if ($("#settings_twocap").val() != "") //2captcha key is set
     {
+        $("generate_status").text("Waiting for 2Captcha...");
         change_visibility(true);
         var recap_key = await getRecaptchaSolution();
+        $("generate_status").text("Captcha solution got!");
         var result = await generateaccount(recap_key);
         on_generated(result);
         return;

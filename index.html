@@ -203,8 +203,9 @@
          <div id="control_buttons">
             <button id="generate_button" type="button" onclick="gtag('event', 'newgen_gen_clicked');generate_pressed();"
                class="btn btn-primary btn-lg">Generate</button>
-            <button type="button" class="btn btn-primary btn-lg" onclick="gtag('event', 'custom_domain_button');settings_pressed();"
-               data-toggle="modal" data-target="#settings_popup">Preferences</button>
+            <button type="button" class="btn btn-primary btn-lg"
+               onclick="gtag('event', 'custom_domain_button');settings_pressed();" data-toggle="modal"
+               data-target="#settings_popup">Preferences</button>
             <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
                class="btn btn-primary btn-lg">History</button>
          </div>
@@ -218,6 +219,7 @@
                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
                   aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
             </div>
+            <span id="generate_status">If you see this, its a bug!</span>
          </div>
       </div>
    </div>
