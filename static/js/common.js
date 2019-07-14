@@ -530,8 +530,8 @@ async function getRecaptchaSolution() {
 
 async function mass_generate_clicked() {
     var max_count = $("#mass_gen_count").val();
-    if (isNaN(max_count)) {
-        displayerror("Count must be a number!");
+    if (!max_count || isNaN(max_count) || max_count < 1) {
+        displayerror("Count must be a non 0 and non negative number!");
         return;
     }
     change_visibility(true);
@@ -553,6 +553,7 @@ async function mass_generate_clicked() {
         }
     }
     console.log(valid_accounts);
+    change_visibility(0);
     change_visibility(2);
     displayhistorylist(valid_accounts);
     change_gen_status_text(undefined, 1);
