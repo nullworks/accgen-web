@@ -41,7 +41,7 @@ function httpRequest(options, proxy, cookies) {
         else {
             var agent = undefined;
             if (proxy)
-                agent = new httpsProxyAgent(`http://${proxy.ip}:${proxy.port}`);
+                agent = new httpsProxyAgent(proxy);
             axios(
                 extend({
                     httpsAgent: agent,
@@ -84,13 +84,7 @@ async function generateaccount(recaptcha_solution) {
     // Configure proxy
     var proxy = undefined;
     if ($("#settings_proxy").val() != "") {
-        var split = $("#settings_proxy").val().split(":");
-        if (split.length == 2) {
-            proxy = {
-                ip: split[0],
-                port: split[1]
-            };
-        }
+        var proxy = $("#settings_proxy").val();
     }
 
     var cookies = undefined;
@@ -800,17 +794,10 @@ async function save_clicked() {
     }
 
     if ($("#settings_proxy").val() != "") {
-        var split = $("#settings_proxy").val().split(":");
-        if (split.length != 2) {
-            $("#proxy_error").show("slow");
-            return;
-        }
+        var proxy = $("#settings_proxy").val().split(":");
         var res = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, {
-            ip: split[0],
-            port: split[1]
-        }).catch(function (e) {
+        }, proxy).catch(function (e) {
             console.log(e)
         })
         if (!res) {
