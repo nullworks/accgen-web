@@ -84,7 +84,7 @@ async function generateaccount(recaptcha_solution) {
     // Configure proxy
     var proxy = undefined;
     if ($("#settings_proxy").val() != "") {
-        var proxy = $("#settings_proxy").val();
+        proxy = $("#settings_proxy").val();
     }
 
     var cookies = undefined;
