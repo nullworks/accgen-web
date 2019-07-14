@@ -352,7 +352,7 @@ function registerevents() {
 
         var recap_token = e.data.split(";")[0];
         var account = await generateaccount(recap_token);
-        on_generated(account);
+        display_data(account);
     }, false);
 }
 
@@ -543,10 +543,10 @@ async function mass_generate_clicked() {
         var recap_key = await getRecaptchaSolution();
         change_gen_status_text(`(${i}/${max_count}) Generating...`, 1);
         var result = await generateaccount(recap_key);
+        if (result && typeof post_generate != "undefined")
+            result = await post_generate(result);
         if (result)
             valid_accounts.push(result);
-        if (result)
-            on_generated(result);
         else {
             change_gen_status_text(`(${i}/${max_count}) Account generation failed! Skipping!`, 1);
             await sleep(3000);
