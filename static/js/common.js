@@ -143,7 +143,7 @@ async function generateaccount(recaptcha_solution) {
         data: stringifyQueryString({
             email: custom_email ? custom_email : data.email,
             captchagid: gid,
-            captcha_text: recap_token
+            captcha_text: recaptcha_solution
         })
     }, proxy, cookies).catch(function () {
         err = error ? error : true;
@@ -473,7 +473,7 @@ async function installAddon() {
 
 async function getRecaptchaSolution() {
     var res = await httpRequest({
-        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&json=1`
+        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&json=1`
     });
 
     if (!res.request)
@@ -483,7 +483,7 @@ async function getRecaptchaSolution() {
     for (var i = 0; i < 20; i++) {
         await sleep(5000);
         var ans_res = await httpRequest({
-            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=get&id=${res.request}&json=1`
+            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=get&id=${res.request}&json=1&header_acao=1`
         })
         console.log(ans_res)
         // Status could be error, 0 = not yet ready
@@ -492,7 +492,7 @@ async function getRecaptchaSolution() {
         res = ans_res;
         break;
     }
-    if (res.status != 1)
+    if (res.status == 1)
         return res.request;
     else
         throw new Error("2Captcha error!");
@@ -507,6 +507,14 @@ async function getRecaptchaSolution() {
 /*Automatic generation end*/
 
 function common_generate_pressed() {
+    if ($("#settings_twocap").val() != "") //2captcha key is set
+    {
+        change_visibility(true);
+        var recap_key = await getRecaptchaSolution();
+        var result = await generateaccount(recap_key);
+        on_generated(result);
+        return;
+    }
     if ($("#steam_iframe").is(":hidden"))
         change_visibility(2);
     $("#steam_iframe").toggle("slow")
