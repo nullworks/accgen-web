@@ -28,7 +28,7 @@ function extend(obj, src) {
 
 function httpRequest(options, proxy, cookies) {
     return new Promise(function (resolve, reject) {
-        if (typeof axios == "undefined")
+        if (typeof axios == "undefined" || !proxy)
             $.ajax(extend({
                 success: function (returnData) {
                     resolve(returnData);
