@@ -60,7 +60,9 @@ function httpRequest(options, proxy, cookies) {
 
 var gen_status_text_priority = 0;
 
-function change_gen_status_text(text, priority = 0) {
+function change_gen_status_text(text, priority) {
+    if (!priority)
+        priority = 0;
     if (priority >= gen_status_text_priority) {
         if (text) {
             $("#generate_status").text(text);
@@ -528,7 +530,6 @@ async function getRecaptchaSolution() {
 
 async function mass_generate_clicked() {
     var max_count = $("#mass_gen_count").val();
-    var count = 0;
     if (isNaN(max_count)) {
         displayerror("Count must be a number!");
         return;
@@ -538,15 +539,17 @@ async function mass_generate_clicked() {
     var valid_accounts = [];
     for (var i = 0; i < max_count; i++) {
         change_visibility(true);
-        change_gen_status_text(`(${count}/${max_count}) Waiting for 2Captcha...`, 1);
+        change_gen_status_text(`(${i}/${max_count}) Waiting for 2Captcha...`, 1);
         var recap_key = await getRecaptchaSolution();
-        change_gen_status_text(`(${count}/${max_count}) Generating...`, 1);
+        change_gen_status_text(`(${i}/${max_count}) Generating...`, 1);
         var result = await generateaccount(recap_key);
         if (result)
             valid_accounts.push(result);
         on_generated(result);
     }
     console.log(valid_accounts);
+    change_visibility(2);
+    displayhistorylist(valid_accounts);
     change_gen_status_text(undefined, 1);
     return;
 }
@@ -664,19 +667,30 @@ function common_init() {
     load_settings()
 }
 
-function history_pressed() {
-    if ($("#history_list").is(":hidden")) {
+function displayhistorylist(data) {
+    var shouldshow = data ? true : false;
+    if (shouldshow) {
         change_visibility(2);
         $("#genned_accs").empty();
         if (localStorage.getItem("genned_account") != null) {
-            $.each((JSON.parse(localStorage.getItem("genned_account"))).reverse(), function (i, item) {
+            $.each(data.reverse(), function (i, item) {
                 $('<tr class="table-primary">').html(
                     "<td>" + item.login + "</td><td>" + item.password + "</td>").appendTo('#genned_accs');
             })
 
         }
     }
-    $("#history_list").toggle('slow');
+    if (shouldshow)
+        $("#history_list").show('slow');
+    else
+        $("#history_list").hide('slow');
+}
+
+function history_pressed() {
+    if ($("#history_list").is(":hidden"))
+        displayhistorylist(JSON.parse(localStorage.getItem("genned_account")));
+    else
+        displayhistorylist(undefined);
 }
 
 //https://stackoverflow.com/a/45831280
@@ -692,15 +706,18 @@ function download(filename, text) {
     document.body.removeChild(element);
 }
 
-function history_download_pressed() {
+function download_account_list(accounts) {
     var s = "";
-    var accounts = JSON.parse(localStorage.getItem("genned_account"));
     for (var i = 0; i < accounts.length; i++) {
         s += (accounts[i].login + ":" + accounts[i].password) + "\n";
     }
 
     var date = new Date();
     download(`accounts–${date.getFullYear()}-${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.txt`, s);
+}
+
+function history_download_pressed() {
+    download_account_list(JSON.parse(localStorage.getItem("genned_account")));
 }
 
 function save_settings() {
