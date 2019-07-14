@@ -525,6 +525,7 @@ function common_change_visibility(pre_generate) {
         $('#mx_error').hide("slow");
         $('#saved_success').hide("slow");
         $('#proxy_error').hide("slow");
+        $('#twocap_error').hide("slow");
         $('#generate_error').hide("slow");
         $('#generated_data').hide("slow");
         $('#history_list').hide("slow");
@@ -679,6 +680,10 @@ function settings_help(page) {
     }
 }
 
+function settings_pressed() {
+    change_visibility(2);
+}
+
 function load_settings() {
     $('input[type="text"]').each(function () {
         var id = $(this).attr('id');
@@ -708,7 +713,7 @@ async function save_clicked() {
         $("#twocap_error").hide("slow");
     } else
         $("#twocap_error").hide("slow");
-        
+
     if ($("#settings_custom_domain").val() == "") {
         $("#mx_error").hide("slow");
     } else {
