@@ -58,6 +58,26 @@ function httpRequest(options, proxy, cookies) {
     });
 }
 
+var gen_status_text_priority = 0;
+
+function change_gen_status_text(text, priority = 0) {
+    if (priority >= gen_status_text_priority) {
+        if (text) {
+            $("#generate_status").text(text);
+            gen_status_text_priority = priority;
+        } else
+            gen_status_text_priority = 0;
+    }
+}
+
+function displayerror(errortext) {
+    if (errortext) {
+        $("#generic_error").show("slow");
+        $("#generic_error").text(errortext);
+    } else
+        $("#generic_error").hide("slow");
+}
+
 async function generateaccount(recaptcha_solution) {
     // Configure proxy
     var proxy = undefined;
@@ -75,7 +95,7 @@ async function generateaccount(recaptcha_solution) {
     if (typeof toughCookie != "undefined")
         cookies = new toughCookie.CookieJar();
 
-    $("#generate_status").text("Starting...");
+    change_gen_status_text("Starting...");
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
@@ -107,7 +127,7 @@ async function generateaccount(recaptcha_solution) {
             custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
     }
 
-    $("#generate_status").text("Getting registration data...");
+    change_gen_status_text("Getting registration data...");
     var data = await new Promise(function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
@@ -140,7 +160,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
-    $("#generate_status").text("Waiting for steam confirmation...");
+    change_gen_status_text("Waiting for steam confirmation...");
     var ajaxveryemail = await httpRequest({
         url: "https://store.steampowered.com/join/ajaxverifyemail",
         method: 'POST',
@@ -199,7 +219,7 @@ async function generateaccount(recaptcha_solution) {
         }
     }
 
-    $("#generate_status").text("Getting email from email server...");
+    change_gen_status_text("Getting email from email server...");
     var verifydata = await new Promise(function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
@@ -233,7 +253,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
-    $("#generate_status").text("Verifying email...");
+    change_gen_status_text("Verifying email...");
     await httpRequest({
         url: verifydata.verifylink
     }, proxy, cookies).catch(function () {
@@ -247,7 +267,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
-    $("#generate_status").text("Creating account...");
+    change_gen_status_text("Creating account...");
     var createaccount = await httpRequest({
         url: "https://store.steampowered.com/join/createaccount",
         method: 'POST',
@@ -269,7 +289,7 @@ async function generateaccount(recaptcha_solution) {
         return;
     }
 
-    $("#generate_status").text("Disabling steam guard, adding CS:GO...");
+    change_gen_status_text("Disabling steam guard, adding CS:GO...");
     var account = await new Promise(function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
@@ -325,7 +345,7 @@ function registerevents() {
             return;
         }
 
-        $("#generate_status").text("Starting...");
+        change_gen_status_text("Starting...");
         change_visibility(true);
 
         var recap_token = e.data.split(";")[0];
@@ -481,7 +501,7 @@ async function installAddon() {
 
 async function getRecaptchaSolution() {
     var res = await httpRequest({
-        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&json=1`
+        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
     });
 
     if (!res.request)
@@ -504,12 +524,31 @@ async function getRecaptchaSolution() {
         return res.request;
     else
         throw new Error("2Captcha error!");
-    //{"status":1,"request":"61926718398"}
-    //loop every 10 secs for max 10 times
-    //now get https://2captcha.com/res.php?key=KEY&action=get&id=IDfromABOVE
-    //SUCCESS: {"status":1,"request":"SOLUTION_FOR_RECAP"}
-    //need to wait: {"status":0,"request":"CAPCHA_NOT_READY"}
+}
 
+async function mass_generate_clicked() {
+    var max_count = $("#mass_gen_count").val();
+    var count = 0;
+    if (isNaN(max_count)) {
+        displayerror("Count must be a number!");
+        return;
+    }
+    change_visibility(true);
+
+    var valid_accounts = [];
+    for (var i = 0; i < max_count; i++) {
+        change_visibility(true);
+        change_gen_status_text(`(${count}/${max_count}) Waiting for 2Captcha...`, 1);
+        var recap_key = await getRecaptchaSolution();
+        change_gen_status_text(`(${count}/${max_count}) Generating...`, 1);
+        var result = await generateaccount(recap_key);
+        if (result)
+            valid_accounts.push(result);
+        on_generated(result);
+    }
+    console.log(valid_accounts);
+    change_gen_status_text(undefined, 1);
+    return;
 }
 
 /*Automatic generation end*/
@@ -517,12 +556,8 @@ async function getRecaptchaSolution() {
 async function common_generate_pressed() {
     if ($("#settings_twocap").val() != "") //2captcha key is set
     {
-        $("#generate_status").text("Waiting for 2Captcha...");
-        change_visibility(true);
-        var recap_key = await getRecaptchaSolution();
-        $("#generate_status").text("Captcha solution got!");
-        var result = await generateaccount(recap_key);
-        on_generated(result);
+        change_visibility(2);
+        $("#mass_generator").modal('show');
         return;
     }
     if ($("#steam_iframe").is(":hidden"))
@@ -541,6 +576,7 @@ function common_change_visibility(pre_generate) {
         $('#generated_data').hide("slow");
         $('#history_list').hide("slow");
         $('#steam_iframe').hide("slow");
+        displayerror(undefined);
 
         if (pre_generate == 1) {
             $('#control_buttons').hide();

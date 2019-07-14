@@ -90,6 +90,15 @@
                Settings have been saved successfully!</strong>
          </div>
          <br>
+         <div id="generic_error" class="alert alert-warning" style="display: none">
+            <strong>
+               <span id="generic_error_text">
+                  Your MX Settings are invalid.
+                  Please check Help for the correct settings. Note that DNS settings might take hours to
+                  propagate.
+               </span>
+            </strong>
+         </div>
          <div id="mx_error" class="alert alert-warning" style="display: none"> <strong>Your MX Settings are invalid.
                Please check Help for the correct settings. Note that DNS settings might take hours to
                propagate.</strong>
@@ -123,6 +132,35 @@
                </div>
             </div>
          </div>
+         <!-- no. of accs, down after gen START -->
+         <div class="modal fade" id="mass_generator">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Mass Generator</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                           aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
+                        <div class="card-body">
+                           <form id="mass_gen_form" action="#">
+                              Number of accounts: <input type="text" id="mass_gen_count" /><br>
+                              Download Accounts after generation: <input type="checkbox" id="down_check" checked="" /><br>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-primary" onclick="mass_generate_clicked()"
+                        data-dismiss="modal">Generate</button>
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- END -->
          <div class="modal fade" id="settings_popup">
             <div class="modal-dialog">
                <div class="modal-content">
