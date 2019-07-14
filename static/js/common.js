@@ -551,6 +551,8 @@ async function mass_generate_clicked() {
     change_visibility(2);
     displayhistorylist(valid_accounts);
     change_gen_status_text(undefined, 1);
+    if ($("#down_check:checked").val())
+        download_account_list(valid_accounts);
     return;
 }
 
