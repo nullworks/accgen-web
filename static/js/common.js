@@ -160,7 +160,7 @@ async function generateaccount(recaptcha_solution) {
     }
 
     change_gen_status_text("Waiting for steam confirmation...");
-    var ajaxveryemail = await httpRequest({
+    var ajaxverifyemail = await httpRequest({
         url: "https://store.steampowered.com/join/ajaxverifyemail",
         method: 'POST',
         data: stringifyQueryString({
@@ -179,8 +179,9 @@ async function generateaccount(recaptcha_solution) {
         });
         return;
     }
-    if (ajaxveryemail && ajaxveryemail.success) {
-        switch (ajaxveryemail.success) {
+    if (ajaxverifyemail && ajaxverifyemail.success) {
+        last_gen_error = ajaxverifyemail.success;
+        switch (ajaxverifyemail.success) {
             case 13:
                 display_data({
                     error: 'The email chosen by our system was invalid. Please Try again.'
