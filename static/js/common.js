@@ -98,7 +98,7 @@ async function generateaccount(recaptcha_solution) {
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
-    }, proxy, cookies).catch(function () {});
+    }, proxy, cookies).catch(function () { });
 
     // no gid? error out
     if (!gid) {
@@ -669,7 +669,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () {}).fail(function (resp) {
+    }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
@@ -720,7 +720,7 @@ function download(filename, text) {
 function download_account_list(accounts) {
     var s = "";
     for (var i = 0; i < accounts.length; i++) {
-        s += (accounts[i].login + ":" + accounts[i].password) + "\n";
+        s += (accounts[i].login + ":" + accounts[i].password) + "\r\n";
     }
 
     var date = new Date();
