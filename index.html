@@ -32,22 +32,19 @@
    <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
    </script>
    <ul class="nav nav-tabs">
-      <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="/"
-            onclick="gtag('event', 'homepage link');">Generator</a>
+      <li class="nav-item"> <a class="nav-link active" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
       </li>
-      <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="custom_gen.html"
-            onclick="gtag('event', 'custom gen');">Custom
+      <li class="nav-item"> <a class="nav-link" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
             Accounts</a>
       </li>
-      <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="recovery.html"
-            onclick="gtag('event', 'stats link');">Account
+      <li class="nav-item"> <a class="nav-link" href="recovery.html" onclick="gtag('event', 'stats link');">Account
             Recovery</a>
       </li>
       <li class="nav-item"> <a target="_blank" class="nav-link" data-toggle="tab"
             href="https://gitlab.com/nullworks/accgen/accgen-web/issues"
             onclick="gtag('event', 'Gitlab issues link');">Gitlab Issues</a>
       </li>
-      <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="telegram.html"
+      <li class="nav-item"> <a class="nav-link" href="telegram.html"
             onclick="gtag('event', 'telegram channel link');">TG
             Announcement
             Channel</a>
@@ -80,25 +77,54 @@
             <h5><a id="ffaddon" href='#' onclick="installAddon()">Download the SAG addon!</a>
             </h5>
             <strong>The addon is required in order to support steam's new registration system.</strong>
+            <br>
+            <strong>
+               <a
+                  href='https://gitlab.com/nullworks/accgen/accgen-electron-app/-/jobs/artifacts/master/browse/dist?job=build'>
+                  Alternatively, download the open source electron app with proxy support!</a>
+            </strong>
          </div>
       </div>
       <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center; padding-bottom: 3%">
          <div class="container text-center">
-            <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't recommend
-               storing valuable items on the accounts.</div>
+            <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't
+               recommend storing valuable items on the accounts.</div>
          </div>
-         <div id="saved_success" class="alert alert-dismissible alert-success" style="display: none"><strong>Your
+         <div class="container text-center">
+            <div class="alert alert-success">
+               <h5><a
+                     href='https://gitlab.com/nullworks/accgen/accgen-electron-app/-/jobs/artifacts/master/browse/dist?job=build'>
+                     Check out our open source electron app with proxy support!</a></h5>
+            </div>
+         </div>
+         <br>
+         <div id="saved_success" class="alert alert-dismissible alert-success" style="display: none">
+            <strong>Your
                Settings have been saved successfully!</strong>
          </div>
          <br>
-         <div id="mx_error" class="alert alert-warning" style="display: none"> <strong>Your MX Settings are invalid.
+         <div id="generic_error" class="alert alert-danger" style="display: none">
+            <strong>
+               <span id="generic_error_text">
+                  Your MX Settings are invalid.
+                  Please check Help for the correct settings. Note that DNS settings might take hours to
+                  propagate.
+               </span>
+            </strong>
+         </div>
+         <div id="mx_error" class="alert alert-warning" style="display: none"> <strong>Your MX Settings are
+               invalid.
                Please check Help for the correct settings. Note that DNS settings might take hours to
                propagate.</strong>
+         </div>
+         <div id="twocap_error" class="alert alert-warning" style="display: none"> <strong>Your 2captcha key is
+               invalid.</strong>
          </div>
          <br>
          <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
          <br>
-         <div id="proxy_error" class="alert alsert-warning" style="display: none"> <strong>The proxy doesn't answer
+         <div id="proxy_error" class="alert alsert-warning" style="display: none"> <strong>The proxy doesn't
+               answer
                requests. (Only http and https proxies are supported)</strong>
          </div>
          <br>
@@ -121,6 +147,39 @@
                </div>
             </div>
          </div>
+         <!-- no. of accs, down after gen START -->
+         <div class="modal fade" id="mass_generator">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Mass Generator</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                           aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
+                        <div class="card-body">
+                           <form id="mass_gen_form" action="#" _lpchecked="1" style="text-align: left;">
+                              Number of accounts: <span style="padding-left: 13rem;"><input type="number"
+                                    id="mass_gen_count"
+                                    style="border-radius: 25px; color: #C0C0C0; background-color: #17191a ;width: 3rem;text-align: center;"></span><br><br>
+                              Download Accounts after generation: <span style="padding-left: 7rem;"><input
+                                    type="checkbox" id="down_check" style="width: 1rem; height: 1rem"
+                                    checked=""></span><br>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-primary" onclick="mass_generate_clicked()"
+                        data-dismiss="modal">Generate</button>
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- END -->
          <div class="modal fade" id="settings_popup">
             <div class="modal-dialog">
                <div class="modal-content">
@@ -139,17 +198,18 @@
                                     class="form-control" placeholder="Enter your custom domain or gmail address"
                                     autocomplete="off"><br>
                                  <button id="help_button" type="button" onclick="settings_help('mx')"
-                                    class="btn btn-primary btn-lg"
-                                    style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
-                                    data-darkreader-inline-color="">Custom domain Help</button>
+                                    class="btn btn-primary btn-lg">Custom domain Help</button>
                                  <button id="help_button" type="button" onclick="settings_help('gmail')"
-                                    class="btn btn-primary btn-lg"
-                                    style="color: darkgrey; --darkreader-inline-color:#cdc7bc;"
-                                    data-darkreader-inline-color="">Gmail setup Help</button>
-                              </h6>
+                                    class="btn btn-primary btn-lg">Gmail setup Help</button>
+                              </h6><br>
                               <h6 id="proxy-settings" class="card-text" style="display: none;">
                                  Proxy settings: <input type="text" id="settings_proxy" class="form-control"
-                                    placeholder="ip:port (http/https proxies only)" autocomplete="off"><br>
+                                    placeholder="protocol://ip:port (http/https proxies only)" autocomplete="off"><br>
+                              </h6>
+                              <br>
+                              <h6 id="twocap-settings" class="card-text">
+                                 2Captcha Key: <input type="text" id="settings_twocap" class="form-control"
+                                    placeholder="Enter your 2Captcha key" autocomplete="off"><br>
                               </h6>
                               <br>
                            </form>
@@ -200,8 +260,9 @@
          <div id="control_buttons">
             <button id="generate_button" type="button" onclick="gtag('event', 'newgen_gen_clicked');generate_pressed();"
                class="btn btn-primary btn-lg">Generate</button>
-            <button type="button" class="btn btn-primary btn-lg" onclick="gtag('event', 'custom_domain_button');"
-               data-toggle="modal" data-target="#settings_popup">Preferences</button>
+            <button type="button" class="btn btn-primary btn-lg"
+               onclick="gtag('event', 'custom_domain_button');settings_pressed();" data-toggle="modal"
+               data-target="#settings_popup">Preferences</button>
             <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
                class="btn btn-primary btn-lg">History</button>
          </div>
@@ -215,6 +276,7 @@
                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
                   aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
             </div>
+            <span id="generate_status">If you see this, its a bug!</span>
          </div>
       </div>
    </div>
