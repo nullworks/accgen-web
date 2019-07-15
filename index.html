@@ -77,14 +77,29 @@
             <h5><a id="ffaddon" href='#' onclick="installAddon()">Download the SAG addon!</a>
             </h5>
             <strong>The addon is required in order to support steam's new registration system.</strong>
+            <br>
+            <strong>
+               <a
+                  href='https://gitlab.com/nullworks/accgen/accgen-electron-app/-/jobs/artifacts/master/browse/dist?job=build'>
+                  Alternatively, download the open source electron app with proxy support!</a>
+            </strong>
          </div>
       </div>
       <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center; padding-bottom: 3%">
          <div class="container text-center">
-            <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't recommend
-               storing valuable items on the accounts.</div>
+            <div class="alert alert-warning">We don't provide email access to the accounts you make. We don't
+               recommend storing valuable items on the accounts.</div>
          </div>
-         <div id="saved_success" class="alert alert-dismissible alert-success" style="display: none"><strong>Your
+         <div class="container text-center">
+            <div class="alert alert-success">
+               <h5><a
+                     href='https://gitlab.com/nullworks/accgen/accgen-electron-app/-/jobs/artifacts/master/browse/dist?job=build'>
+                     Check out our open source electron app with proxy support!</a></h5>
+            </div>
+         </div>
+         <br>
+         <div id="saved_success" class="alert alert-dismissible alert-success" style="display: none">
+            <strong>Your
                Settings have been saved successfully!</strong>
          </div>
          <br>
@@ -97,7 +112,8 @@
                </span>
             </strong>
          </div>
-         <div id="mx_error" class="alert alert-warning" style="display: none"> <strong>Your MX Settings are invalid.
+         <div id="mx_error" class="alert alert-warning" style="display: none"> <strong>Your MX Settings are
+               invalid.
                Please check Help for the correct settings. Note that DNS settings might take hours to
                propagate.</strong>
          </div>
@@ -107,7 +123,8 @@
          <br>
          <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
          <br>
-         <div id="proxy_error" class="alert alsert-warning" style="display: none"> <strong>The proxy doesn't answer
+         <div id="proxy_error" class="alert alsert-warning" style="display: none"> <strong>The proxy doesn't
+               answer
                requests. (Only http and https proxies are supported)</strong>
          </div>
          <br>
