@@ -1,7 +1,7 @@
 "let strict";
 
-function on_generated(account) {
-    $.ajax({
+async function post_generate(account) {
+    var data = await httpRequest({
         url: `/userapi/patreon/customacc/${account.login}/${account.password}`,
         type: 'POST',
         contentType: 'application/json',
@@ -16,12 +16,13 @@ function on_generated(account) {
             image: $("input[name=acc_profileimage]").val()
         }),
         dataType: 'json'
-    }).done(function (data) {
-        data.steamid = account.steamid;
-        display_data(data);
-    }).fail(function (xhr, status, error) {
-        display_data(JSON.parse(xhr.responseText));
+    }).catch(function (xhr) {
+        display_data(xhr)
     });
+    if (!data)
+        return;
+    data.steamid = account.steamid;
+    return data;
 }
 
 function generate_pressed() {

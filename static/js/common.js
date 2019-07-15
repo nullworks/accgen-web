@@ -28,20 +28,20 @@ function extend(obj, src) {
 
 function httpRequest(options, proxy, cookies) {
     return new Promise(function (resolve, reject) {
-        if (typeof axios == "undefined")
+        if (typeof axios == "undefined" || !proxy)
             $.ajax(extend({
                 success: function (returnData) {
                     resolve(returnData);
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr, error);
-                    reject(xhr);
+                    reject(xhr, error);
                 }
             }, options));
         else {
             var agent = undefined;
             if (proxy)
-                agent = new httpsProxyAgent(`http://${proxy.ip}:${proxy.port}`);
+                agent = new httpsProxyAgent(proxy);
             axios(
                 extend({
                     httpsAgent: agent,
@@ -56,6 +56,275 @@ function httpRequest(options, proxy, cookies) {
             })
         }
     });
+}
+
+var gen_status_text_priority = 0;
+
+function change_gen_status_text(text, priority) {
+    if (!priority)
+        priority = 0;
+    if (priority >= gen_status_text_priority) {
+        if (text) {
+            $("#generate_status").text(text);
+            gen_status_text_priority = priority;
+        } else
+            gen_status_text_priority = 0;
+    }
+}
+
+function displayerror(errortext) {
+    if (errortext) {
+        $("#generic_error").show("slow");
+        $("#generic_error").text(errortext);
+    } else
+        $("#generic_error").hide("slow");
+}
+
+// stores last error returned by https://store.steampowered.com/join/ajaxverifyemail
+var last_gen_error = 1;
+
+async function generateaccount(recaptcha_solution) {
+    // Configure proxy
+    var proxy = undefined;
+    if ($("#settings_proxy").val() != "") {
+        proxy = $("#settings_proxy").val();
+    }
+
+    var cookies = undefined;
+    if (typeof toughCookie != "undefined")
+        cookies = new toughCookie.CookieJar();
+
+    change_gen_status_text("Starting...");
+    // get a fresh gid instead
+    var gid = await httpRequest({
+        url: "https://store.steampowered.com/join/refreshcaptcha/"
+    }, proxy, cookies).catch(function () {});
+
+    // no gid? error out
+    if (!gid) {
+        display_data({
+            error: !proxy ? "Invalid data recieved from steam!" : "Proxy couldn't contact Steam!"
+        });
+        return;
+    }
+    console.log(gid);
+
+    if (gid.gid)
+        gid = gid.gid
+    else
+        gid = JSON.parse(gid).gid;
+
+    console.log(gid)
+
+    var err = undefined;
+    var custom_email = undefined;
+
+    if ($("#settings_custom_domain").val() != "") {
+        if ($("#settings_custom_domain").val().includes("@"))
+            custom_email = $("#settings_custom_domain").val().toLowerCase();
+        else
+            custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
+    }
+
+    change_gen_status_text("Getting registration data...");
+    var data = await new Promise(function (resolve, reject) {
+        $.ajax({
+            url: '/userapi/recaptcha/addtask',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                step: "getdata"
+            }),
+            success: function (returnData) {
+                resolve(returnData);
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr);
+                reject(xhr.responseJSON);
+            }
+        });
+    }).catch(function (error) {
+        err = error ? error : true;
+        console.log(err);
+    });
+    if (err) {
+        if (err.error) {
+            display_data(err);
+            return;
+        }
+        display_data({
+            error: 'Error returned by SAG backend! Check console for details!'
+        });
+        return;
+    }
+
+    change_gen_status_text("Waiting for steam confirmation...");
+    var ajaxverifyemail = await httpRequest({
+        url: "https://store.steampowered.com/join/ajaxverifyemail",
+        method: 'POST',
+        data: stringifyQueryString({
+            email: custom_email ? custom_email : data.email,
+            captchagid: gid,
+            captcha_text: recaptcha_solution
+        })
+    }, proxy, cookies).catch(function () {
+        err = error ? error : true;
+        console.log(err);
+    });
+
+    if (err) {
+        display_data({
+            error: 'Error while creating the Steam account! Check console for details!'
+        });
+        return;
+    }
+    if (ajaxverifyemail && ajaxverifyemail.success) {
+        last_gen_error = ajaxverifyemail.success;
+        switch (ajaxverifyemail.success) {
+            case 13:
+                display_data({
+                    error: 'The email chosen by our system was invalid. Please Try again.'
+                });
+                return;
+            case 14:
+                display_data({
+                    error: 'The account name our system chose was not available. Please Try again.'
+                });
+                return;
+            case 84:
+                display_data({
+                    error: 'Steam is limitting account creations from your IP. Try again later.'
+                });
+                return;
+            case 101:
+                display_data({
+                    error: 'Captcha failed or IP banned by steam (vpn?)'
+                });
+                return;
+            case 17:
+                display_data({
+                    error: 'Steam has banned the domain. Please use Gmail or Custom domain'
+                });
+                $("#custom_domain_div").show('slow');
+                report_email();
+                return;
+            case 1:
+                break;
+            default:
+                display_data({
+                    error: 'Error while creating the Steam account! Check console for details!'
+                });
+                return;
+        }
+    }
+
+    change_gen_status_text("Getting email from email server...");
+    var verifydata = await new Promise(function (resolve, reject) {
+        $.ajax({
+            url: '/userapi/recaptcha/addtask',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                step: "getverify",
+                email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
+            }),
+            success: function (returnData) {
+                resolve(returnData);
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr);
+                reject(xhr.responseJSON);
+            }
+        });
+    }).catch(function (error) {
+        err = error ? error : true;
+        console.log(err);
+    });
+    if (err) {
+        if (err.error) {
+            display_data(err);
+            return;
+        }
+        display_data({
+            error: 'Error returned by SAG backend! Check console for details!'
+        });
+        return;
+    }
+
+    change_gen_status_text("Verifying email...");
+    await httpRequest({
+        url: verifydata.verifylink
+    }, proxy, cookies).catch(function () {
+        err = error ? error : true;
+        console.log(err);
+    });
+    if (err) {
+        display_data({
+            error: 'Error while creating the Steam account! Check console for details!'
+        });
+        return;
+    }
+
+    change_gen_status_text("Creating account...");
+    var createaccount = await httpRequest({
+        url: "https://store.steampowered.com/join/createaccount",
+        method: 'POST',
+        data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid
+    }, proxy, cookies).catch(function (error) {
+        err = error ? error : true;
+        console.log(err);
+    });
+    if (err) {
+        display_data({
+            error: 'Error while creating the Steam account! Check console for details!'
+        });
+        return;
+    }
+    if (!createaccount.bSuccess) {
+        display_data({
+            error: 'Error while creating the Steam account! Check console for details!'
+        });
+        return;
+    }
+
+    change_gen_status_text("Disabling steam guard, adding CS:GO...");
+    var account = await new Promise(function (resolve, reject) {
+        $.ajax({
+            url: '/userapi/recaptcha/addtask',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                step: "steamguard",
+                username: data.username,
+                password: data.password,
+                email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
+            }),
+            success: function (returnData) {
+                resolve(returnData);
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr);
+                reject(xhr.responseJSON);
+            }
+        });
+    }).catch(function (error) {
+        err = error ? error : true;
+        console.log(err);
+    });
+    if (err) {
+        if (err.error) {
+            display_data(err);
+            return;
+        }
+        display_data({
+            error: 'Error returned by SAG backend! Check console for details!'
+        });
+        return;
+    }
+    return account;
 }
 
 function registerevents() {
@@ -76,250 +345,12 @@ function registerevents() {
             return;
         }
 
-        // Configure proxy
-        var proxy = undefined;
-        if ($("#settings_proxy").val() != "") {
-            var split = $("#settings_proxy").val().split(":");
-            if (split.length == 2) {
-                proxy = {
-                    ip: split[0],
-                    port: split[1]
-                };
-            }
-        }
-
-        var cookies = undefined;
-        if (typeof toughCookie != "undefined")
-            cookies = new toughCookie.CookieJar();
-
+        change_gen_status_text("Starting...");
         change_visibility(true);
 
-        var gid = e.data.split(";")[1];
         var recap_token = e.data.split(";")[0];
-
-        // get a fresh gid instead
-        gid = await httpRequest({
-            url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () {});
-
-        // no gid? error out
-        if (!gid) {
-            display_data({
-                error: !proxy ? "Invalid data recieved from steam!" : "Proxy couldn't contact Steam!"
-            });
-            return;
-        }
-        console.log(gid);
-
-        if (gid.gid)
-            gid = gid.gid
-        else
-            gid = JSON.parse(gid).gid;
-
-        console.log(gid)
-
-        var err = undefined;
-        var custom_email = undefined;
-
-        if ($("#settings_custom_domain").val() != "") {
-            if ($("#settings_custom_domain").val().includes("@"))
-                custom_email = $("#settings_custom_domain").val().toLowerCase();
-            else
-                custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
-        }
-        var data = await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: '/userapi/recaptcha/addtask',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    step: "getdata"
-                }),
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr);
-                    reject(xhr.responseJSON);
-                }
-            });
-        }).catch(function (error) {
-            err = error ? error : true;
-            console.log(err);
-        });
-        if (err) {
-            if (err.error) {
-                display_data(err);
-                return;
-            }
-            display_data({
-                error: 'Error returned by SAG backend! Check console for details!'
-            });
-            return;
-        }
-
-        var ajaxveryemail = await httpRequest({
-            url: "https://store.steampowered.com/join/ajaxverifyemail",
-            method: 'POST',
-            data: stringifyQueryString({
-                email: custom_email ? custom_email : data.email,
-                captchagid: gid,
-                captcha_text: recap_token
-            })
-        }, proxy, cookies).catch(function () {
-            err = error ? error : true;
-            console.log(err);
-        });
-
-        if (err) {
-            display_data({
-                error: 'Error while creating the Steam account! Check console for details!'
-            });
-            return;
-        }
-        if (ajaxveryemail && ajaxveryemail.success) {
-            switch (ajaxveryemail.success) {
-                case 13:
-                    display_data({
-                        error: 'The email chosen by our system was invalid. Please Try again.'
-                    });
-                    break;
-
-                case 14:
-                    display_data({
-                        error: 'The account name our system chose was not available. Please Try again.'
-                    });
-                    break;
-                case 84:
-                    display_data({
-                        error: 'Steam is limitting account creations from your IP. Try again later.'
-                    });
-                    break;
-                case 101:
-                    display_data({
-                        error: 'Captcha failed or IP banned by steam (vpn?)'
-                    });
-                    break;
-                case 17:
-                    display_data({
-                        error: 'Steam has banned the domain. Please use Gmail or Custom domain'
-                    });
-                    $("#custom_domain_div").show('slow');
-                    report_email();
-                    break;
-                case 1:
-                    break;
-                default:
-                    display_data({
-                        error: 'Error while creating the Steam account! Check console for details!'
-                    });
-                    break;
-            }
-        }
-
-        var verifydata = await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: '/userapi/recaptcha/addtask',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    step: "getverify",
-                    email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
-                }),
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr);
-                    reject(xhr.responseJSON);
-                }
-            });
-        }).catch(function (error) {
-            err = error ? error : true;
-            console.log(err);
-        });
-        if (err) {
-            if (err.error) {
-                display_data(err);
-                return;
-            }
-            display_data({
-                error: 'Error returned by SAG backend! Check console for details!'
-            });
-            return;
-        }
-
-        await httpRequest({
-            url: verifydata.verifylink
-        }, proxy, cookies).catch(function () {
-            err = error ? error : true;
-            console.log(err);
-        });
-        if (err) {
-            display_data({
-                error: 'Error while creating the Steam account! Check console for details!'
-            });
-            return;
-        }
-
-        var createaccount = await httpRequest({
-            url: "https://store.steampowered.com/join/createaccount",
-            method: 'POST',
-            data: 'accountname=' + data.username + '&password=' + data.password + '&count=4&lt=0&creation_sessionid=' + verifydata.creationid
-        }, proxy, cookies).catch(function (error) {
-            err = error ? error : true;
-            console.log(err);
-        });
-        if (err) {
-            display_data({
-                error: 'Error while creating the Steam account! Check console for details!'
-            });
-            return;
-        }
-        if (!createaccount.bSuccess) {
-            display_data({
-                error: 'Error while creating the Steam account! Check console for details!'
-            });
-            return;
-        }
-
-        var account = await new Promise(function (resolve, reject) {
-            $.ajax({
-                url: '/userapi/recaptcha/addtask',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    step: "steamguard",
-                    username: data.username,
-                    password: data.password,
-                    email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
-                }),
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr);
-                    reject(xhr.responseJSON);
-                }
-            });
-        }).catch(function (error) {
-            err = error ? error : true;
-            console.log(err);
-        });
-        if (err) {
-            if (err.error) {
-                display_data(err);
-                return;
-            }
-            display_data({
-                error: 'Error returned by SAG backend! Check console for details!'
-            });
-            return;
-        }
-        on_generated(account);
+        var account = await generateaccount(recap_token);
+        display_data(account);
     }, false);
 }
 
@@ -466,7 +497,83 @@ async function installAddon() {
     }
 }
 
-function common_generate_pressed() {
+/*Automatic generation*/
+
+async function getRecaptchaSolution() {
+    var res = await httpRequest({
+        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
+    });
+
+    if (!res.request)
+        throw new Error("2Captcha sent invalid json!");
+    console.log("2captcha requestid: " + res.request);
+    await sleep(10000);
+    for (var i = 0; i < 20; i++) {
+        await sleep(5000);
+        var ans_res = await httpRequest({
+            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=get&id=${res.request}&json=1&header_acao=1`
+        })
+        console.log(ans_res)
+        // Status could be error, 0 = not yet ready
+        if (ans_res.status == 0)
+            continue;
+        res = ans_res;
+        break;
+    }
+    if (res.status == 1)
+        return res.request;
+    else
+        throw new Error("2Captcha error!");
+}
+
+async function mass_generate_clicked() {
+    var max_count = $("#mass_gen_count").val();
+    if (!max_count || isNaN(max_count) || max_count < 1) {
+        displayerror("Count must be a non 0 and non negative number!");
+        return;
+    }
+    change_visibility(true);
+
+    var valid_accounts = [];
+    for (var i = 0; i < max_count; i++) {
+        change_visibility(true);
+        change_gen_status_text(`(${i}/${max_count}) Waiting for 2Captcha...`, 1);
+        var recap_key = await getRecaptchaSolution();
+        change_gen_status_text(`(${i}/${max_count}) Generating...`, 1);
+        var result = await generateaccount(recap_key);
+        if (result && typeof post_generate != "undefined")
+            result = await post_generate(result);
+        if (result)
+            valid_accounts.push(result);
+        else {
+            if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14)
+                break;
+            change_gen_status_text(`(${i}/${max_count}) Account generation failed! Skipping!`, 1);
+            await sleep(3000);
+        }
+    }
+    console.log(valid_accounts);
+    change_visibility(0);
+    change_visibility(2);
+    displayhistorylist(valid_accounts);
+    change_gen_status_text(undefined, 1);
+    if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14) {
+        displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.");
+    }
+    if ($("#down_check:checked").val())
+        download_account_list(valid_accounts);
+    return;
+}
+
+/*Automatic generation end*/
+
+async function common_generate_pressed() {
+    if ($("#settings_twocap").val() != "") //2captcha key is set
+    {
+        change_visibility(2);
+        $("#mass_generator").modal('show');
+        return;
+    }
     if ($("#steam_iframe").is(":hidden"))
         change_visibility(2);
     $("#steam_iframe").toggle("slow")
@@ -478,10 +585,12 @@ function common_change_visibility(pre_generate) {
         $('#mx_error').hide("slow");
         $('#saved_success').hide("slow");
         $('#proxy_error').hide("slow");
+        $('#twocap_error').hide("slow");
         $('#generate_error').hide("slow");
         $('#generated_data').hide("slow");
         $('#history_list').hide("slow");
         $('#steam_iframe').hide("slow");
+        displayerror(undefined);
 
         if (pre_generate == 1) {
             $('#control_buttons').hide();
@@ -569,19 +678,30 @@ function common_init() {
     load_settings()
 }
 
-function history_pressed() {
-    if ($("#history_list").is(":hidden")) {
+function displayhistorylist(data) {
+    var shouldshow = data ? true : false;
+    if (shouldshow) {
         change_visibility(2);
         $("#genned_accs").empty();
         if (localStorage.getItem("genned_account") != null) {
-            $.each((JSON.parse(localStorage.getItem("genned_account"))).reverse(), function (i, item) {
+            $.each(data.reverse(), function (i, item) {
                 $('<tr class="table-primary">').html(
                     "<td>" + item.login + "</td><td>" + item.password + "</td>").appendTo('#genned_accs');
             })
 
         }
     }
-    $("#history_list").toggle('slow');
+    if (shouldshow)
+        $("#history_list").show('slow');
+    else
+        $("#history_list").hide('slow');
+}
+
+function history_pressed() {
+    if ($("#history_list").is(":hidden"))
+        displayhistorylist(JSON.parse(localStorage.getItem("genned_account")));
+    else
+        displayhistorylist(undefined);
 }
 
 //https://stackoverflow.com/a/45831280
@@ -597,15 +717,18 @@ function download(filename, text) {
     document.body.removeChild(element);
 }
 
-function history_download_pressed() {
+function download_account_list(accounts) {
     var s = "";
-    var accounts = JSON.parse(localStorage.getItem("genned_account"));
     for (var i = 0; i < accounts.length; i++) {
         s += (accounts[i].login + ":" + accounts[i].password) + "\n";
     }
 
     var date = new Date();
     download(`accounts–${date.getFullYear()}-${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.txt`, s);
+}
+
+function history_download_pressed() {
+    download_account_list(JSON.parse(localStorage.getItem("genned_account")));
 }
 
 function save_settings() {
@@ -632,6 +755,10 @@ function settings_help(page) {
     }
 }
 
+function settings_pressed() {
+    change_visibility(2);
+}
+
 function load_settings() {
     $('input[type="text"]').each(function () {
         var id = $(this).attr('id');
@@ -644,6 +771,24 @@ function load_settings() {
 
 async function save_clicked() {
     gtag('event', 'settings_saved');
+    if ($("#settings_twocap").val() != "") {
+        var res = await httpRequest({
+            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
+        }).catch(function (err_response, error) {
+            $("#twocap_error").show("slow");
+            $("#settings_twocap").val("");
+        });
+        if (!res)
+            return;
+        if (res == "ERROR_KEY_DOES_NOT_EXIST") {
+            $("#twocap_error").show("slow");
+            $("#settings_twocap").val("");
+            return;
+        }
+        $("#twocap_error").hide("slow");
+    } else
+        $("#twocap_error").hide("slow");
+
     if ($("#settings_custom_domain").val() == "") {
         $("#mx_error").hide("slow");
     } else {
@@ -658,17 +803,10 @@ async function save_clicked() {
     }
 
     if ($("#settings_proxy").val() != "") {
-        var split = $("#settings_proxy").val().split(":");
-        if (split.length != 2) {
-            $("#proxy_error").show("slow");
-            return;
-        }
+        var proxy = $("#settings_proxy").val();
         var res = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, {
-            ip: split[0],
-            port: split[1]
-        }).catch(function (e) {
+        }, proxy).catch(function (e) {
             console.log(e)
         })
         if (!res) {
