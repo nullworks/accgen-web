@@ -1,6 +1,7 @@
 "let strict";
 
 async function post_generate(account) {
+    change_gen_status_text("Applying custom generator settings...");
     var data = await httpRequest({
         url: `/userapi/patreon/customacc/${account.login}/${account.password}`,
         type: 'POST',
