@@ -711,9 +711,9 @@ function displayhistorylist(data, showdownloadhistory) {
     if (shouldshow) {
         $("#history_list").show('slow');
         if (showdownloadhistory)
-            $("history_download_button").show();
+            $("#history_download_button").show();
         else
-            $("history_download_button").hide();
+            $("#history_download_button").hide();
     } else
         $("#history_list").hide('slow');
 }
