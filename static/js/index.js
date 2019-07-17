@@ -6,10 +6,10 @@ function init() {
 
 function generate_pressed()
 {
-    common_generate_pressed();
+    commonGeneratePressed();
 }
 
 function change_visibility(status)
 {
-    common_change_visibility(status);
+    commonChangeVisibility(status);
 }

@@ -105,7 +105,7 @@ async function generateaccount(recaptcha_solution) {
 
         // no gid? error out
         if (!gid) {
-            display_data({
+            displayData({
                 error: !proxy ? "Invalid data recieved from steam!" : "Proxy couldn't contact Steam!"
             });
             return;
@@ -153,10 +153,10 @@ async function generateaccount(recaptcha_solution) {
         });
         if (err) {
             if (err.error) {
-                display_data(err);
+                displayData(err);
                 return;
             }
-            display_data({
+            displayData({
                 error: 'Error returned by SAG backend! Check console for details!'
             });
             return;
@@ -177,7 +177,7 @@ async function generateaccount(recaptcha_solution) {
         });
 
         if (err) {
-            display_data({
+            displayData({
                 error: 'Error while creating the Steam account! Check console for details!'
             });
             return;
@@ -186,27 +186,27 @@ async function generateaccount(recaptcha_solution) {
             last_gen_error = ajaxverifyemail.success;
             switch (ajaxverifyemail.success) {
                 case 13:
-                    display_data({
+                    displayData({
                         error: 'The email chosen by our system was invalid. Please Try again.'
                     });
                     return;
                 case 14:
-                    display_data({
+                    displayData({
                         error: 'The account name our system chose was not available. Please Try again.'
                     });
                     return;
                 case 84:
-                    display_data({
+                    displayData({
                         error: 'Steam is limitting account creations from your IP. Try again later.'
                     });
                     return;
                 case 101:
-                    display_data({
+                    displayData({
                         error: 'Captcha failed or IP banned by steam (vpn?)'
                     });
                     return;
                 case 17:
-                    display_data({
+                    displayData({
                         error: 'Steam has banned the domain. Please use Gmail or Custom domain'
                     });
                     $("#custom_domain_div").show('slow');
@@ -215,7 +215,7 @@ async function generateaccount(recaptcha_solution) {
                 case 1:
                     break;
                 default:
-                    display_data({
+                    displayData({
                         error: 'Error while creating the Steam account! Check console for details!'
                     });
                     return;
@@ -247,10 +247,10 @@ async function generateaccount(recaptcha_solution) {
         });
         if (err) {
             if (err.error) {
-                display_data(err);
+                displayData(err);
                 return;
             }
-            display_data({
+            displayData({
                 error: 'Error returned by SAG backend! Check console for details!'
             });
             return;
@@ -264,7 +264,7 @@ async function generateaccount(recaptcha_solution) {
             console.log(err);
         });
         if (err) {
-            display_data({
+            displayData({
                 error: 'Error while creating the Steam account! Check console for details!'
             });
             return;
@@ -280,13 +280,13 @@ async function generateaccount(recaptcha_solution) {
             console.log(err);
         });
         if (err) {
-            display_data({
+            displayData({
                 error: 'Error while creating the Steam account! Check console for details!'
             });
             return;
         }
         if (!createaccount.bSuccess) {
-            display_data({
+            displayData({
                 error: 'Error while creating the Steam account! Check console for details!'
             });
             return;
@@ -319,10 +319,10 @@ async function generateaccount(recaptcha_solution) {
         });
         if (err) {
             if (err.error) {
-                display_data(err);
+                displayData(err);
                 return;
             }
-            display_data({
+            displayData({
                 error: 'Error returned by SAG backend! Check console for details!'
             });
             return;
@@ -330,7 +330,7 @@ async function generateaccount(recaptcha_solution) {
         return account;
     } catch (error) {
         // We errored out. Display error!
-        display_data({
+        displayData({
             error: 'Unknown exception! Try again!'
         });
         return;
@@ -362,7 +362,7 @@ function registerevents() {
         var account = await generateaccount(recap_token);
         if (account && typeof post_generate != "undefined")
             account = await post_generate(account);
-        display_data(account);
+        displayData(account);
     }, false);
 }
 
@@ -555,9 +555,11 @@ async function mass_generate_clicked() {
         var result = await generateaccount(recap_key);
         if (result && typeof post_generate != "undefined")
             result = await post_generate(result);
-        if (result)
+        if (result && result.login) {
             valid_accounts.push(result);
-        else {
+            if (max_count == 1)
+                addToHistory(result);
+        } else {
             if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14)
                 break;
             change_gen_status_text(`(${i}/${max_count}) Account generation failed! Skipping!`, 1);
@@ -581,7 +583,7 @@ async function mass_generate_clicked() {
 
 /*Automatic generation end*/
 
-async function common_generate_pressed() {
+async function commonGeneratePressed() {
     if ($("#settings_twocap").val() != "") //2captcha key is set
     {
         change_visibility(2);
@@ -594,7 +596,7 @@ async function common_generate_pressed() {
     document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
 }
 
-function common_change_visibility(pre_generate) {
+function commonChangeVisibility(pre_generate) {
     if (pre_generate) {
         $('#mx_error').hide("slow");
         $('#saved_success').hide("slow");
@@ -616,7 +618,14 @@ function common_change_visibility(pre_generate) {
     }
 }
 
-function display_data(acc_data) {
+function addToHistory(acc_data) {
+    if (localStorage.getItem("genned_account") == null) {
+        localStorage.setItem("genned_account", JSON.stringify([]))
+    }
+    localStorage.setItem("genned_account", JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
+}
+
+function displayData(acc_data) {
     change_visibility(false);
 
     if (acc_data.error) {
@@ -624,11 +633,8 @@ function display_data(acc_data) {
         $("#generate_error_text").html(acc_data.error)
         return;
     }
-    if (localStorage.getItem("genned_account") == null) {
-        localStorage.setItem("genned_account", JSON.stringify([]))
 
-    }
-    localStorage.setItem("genned_account", JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
+    addToHistory(acc_data);
 
     $("#acc_login").html(`Login: <a id="acc_link"><strong>${acc_data.login}</strong></a>`)
     $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);

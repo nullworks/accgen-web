@@ -18,7 +18,7 @@ async function post_generate(account) {
         }),
         dataType: 'json'
     }).catch(function (xhr) {
-        display_data(xhr)
+        displayData(xhr)
     });
     if (!data)
         return;
@@ -27,7 +27,7 @@ async function post_generate(account) {
 }
 
 function generate_pressed() {
-    common_generate_pressed();
+    commonGeneratePressed();
 }
 
 function change_visibility(status) {
@@ -35,7 +35,7 @@ function change_visibility(status) {
         $('custom_gen_form').show('hide');
     else if (!status)
         $('custom_gen_form').show('slow');
-    common_change_visibility(status);
+    commonChangeVisibility(status);
 }
 
 function init() {
