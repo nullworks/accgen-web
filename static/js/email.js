@@ -57,6 +57,7 @@ function startPolling(user, pass) {
             if (returnData.email != "") {
                 $("#email_content").html(DOMPurify.sanitize(returnData.email));
                 $("#email_display").modal('show');
+                $("#email_display").css('padding-right', '27rem')
                 $("#polling_email").hide("slow");
             }
             else {
@@ -65,7 +66,7 @@ function startPolling(user, pass) {
             }
         },
         error: function (xhr, status, error) {
-            /* commented till ratelimits is fixed
+            /* commented till ratelimits is fixed (sometimes we get limited while polling every 5 secs)
                switch (xhr.status) {
                    case 400:
                        $("#error_invalid").show();
