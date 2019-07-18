@@ -65,7 +65,7 @@ function startPolling(user, pass) {
             }
         },
         error: function (xhr, status, error) {
-            /* for some reason it times out rarely.. could result in loss of emails?
+            /* commented till ratelimits is fixed
                switch (xhr.status) {
                    case 400:
                        $("#error_invalid").show();
