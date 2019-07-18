@@ -59,23 +59,19 @@ function startPolling(user, pass) {
                 $("#email_display").modal('show');
                 $("#email_display").css('padding-right', '27rem')
                 $("#polling_email").hide("slow");
-            }
-            else {
-                await sleep(5000);
-                startPolling(user, pass);
+            } else {
+                setTimeout(startPolling, 5000, user, pass);
             }
         },
         error: function (xhr, status, error) {
-            /* commented till ratelimits is fixed (sometimes we get limited while polling every 5 secs)
-               switch (xhr.status) {
-                   case 400:
-                       $("#error_invalid").show();
-                       break;
-                   default:
-                       $("#error_others").show();
-                       break;
-               }
-               */
+            switch (xhr.status) {
+                case 400:
+                    $("#error_invalid").show();
+                    break;
+                default:
+                    $("#error_others").show();
+                    break;
+            }
         }
     })
 }
