@@ -101,7 +101,7 @@ async function generateaccount(recaptcha_solution) {
         // get a fresh gid instead
         var gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () { });
+        }, proxy, cookies).catch(function () {});
 
         // no gid? error out
         if (!gid) {
@@ -554,8 +554,11 @@ async function mass_generate_clicked() {
     for (var i = 0; i < max_count; i++) {
         change_visibility(true);
         change_gen_status_text(`(${i}/${max_count}) Waiting for 2Captcha...`, 1);
-        var recap_key = await getRecaptchaSolution().catch(async function (error) {
-            console.log(error);
+        var recap_key;
+        try {
+            recap_key = await getRecaptchaSolution();
+        } catch (error) {
+            console.error(error);
             if (tries > 2) {
                 change_gen_status_text(`(${i}/${max_count}) Account generation failed! Aborting! [2Captcha error]`, 1);
                 displayerror(`Account generation failed! Aborting! [2Captcha error]`);
@@ -568,11 +571,10 @@ async function mass_generate_clicked() {
                 await sleep(3000);
                 displayerror(undefined);
                 i--;
+                tries++;
                 continue;
             }
-            tries++;
-
-        });
+        }
         tries = 0;
         change_gen_status_text(`(${i}/${max_count}) Generating...`, 1);
         var result = await generateaccount(recap_key);
@@ -712,7 +714,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () { }).fail(function (resp) {
+    }).done(function () {}).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
