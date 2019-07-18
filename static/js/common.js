@@ -101,7 +101,7 @@ async function generateaccount(recaptcha_solution) {
         // get a fresh gid instead
         var gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () {});
+        }, proxy, cookies).catch(function () { });
 
         // no gid? error out
         if (!gid) {
@@ -514,6 +514,9 @@ async function installAddon() {
 async function getRecaptchaSolution() {
     var res = await httpRequest({
         url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
+    }).catch(function (err) {
+        console.log(err);
+        throw new Error("2Captcha sent invalid or empty json!");
     });
 
     if (!res.request)
@@ -547,10 +550,30 @@ async function mass_generate_clicked() {
     change_visibility(true);
 
     var valid_accounts = [];
+    var tries = 0;
     for (var i = 0; i < max_count; i++) {
         change_visibility(true);
         change_gen_status_text(`(${i}/${max_count}) Waiting for 2Captcha...`, 1);
-        var recap_key = await getRecaptchaSolution();
+        var recap_key = await getRecaptchaSolution().catch(function (error) {
+            console.log(error);
+            if (tries > 2) {
+                change_gen_status_text(`(${i}/${max_count}) Account generation failed! Aborting! [2Captcha error]`, 1);
+                displayerror(`Account generation failed! Aborting! [2Captcha error]`);
+                await sleep(3000);
+                displayerror(undefined);
+                break;
+            } else {
+                change_gen_status_text(`(${i}/${max_count}) Account generation failed! Trying again! [${(i + 1)}/3]`, 1);
+                displayerror(`Account generation failed! Trying again! [${(i + 1)}/3]`);
+                await sleep(3000);
+                displayerror(undefined);
+                i--;
+                continue;
+            }
+            tries++;
+
+        });
+        tries = 0;
         change_gen_status_text(`(${i}/${max_count}) Generating...`, 1);
         var result = await generateaccount(recap_key);
         if (result && typeof post_generate != "undefined")
@@ -689,7 +712,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () {}).fail(function (resp) {
+    }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
