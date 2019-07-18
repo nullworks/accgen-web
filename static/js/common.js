@@ -554,7 +554,7 @@ async function mass_generate_clicked() {
     for (var i = 0; i < max_count; i++) {
         change_visibility(true);
         change_gen_status_text(`(${i}/${max_count}) Waiting for 2Captcha...`, 1);
-        var recap_key = await getRecaptchaSolution().catch(function (error) {
+        var recap_key = await getRecaptchaSolution().catch(async function (error) {
             console.log(error);
             if (tries > 2) {
                 change_gen_status_text(`(${i}/${max_count}) Account generation failed! Aborting! [2Captcha error]`, 1);
