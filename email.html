@@ -15,7 +15,7 @@
   </script>
 
   <meta charset="utf-8">
-  <title>SAG - Email Recovery</title>
+  <title>SAG - Email Access</title>
   <meta name="description" content="Restore Steam accounts that were generated before recaptcha was added to Steam">
   <meta name="author" content="nullworks">
   <link rel="stylesheet" href="static/css/bootswatch.min.css">
@@ -26,7 +26,11 @@
   <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-  <script src="static/js/recovery.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha256-CjSoeELFOcH0/uxWu6mC/Vlrc1AARqbm/jiiImDGV3s=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.11/purify.min.js"
+    integrity="sha256-80n5dmervCuGISioxGlsumrwgMc8LJKT0wZybkLtkLM=" crossorigin="anonymous"></script>
+  <script src="static/js/email.js"></script>
   </script>
   <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -70,18 +74,33 @@
       <h4 class="alert-heading">Unknown Error!</h4>
       <p class="mb-0">Temporary Failure. Please try again</p>
     </div>
-    <div id="recovered_email" style="display: none;">
-      <div id="card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
-        <div class="card-header">Account information</div>
-        <div class="card-body">
-          <h6 id="acc_email" class="card-text">
-            Email: <strong>niceemail</strong>
-            <p></p>
-          </h6>
+    <div class="modal fade" id="email_display" style="padding-right: 27rem">
+      <div class="modal-dialog">
+        <div class="modal-content" style="width: 60rem">
+          <div class="modal-header">
+            <h5 class="modal-title">Email</h5>
+          </div>
+          <div class="modal-body">
+            <div id="custom_domain_div" class="card border-dark mb-3" style="margin:auto;">
+              <div class="card-body">
+                <span id="email_content"></span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
         </div>
       </div>
     </div>
-
+    <div id="polling_email" style="display: none;">
+      <h5 id="acc_email">Waiting for emails status</h5>
+      <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
+          aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+      </div>
+    </div>
+    <br><br>
     <div class="form-group">
       <h4><strong>Enter the details of the Steam Account</strong></h4>
       <div class="form-group">
@@ -92,7 +111,7 @@
         <input type="password" id="password" class="form-control" name="password"
           placeholder="Enter Password of the steam account">
       </div>
-      <button type="submit" onclick="gtag('event', 'email_recovery');submit_clicked()"
+      <button type="submit" onclick="gtag('event', 'email_recovery');EmailAccessCheck()"
         class="btn btn-primary">Submit</button>
     </div>
   </div>
