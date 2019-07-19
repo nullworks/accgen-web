@@ -6,7 +6,7 @@ function EmailAccessCheck() {
     $("#mass_generator").modal('hide');
     $("#recovered_email").hide("slow");
     displayerror(undefined);
-    $("submit").hide("slow");
+    $("#submit").hide("slow");
 
     if ($("#username").val() == "" || $("#password").val() == "") {
         $("#error_invalid").show();
@@ -28,7 +28,7 @@ function EmailAccessCheck() {
             startPolling($("#username").val(), $("#password").val());
         },
         error: function (xhr, status, error) {
-            $("submit").show("slow");
+            $("#submit").show("slow");
             try {
                 var res = JSON.parse(xhr.responseText);
                 if (res.error)
@@ -63,7 +63,7 @@ function startPolling(user, pass) {
         }),
         success: async function (returnData) {
             if (returnData.email != "") {
-                $("submit").show("slow");
+                $("#submit").show("slow");
                 document.getElementById("email_content").innerHTML = DOMPurify.sanitize(returnData.email);
                 $("#email_display").modal('show');
                 $("#email_display").css('padding-right', '27rem')
@@ -73,7 +73,7 @@ function startPolling(user, pass) {
             }
         },
         error: function (xhr, status, error) {
-            $("submit").show("slow");
+            $("#submit").show("slow");
             try {
                 var res = JSON.parse(xhr.responseText);
                 if (res.error)
