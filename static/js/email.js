@@ -55,7 +55,7 @@ function startPolling(user, pass) {
         }),
         success: async function (returnData) {
             if (returnData.email != "") {
-                $("#email_content").html(DOMPurify.sanitize(returnData.email));
+                document.getElementById("email_content").innerHTML = DOMPurify.sanitize(returnData.email);
                 $("#email_display").modal('show');
                 $("#email_display").css('padding-right', '27rem')
                 $("#polling_email").hide("slow");
