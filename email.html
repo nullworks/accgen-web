@@ -64,14 +64,16 @@
 <body>
   <div id="recovery_ui" class="container text-center"
     style="margin: auto;height: 50%;min-width: 200px; padding-top: 7%;">
-    <div id="error_invalid" class="alert alert-dismissible alert-danger" style="display: none">
-      <h4 class="alert-heading">Error!</h4>
-      <p class="mb-0">Incorrect Username/Password Combination</p>
+    <div id="generic_error" class="alert alert-danger" style="display: none">
+      <strong>
+        <span id="generic_error_text">
+          Your MX Settings are invalid.
+          Please check Help for the correct settings. Note that DNS settings might take hours to
+          propagate.
+        </span>
+      </strong>
     </div>
-    <div id="error_others" class="alert alert-dismissible alert-danger" style="display: none">
-      <h4 class="alert-heading">Unknown Error!</h4>
-      <p class="mb-0">Temporary Failure. Please try again</p>
-    </div>
+
     <div style="padding-right: 27rem">
       <div class="modal fade" id="email_display">
         <div class="modal-dialog">

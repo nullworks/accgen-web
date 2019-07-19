@@ -26,20 +26,27 @@ function EmailAccessCheck() {
             $("#acc_email").html(`Waiting for emails at <strong>${returnData.email}</strong>`);
             $("#polling_email").show("slow");
             startPolling($("#username").val(), $("#password").val());
-
         },
         error: function (xhr, status, error) {
-            console.error(xhr);
-            switch (xhr.status) {
-                case 400:
-                    $("#error_invalid").show();
-                    break;
-                default:
-                    $("#error_others").show();
-                    break;
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if (res.error)
+                    displayerror(res.error);
+                else
+                    throw new Error("Object does not contain .error!")
+            } catch (error) {
+                displayerror("Unknown error! Please try again later.");
             }
         }
     })
+}
+
+function displayerror(errortext) {
+    if (errortext) {
+        $("#generic_error").show("slow");
+        $("#generic_error").text(errortext);
+    } else
+        $("#generic_error").hide("slow");
 }
 
 function startPolling(user, pass) {
@@ -64,13 +71,14 @@ function startPolling(user, pass) {
             }
         },
         error: function (xhr, status, error) {
-            switch (xhr.status) {
-                case 400:
-                    $("#error_invalid").show();
-                    break;
-                default:
-                    $("#error_others").show();
-                    break;
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if (res.error)
+                    displayerror(res.error);
+                else
+                    throw new Error("Object does not contain .error!")
+            } catch (error) {
+                displayerror("Unknown error! Please try again later.");
             }
         }
     })
