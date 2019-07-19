@@ -462,6 +462,9 @@ function changeText() {
             if (isIOS())
                 return AddonsNotSupported("Firefox IOS")
             document.getElementById("addon_download_text").textContent = "You don't have our Firefox addon yet!";
+            document.getElementById('ffaddon').href = 'https://addons.mozilla.org/de/firefox/addon/sag/';
+            document.getElementById('ffaddon').target = "_blank";
+            document.getElementById('ffaddon').onclick = "";
             break;
         case "Chrome":
             if (isMobile())
@@ -489,23 +492,6 @@ function changeText() {
             break;
         default:
             return AddonsNotSupported();
-    }
-}
-
-async function installAddon() {
-    switch (GetBrowser()) {
-        case "Firefox":
-            InstallTrigger.install({
-                'Steam Account Helper': 'https://addons.mozilla.org/firefox/downloads/latest/sag/'
-            });
-            // Don't redirect to addon page if doubleclicking
-            await sleep(500);
-            document.getElementById('ffaddon').href = 'https://addons.mozilla.org/en-US/firefox/addon/sag/'; //if above failed
-            document.getElementById('ffaddon').target = "_blank";
-            document.getElementById('ffaddon').onclick = "";
-            break;
-        default:
-            break;
     }
 }
 

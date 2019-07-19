@@ -23,6 +23,7 @@ function EmailAccessCheck() {
             check: true
         }),
         success: async function (returnData) {
+            displayerror(undefined);
             $("#acc_email").html(`Waiting for emails at <strong>${returnData.email}</strong>`);
             $("#polling_email").show("slow");
             startPolling($("#username").val(), $("#password").val());
