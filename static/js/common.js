@@ -134,7 +134,7 @@ async function generateaccount(recaptcha_solution) {
         // get a fresh gid instead
         var gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () { });
+        }, proxy, cookies).catch(function () {});
 
         // no gid? error out
         if (!gid) {
@@ -638,6 +638,8 @@ function addToHistory(acc_data) {
     localStorage.setItem("genned_account", JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
 }
 
+var lastacc;
+
 function displayData(acc_data) {
     change_visibility(false);
 
@@ -648,11 +650,16 @@ function displayData(acc_data) {
     }
 
     addToHistory(acc_data);
+    lastacc = acc_data;
 
     $("#acc_login").html(`Login: <a id="acc_link" target="_blank"><strong>${acc_data.login}</strong></a>`)
     $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow");
+}
+
+function electronSteamSignIn() {
+    document.startSteam(lastacc);
 }
 
 async function isvalidmx(domain) {
@@ -691,6 +698,9 @@ function common_init() {
             args.splice(1, 0, 0);
             setTimeout(...args);
         };
+        if (typeof document.startSteam != "undefined") {
+            $("#electron_steam_signin").show();
+        }
     }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();

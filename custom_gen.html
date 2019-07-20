@@ -32,21 +32,19 @@
   <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
   </script>
   <ul class="nav nav-tabs">
-    <li class="nav-item"> <a class="nav-link" href="/"
-        onclick="gtag('event', 'homepage link');">Generator</a>
+    <li class="nav-item"> <a class="nav-link" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
     </li>
     <li class="nav-item"> <a class="nav-link active" href="custom_gen.html"
         onclick="gtag('event', 'custom gen');">Custom
         Accounts</a>
     </li>
     <li class="nav-item"> <a class="nav-link" href="email.html" onclick="gtag('event', 'emailaccess');">Email
-            Access</a>
+        Access</a>
     <li class="nav-item"> <a target="_blank" class="nav-link"
         href="https://gitlab.com/nullworks/accgen/accgen-web/issues"
         onclick="gtag('event', 'Gitlab issues link');">Gitlab Issues</a>
     </li>
-    <li class="nav-item"> <a class="nav-link" href="telegram.html"
-        onclick="gtag('event', 'telegram channel link');">TG
+    <li class="nav-item"> <a class="nav-link" href="telegram.html" onclick="gtag('event', 'telegram channel link');">TG
         Announcement
         Channel</a>
     </li>
@@ -430,6 +428,9 @@
               Password: <strong>nicepass</strong>
               <p></p>
             </h6>
+            <button id="electron_steam_signin" type="button"
+              onclick="gtag('event', 'electron_steam_signin');electronSteamSignIn()" class="btn btn-primary btn-lg"
+              style="display: none;">Sign in using Steam</button>
           </div>
         </div>
       </div>
