@@ -646,6 +646,7 @@ function displayData(acc_data) {
 
 function electronSteamSignIn() {
     document.startSteam(lastacc);
+    $("#electron_steam_signin").hide("slow");
 }
 
 async function isvalidmx(domain) {
