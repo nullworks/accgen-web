@@ -671,6 +671,13 @@ function common_init() {
             })
             document.ipc.send("ready");
             console.log("Ready sent!");
+        } else if (typeof ipc != "undefined") {
+            // FIXME: Fix a regression (2019-07-20), remove after 2019-09-20
+            ipc.on('alert-msg', (event, arg) => {
+                on_status_received(arg);
+            })
+            ipc.send("ready");
+            console.log("Ready sent!");
         }
         // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
         window.setImmediate = typeof setImmediate === 'function' ? setImmediate : (...args) => {
