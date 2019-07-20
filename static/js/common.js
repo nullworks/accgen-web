@@ -80,6 +80,39 @@ function displayerror(errortext) {
         $("#generic_error").hide("slow");
 }
 
+function parseSteamError(code, report) {
+    switch (code) {
+        case 13:
+            return {
+                error: 'The email chosen by our system was invalid. Please Try again.'
+            };
+        case 14:
+            return {
+                error: 'The account name our system chose was not available. Please Try again.'
+            };
+        case 84:
+            return {
+                error: 'Steam is limitting account creations from your IP. Try again later.'
+            };
+        case 101:
+            return {
+                error: 'Captcha failed or IP banned by steam (vpn?)'
+            };
+        case 17:
+            if (report)
+                report_email();
+            return {
+                error: 'Steam has banned the domain. Please use Gmail or Custom domain'
+            };
+        case 1:
+            return {};
+        default:
+            return {
+                error: 'Error while creating the Steam account! Check console for details!'
+            };
+    }
+}
+
 // stores last error returned by https://store.steampowered.com/join/ajaxverifyemail
 var last_gen_error = 1;
 
@@ -184,42 +217,9 @@ async function generateaccount(recaptcha_solution) {
         }
         if (ajaxverifyemail && ajaxverifyemail.success) {
             last_gen_error = ajaxverifyemail.success;
-            switch (ajaxverifyemail.success) {
-                case 13:
-                    displayData({
-                        error: 'The email chosen by our system was invalid. Please Try again.'
-                    });
-                    return;
-                case 14:
-                    displayData({
-                        error: 'The account name our system chose was not available. Please Try again.'
-                    });
-                    return;
-                case 84:
-                    displayData({
-                        error: 'Steam is limitting account creations from your IP. Try again later.'
-                    });
-                    return;
-                case 101:
-                    displayData({
-                        error: 'Captcha failed or IP banned by steam (vpn?)'
-                    });
-                    return;
-                case 17:
-                    displayData({
-                        error: 'Steam has banned the domain. Please use Gmail or Custom domain'
-                    });
-                    $("#custom_domain_div").show('slow');
-                    report_email();
-                    return;
-                case 1:
-                    break;
-                default:
-                    displayData({
-                        error: 'Error while creating the Steam account! Check console for details!'
-                    });
-                    return;
-            }
+            var error = parseSteamError(ajaxverifyemail.success, true);
+            if (error.error)
+                displayData(error);
         }
 
         change_gen_status_text("Getting email from email server...");
@@ -586,6 +586,8 @@ async function mass_generate_clicked() {
     change_gen_status_text(undefined, 1);
     if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14) {
         displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.");
+        var error = parseSteamError(last_gen_error);
+        displayData(error);
     }
     if ($("#down_check:checked").val())
         download_account_list(valid_accounts);
