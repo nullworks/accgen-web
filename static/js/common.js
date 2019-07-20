@@ -637,6 +637,10 @@ function displayData(acc_data) {
 
     addToHistory(acc_data);
     lastacc = acc_data;
+    
+    if (typeof document.startSteam != "undefined") {
+        $("#electron_steam_signin").show();
+    }
 
     $("#acc_login").html(`Login: <a id="acc_link" target="_blank"><strong>${acc_data.login}</strong></a>`)
     $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
@@ -692,9 +696,6 @@ function common_init() {
             args.splice(1, 0, 0);
             setTimeout(...args);
         };
-        if (typeof document.startSteam != "undefined") {
-            $("#electron_steam_signin").show();
-        }
     }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
