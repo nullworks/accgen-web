@@ -27,8 +27,8 @@ function extend(obj, src) {
 }
 
 function httpRequest(options, proxy, cookies) {
-    return new Promise(function (resolve, reject) {
-        if (typeof axios == "undefined" || !proxy)
+    return new Promise(async function (resolve, reject) {
+        if (typeof proxiedHttpRequest == "undefined" || !proxy)
             $.ajax(extend({
                 success: function (returnData) {
                     resolve(returnData);
@@ -39,21 +39,7 @@ function httpRequest(options, proxy, cookies) {
                 }
             }, options));
         else {
-            var agent = undefined;
-            if (proxy)
-                agent = new httpsProxyAgent(proxy);
-            axios(
-                extend({
-                    httpsAgent: agent,
-                    jar: cookies,
-                    withCredentials: true,
-                }, options)
-            ).then(function (res) {
-                resolve(res.data);
-            }, function (err) {
-                console.error(err);
-                reject(err.response, err);
-            })
+            document.proxiedHttpRequest(options, proxy, cookies, resolve, reject);
         }
     });
 }
@@ -127,14 +113,14 @@ async function generateaccount(recaptcha_solution) {
         }
 
         var cookies = undefined;
-        if (typeof toughCookie != "undefined")
-            cookies = new toughCookie.CookieJar();
+        if (typeof document.toughCookie != "undefined")
+            cookies = new document.toughCookie.CookieJar();
 
         change_gen_status_text("Starting...");
         // get a fresh gid instead
         var gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () { });
+        }, proxy, cookies).catch(function () {});
 
         // no gid? error out
         if (!gid) {
@@ -531,7 +517,7 @@ async function mass_generate_clicked() {
     var max_count = $("#mass_gen_count").val();
     if (!max_count || isNaN(max_count) || max_count < 1) {
         displayerror("Count must be a non 0 and non negative number!");
-        return;
+        return false;
     }
     change_visibility(true);
 
@@ -591,7 +577,7 @@ async function mass_generate_clicked() {
     }
     if ($("#down_check:checked").val())
         download_account_list(valid_accounts);
-    return;
+    return false;
 }
 
 /*Automatic generation end*/
@@ -679,11 +665,11 @@ async function isvalidmx(domain) {
 
 function common_init() {
     if (isElectron()) {
-        if (typeof ipc != "undefined") {
-            ipc.on('alert-msg', (event, arg) => {
+        if (typeof document.ipc != "undefined") {
+            document.ipc.on('alert-msg', (event, arg) => {
                 on_status_received(arg);
             })
-            ipc.send("ready");
+            document.ipc.send("ready");
             console.log("Ready sent!");
         }
         // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
@@ -702,7 +688,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () { }).fail(function (resp) {
+    }).done(function () {}).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
@@ -736,6 +722,7 @@ function history_pressed() {
         displayhistorylist(JSON.parse(localStorage.getItem("genned_account")), true);
     else
         displayhistorylist(undefined);
+    return false;
 }
 
 //https://stackoverflow.com/a/45831280
@@ -763,6 +750,7 @@ function download_account_list(accounts) {
 
 function history_download_pressed() {
     download_account_list(JSON.parse(localStorage.getItem("genned_account")));
+    return false;
 }
 
 function save_settings() {
@@ -791,6 +779,7 @@ function settings_help(page) {
 
 function settings_pressed() {
     change_visibility(2);
+    return false;
 }
 
 function load_settings() {
@@ -813,11 +802,11 @@ async function save_clicked() {
             $("#settings_twocap").val("");
         });
         if (!res)
-            return;
+            return false;
         if (res == "ERROR_KEY_DOES_NOT_EXIST") {
             $("#twocap_error").show("slow");
             $("#settings_twocap").val("");
-            return;
+            return false;
         }
         $("#twocap_error").hide("slow");
     } else
@@ -832,7 +821,7 @@ async function save_clicked() {
             } else {
                 $("#mx_error").show("slow");
                 $("#settings_custom_domain").val("");
-                return;
+                return false;
             }
     }
 
@@ -846,9 +835,10 @@ async function save_clicked() {
         if (!res) {
             $("#proxy_error").show("slow");
             $("#settings_proxy").val("")
-            return;
+            return false;
         }
     } else
         $("#proxy_error").hide("slow");
     save_settings();
+    return false
 }

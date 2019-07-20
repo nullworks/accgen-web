@@ -7,6 +7,7 @@ function init() {
 function generate_pressed()
 {
     commonGeneratePressed();
+    return false;
 }
 
 function change_visibility(status)
