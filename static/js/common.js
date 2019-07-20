@@ -101,7 +101,7 @@ async function generateaccount(recaptcha_solution) {
         // get a fresh gid instead
         var gid = await httpRequest({
             url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy, cookies).catch(function () {});
+        }, proxy, cookies).catch(function () { });
 
         // no gid? error out
         if (!gid) {
@@ -647,7 +647,7 @@ function displayData(acc_data) {
 
     addToHistory(acc_data);
 
-    $("#acc_login").html(`Login: <a id="acc_link"><strong>${acc_data.login}</strong></a>`)
+    $("#acc_login").html(`Login: <a id="acc_link" target="_blank"><strong>${acc_data.login}</strong></a>`)
     $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow");
@@ -700,7 +700,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () {}).fail(function (resp) {
+    }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
