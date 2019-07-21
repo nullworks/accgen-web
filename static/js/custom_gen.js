@@ -28,6 +28,17 @@ async function post_generate(account) {
 
 function generate_pressed() {
     commonGeneratePressed();
+    // Save settings
+    localStorage.setItem("custom_gen_settings", JSON.stringify({
+        name: $("input[name=acc_username]").val(),
+        realName: $("input[name=acc_realname]").val(),
+        summary: $("textarea[name=acc_bio]").val(),
+        country: $("select[name=acc_country]").val(),
+        state: $("input[name=acc_state]").val(),
+        city: $("input[name=acc_city]").val(),
+        customURL: $("input[name=acc_profileurl]").val(),
+        image: $("input[name=acc_profileimage]").val()
+    }))
 }
 
 function change_visibility(status) {
