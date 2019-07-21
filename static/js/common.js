@@ -572,7 +572,7 @@ async function mass_generate_clicked() {
     change_gen_status_text(undefined, 1);
     if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14) {
         var error = parseSteamError(last_gen_error);
-        displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.\n" + error);
+        displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.\n" + error.error);
     }
     if ($("#down_check:checked").val())
         download_account_list(valid_accounts);
