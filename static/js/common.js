@@ -204,8 +204,10 @@ async function generateaccount(recaptcha_solution) {
         if (ajaxverifyemail && ajaxverifyemail.success) {
             last_gen_error = ajaxverifyemail.success;
             var error = parseSteamError(ajaxverifyemail.success, true);
-            if (error.error)
+            if (error.error) {
                 displayData(error);
+                return
+            }
         }
 
         change_gen_status_text("Getting email from email server...");
