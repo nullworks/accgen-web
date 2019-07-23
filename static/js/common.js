@@ -350,7 +350,11 @@ function registerevents() {
         var recap_token = e.data.split(";")[0];
         var account = await generateaccount(recap_token);
         if (account && typeof post_generate != "undefined")
+        {
             account = await post_generate(account);
+            if(!account)
+                return;
+        }
         displayData(account);
     }, false);
 }
