@@ -142,10 +142,11 @@ async function generateaccount(recaptcha_solution) {
         var custom_email = undefined;
 
         if ($("#settings_custom_domain").val() != "") {
-            if ($("#settings_custom_domain").val().includes("@"))
-                custom_email = $("#settings_custom_domain").val().toLowerCase();
-            else
-                custom_email = makeid(10) + "@" + $("#settings_custom_domain").val();
+            if ($("#settings_custom_domain").val().includes("@")) {
+                var email_split = $("#settings_custom_domain").val().toLowerCase().split("@");
+                custom_email = email_split[0].replace(/\./g, '') + "@" + email_split[1];
+            } else
+                custom_email = makeid(10) + "@" + $("#settings_custom_domain").val().toLowerCase();
         }
 
         change_gen_status_text("Getting registration data...");
