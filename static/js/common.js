@@ -78,7 +78,7 @@ function parseSteamError(code, report) {
             };
         case 84:
             return {
-                error: 'Steam is limitting account creations from your IP. Try again later.'
+                error: 'Steam is limitting account creations from your IP or this email address (if using Gmail). Try again later.'
             };
         case 101:
             return {
@@ -349,10 +349,9 @@ function registerevents() {
 
         var recap_token = e.data.split(";")[0];
         var account = await generateaccount(recap_token);
-        if (account && typeof post_generate != "undefined")
-        {
+        if (account && typeof post_generate != "undefined") {
             account = await post_generate(account);
-            if(!account)
+            if (!account)
                 return;
         }
         displayData(account);
