@@ -454,7 +454,7 @@ function changeText() {
             if (isIOS())
                 return AddonsNotSupported("Firefox IOS")
             document.getElementById("addon_download_text").textContent = "You don't have our Firefox addon yet!";
-            document.getElementById('ffaddon').href = 'https://addons.mozilla.org/de/firefox/addon/sag/';
+            document.getElementById('ffaddon').href = 'https://addons.mozilla.org/firefox/addon/sag/';
             document.getElementById('ffaddon').target = "_blank";
             document.getElementById('ffaddon').onclick = "";
             break;
