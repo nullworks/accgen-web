@@ -205,6 +205,12 @@ async function generateaccount(recaptcha_solution) {
         if (ajaxverifyemail && ajaxverifyemail.success) {
             last_gen_error = ajaxverifyemail.success;
             var error = parseSteamError(ajaxverifyemail.success, true);
+            if (ajaxverifyemail.sessionid == null) {
+                displayData({
+                    error: 'Steam is limitting account creations from your IP. Try again later.'
+                });
+                return;
+            }
             if (error.error) {
                 displayData(error);
                 return
