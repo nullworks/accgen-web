@@ -35,7 +35,7 @@ function httpRequest(options, proxy, cookies) {
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr, error);
-                    reject(xhr, error);
+                    reject(xhr.responseJSON || xhr.responseText, error);
                 }
             }, options));
         else {

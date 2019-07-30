@@ -17,8 +17,13 @@ async function post_generate(account) {
             image: $("input[name=acc_profileimage]").val()
         }),
         dataType: 'json'
-    }).catch(function (xhr) {
-        displayData(xhr)
+    }).catch(function (resp) {
+        if (resp.error)
+            displayData(resp)
+        else
+            displayData({
+                error: "Unknown error!"
+            });
     });
     if (!data)
         return;
