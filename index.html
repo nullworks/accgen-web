@@ -149,7 +149,7 @@
                </div>
             </div>
          </div>
-          <div class="modal fade" id="proxy_list_modal">
+         <div class="modal fade" id="proxy_list_modal">
             <div class="modal-dialog">
                <div class="modal-content">
                   <div class="modal-header">
@@ -194,11 +194,10 @@
                               Download Accounts after generation: <span style="padding-left: 7rem;"><input
                                     type="checkbox" id="down_check" style="width: 1rem; height: 1rem"
                                     checked=""></span><br>
-                                    <span style="padding-left: 7rem;">
-                                    Use Proxies: 
-                                    <!-- open modal "proxy_list_modal" on checked (use onchange) -->
-                                    <input
-                                    type="checkbox" id="proxy_check" style="width: 1rem; height: 1rem"
+                              <span style="padding-left: 7rem;">
+                                 Use Proxies:
+                                 <!-- open modal "proxy_list_modal" on checked (use onchange) -->
+                                 <input type="checkbox" id="proxy_check" style="width: 1rem; height: 1rem"
                                     checked=""></span><br>
                            </form>
                         </div>
@@ -254,6 +253,38 @@
                         changes</button>
                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                   </div>
+               </div>
+            </div>
+         </div>
+         <div id="generation_status" style="display: none;">
+            <div id="generation_status_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
+               <div class="card-header">Account generation Status</div>
+               <div class="card-body">
+
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>ID</td>
+                           <th>Username</td>
+                           <th>Password</td>
+                           <th>Email</td>
+                           <th>Status</td>
+                        </tr>
+                     </thead>
+                     <tbody id="status_table">
+                        <!--
+                           <tr>
+                           <td>1</td>
+                           <td>SampleUsername</td>
+                           <td>SamplePassword</td>
+                           <td>SampleEmail</td>
+                           <td>Sample</td>
+                        </tr>
+
+                      -->
+                     </tbody>
+                  </table>
+
                </div>
             </div>
          </div>
