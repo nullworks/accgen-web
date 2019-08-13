@@ -99,21 +99,28 @@ function parseSteamError(code, report) {
     }
 }
 
-async function generateAccount(recaptcha_solution, proxy, update) {
+async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
+    function update(msg) {
+        statuscb(msg, id);
+    }
+
+    recaptcha_solution = typeof recaptcha_solution == "string" ? recaptcha_solution : await recaptcha_solution.getCaptchaSolution(id)
+
     var ret = {
         success: false,
         account: null,
         error: {
             steamerror: null,
             message: null
-        }
+        },
+        id: id
     }
 
     var cookies = undefined;
     if (typeof document.toughCookie != "undefined")
         cookies = new document.toughCookie.CookieJar();
 
-    update("Starting...");
+    update("Getting GID...");
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
@@ -328,22 +335,21 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
 
     var accounts = [];
     var concurrent = 0;
+    change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
+
     for (var i = 0; i < count; i++) {
         while (concurrent >= multigen)
             await sleep(500);
         concurrent++;
-
-        function statusCBWrapper(msg) {
-            statuscb(msg, i);
-        }
-        statusCBWrapper("Starting...");
-        generateAccount(typeof captcha == "string" ? captcha : await captcha.getCaptchaSolution(i), proxylist ? proxylist.getProxy() : {
+        statuscb("Starting...", i);
+        generateAccount(captcha, proxylist ? proxylist.getProxy() : {
             getURI: function () {
                 return null
             }
-        }, statusCBWrapper).then(function (res) {
-            generationcallback(res, i);
+        }, statuscb, i).then(function (res) {
+            generationcallback(res, res.id);
             accounts.push(res);
+            change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
             console.log(res);
             concurrent--;
         }, function (err) {
@@ -587,6 +593,7 @@ async function mass_generate_clicked() {
         return false;
     }
 
+    $("#status_table").empty();
     // Preallocate table
     for (var i = 0; i < max_count; i++)
         $("#status_table").append(
@@ -630,7 +637,7 @@ async function mass_generate_clicked() {
             alter_table(id, {
                 status: "error"
             })
-            return;;
+            return;
         }
         alter_table(id, {
             status: "Completed!",
@@ -641,7 +648,7 @@ async function mass_generate_clicked() {
     }
 
     var valid_accounts = [];
-    var accounts = generateAccounts(max_count, null, captcha, 1, statuscb, generationcallback);
+    var accounts = await generateAccounts(max_count, null, captcha, 1, statuscb, generationcallback);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, true);
@@ -661,58 +668,6 @@ async function mass_generate_clicked() {
     }
     change_visibility(false);
     console.log(valid_accounts);
-
-
-    /*try {
-        recap_key = await getRecaptchaSolution();
-    } catch (error) {
-        console.error(error);
-        if (tries > 2) {
-            change_gen_status_text(`(${i}/${max_count}) Account generation failed! Aborting! [2Captcha error]`, 1);
-            displayerror(`Account generation failed! Aborting! [2Captcha error]`);
-            await sleep(3000);
-            displayerror(undefined);
-            break;
-        } else {
-            change_gen_status_text(`(${i}/${max_count}) Account generation failed! Trying again! [${(i + 1)}/3]`, 1);
-            displayerror(`Account generation failed! Trying again! [${(i + 1)}/3]`);
-            await sleep(3000);
-            displayerror(undefined);
-            i--;
-            tries++;
-            continue;
-        }
-    }
-    tries = 0;
-    change_gen_status_text(`(${i}/${max_count}) Generating...`, 1);
-    var result = await generateaccount(recap_key);
-    if (result && typeof post_generate != "undefined")
-        result = await post_generate(result);
-    if (result && result.login) {
-        valid_accounts.push(result);
-        if (max_count == 1)
-            addToHistory(result);
-    } else {
-        if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14)
-            break;
-        change_gen_status_text(`(${i}/${max_count}) Account generation failed! Skipping!`, 1);
-        displayerror(`Account generation failed! Skipping!`);
-        await sleep(3000);
-        displayerror(undefined);
-    }
-}
-console.log(valid_accounts);
-change_visibility(0);
-change_visibility(2);
-displayhistorylist(valid_accounts, false);
-change_gen_status_text(undefined, 1);
-if (last_gen_error != 1 && last_gen_error != 101 && last_gen_error != 14) {
-    var error = parseSteamError(last_gen_error);
-    displayerror("Account generation was aborted due to an error that would otherwise drain your 2Captcha balance.\n" + error.error);
-}
-if ($("#down_check:checked").val())
-    download_account_list(valid_accounts);
-return false;*/
 }
 
 /*Automatic generation end*/
