@@ -104,7 +104,13 @@ async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
         statuscb(msg, id);
     }
 
-    recaptcha_solution = typeof recaptcha_solution == "string" ? recaptcha_solution : await recaptcha_solution.getCaptchaSolution(id)
+    if (typeof recaptcha_solution != "string") {
+        var res = await recaptcha_solution.getCaptchaSolution(id);
+        if (!res) {
+            ret.error.message = 'Getting recaptcha solution failed. Check your 2Captcha API key.';
+            return ret;
+        }
+    }
 
     var ret = {
         success: false,
