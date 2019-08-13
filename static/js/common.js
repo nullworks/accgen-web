@@ -114,7 +114,6 @@ async function generateAccount(recaptcha_solution, proxy, update) {
         cookies = new document.toughCookie.CookieJar();
 
     update("Starting...");
-    update("Getting GID...");
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
@@ -199,7 +198,7 @@ async function generateAccount(recaptcha_solution, proxy, update) {
             ret.error.message = 'Steam is limitting account creations from your IP. Try again later.';
             return ret;
         }
-        if (error.error) {
+        if (ajaxverifyemail.success != 1) {
             ret.error.steamerror = ajaxverifyemail.success;
             return ret;
         }
@@ -353,6 +352,9 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb) {
             concurrent--;
         })
     }
+    while (concurrent > 0)
+        await sleep(500);
+    console.log(accounts)
     return accounts;
     /*if (count == 1) {
         account = accounts[0];
@@ -384,9 +386,9 @@ function registerevents() {
 
         change_visibility(true);
         var recap_token = e.data.split(";")[0];
-        var account = await generateAccounts(1, null, recap_token, null, function statuscb(msg) {
+        var account = (await generateAccounts(1, null, recap_token, null, function statuscb(msg) {
             change_gen_status_text(msg);
-        })[0];
+        }))[0];
         var error = parseErrors(account, true);
         if (error) {
             displayData({
