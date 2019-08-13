@@ -99,7 +99,7 @@ function parseSteamError(code, report) {
     }
 }
 
-function generateAccount(recaptcha_solution, proxy, update) {
+async function generateAccount(recaptcha_solution, proxy, update) {
     var ret = {
         success: false,
         account: null,
