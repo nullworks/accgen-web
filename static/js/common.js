@@ -630,7 +630,7 @@ async function mass_generate_clicked() {
             alter_table(id, {
                 status: "error"
             })
-            continue;
+            return;;
         }
         alter_table(id, {
             status: "Completed!",
