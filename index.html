@@ -149,6 +149,31 @@
                </div>
             </div>
          </div>
+          <div class="modal fade" id="proxy_list_modal">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Proxy List</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                           aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
+                        <div class="card-body">
+                           <p>Enter your proxy list</p><br>
+                           <textarea id="proxy_list_input"></textarea>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-primary" onclick="mass_generate_clicked()"
+                        data-dismiss="modal">Generate</button>
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
          <!-- no. of accs, down after gen START -->
          <div class="modal fade" id="mass_generator">
             <div class="modal-dialog">
@@ -168,6 +193,12 @@
                                     style="border-radius: 25px; color: #C0C0C0; background-color: #17191a ;width: 3rem;text-align: center;"></span><br><br>
                               Download Accounts after generation: <span style="padding-left: 7rem;"><input
                                     type="checkbox" id="down_check" style="width: 1rem; height: 1rem"
+                                    checked=""></span><br>
+                                    <span style="padding-left: 7rem;">
+                                    Use Proxies: 
+                                    <!-- open modal "proxy_list_modal" on checked (use onchange) -->
+                                    <input
+                                    type="checkbox" id="proxy_check" style="width: 1rem; height: 1rem"
                                     checked=""></span><br>
                            </form>
                         </div>
