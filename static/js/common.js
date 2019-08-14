@@ -66,7 +66,7 @@ function displayerror(errortext) {
         $("#generic_error").hide("slow");
 }
 
-function parseSteamError(code, report) {
+function parseSteamError(code, report, proxymgr) {
     switch (code) {
         case 13:
             return {
@@ -77,10 +77,14 @@ function parseSteamError(code, report) {
                 error: 'The account name our system chose was not available. Please Try again.'
             };
         case 84:
+            if (proxymgr)
+                proxymgr.proxy.ratelimit();
             return {
                 error: 'Steam is limitting account creations from your IP or this email address (if using Gmail). Try again later.'
             };
         case 101:
+            if (proxymgr)
+                proxymgr.proxy.ban();
             return {
                 error: 'Captcha failed or IP banned by steam (vpn?)'
             };
@@ -99,17 +103,9 @@ function parseSteamError(code, report) {
     }
 }
 
-async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
+async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     function update(msg) {
         statuscb(msg, id);
-    }
-
-    if (typeof recaptcha_solution != "string") {
-        var res = await recaptcha_solution.getCaptchaSolution(id);
-        if (!res) {
-            ret.error.message = 'Getting recaptcha solution failed. Check your 2Captcha API key.';
-            return ret;
-        }
     }
 
     var ret = {
@@ -119,7 +115,26 @@ async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
             steamerror: null,
             message: null
         },
-        id: id
+        id: id,
+        proxy: proxymgr
+    }
+
+    if (typeof recaptcha_solution != "string") {
+        var res = await recaptcha_solution.getCaptchaSolution(id);
+        if (!res) {
+            ret.error.message = 'Getting captcha solution failed. Check your 2Captcha API key.';
+            return ret;
+        }
+        recaptcha_solution = res;
+    }
+
+    var proxy;
+    if (ret.proxy) {
+        if (!ret.proxy.proxy) {
+            ret.error.message = 'No valid proxy found! Check the proxy list for banned proxies!';
+            return ret;
+        }
+        proxy = ret.proxy.proxy.uri;
     }
 
     var cookies = undefined;
@@ -134,6 +149,8 @@ async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
 
     // no gid? error out
     if (!gid) {
+        if (ret.proxy)
+            ret.proxy.proxy.error();
         ret.error.message = !proxy ? "Invalid data recieved from steam!" : "Proxy couldn't contact Steam!";
         return ret;
     }
@@ -188,7 +205,7 @@ async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
         return ret;
     }
 
-    update("Waiting for Email verification...");
+    update("Waiting for confirmation from steam...");
     var ajaxverifyemail = await httpRequest({
         url: "https://store.steampowered.com/join/ajaxverifyemail",
         method: 'POST',
@@ -214,6 +231,9 @@ async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
         if (ajaxverifyemail.success != 1) {
             ret.error.steamerror = ajaxverifyemail.success;
             return ret;
+        } else {
+            if (ret.proxy)
+                ret.proxy.proxy.verify();
         }
     }
 
@@ -323,16 +343,142 @@ async function generateAccount(recaptcha_solution, proxy, statuscb, id) {
     return ret;
 }
 
+var proxylist = {
+    proxylist: [],
+    getProxy: function () {
+        var proxies = this.proxylist;
+        var time = Date.now();
+        // Filter out proxies that are on timeout or banned
+        proxies = proxies.filter(function (value) {
+            return !value.banned && !value.errored && (!value.timeout || value.timeout < time);
+        })
+        // sort proxies, verified goes to the top
+        proxies.sort(function (a, b) {
+            if (a.verified == b.verified)
+                return 0;
+            if (a.verified)
+                return -1;
+            if (b.verified)
+                return 1;
+            return 0;
+        })
+        return {
+            proxy: proxies[0]
+        }
+    },
+    import: function (text) {
+        var proxies = text.split("\n");
+        for (var i in proxies) {
+            var err = false;
+            var proxy = proxies[i];
+            try {
+                new URL(proxy);
+            } catch (error) {
+                err = true;
+            }
+            if (!err) {
+                if (this.proxylist.find(o => o.uri == proxy))
+                    continue;
+                this.proxylist.push({
+                    uri: proxy,
+                    errored: false,
+                    banned: false,
+                    verify: function () {
+                        this.verified = true;
+                        this.bancounter = 0;
+                        this.errorcount = 0;
+                    },
+                    ratelimit: function () {
+                        this.timeout = Date.now() + 12 * 60 * 60 * 1000
+                    },
+                    ban: function () {
+                        if (!this.bancounter)
+                            this.bancounter = 1;
+                        else
+                            this.bancounter++;
+                        if (this.bancounter >= 2 && !this.verified)
+                            // proxy likely to be banned
+                            this.banned = true;
+                        else if (this.bancounter >= 4 && this.verified)
+                            // proxy having a bad day?
+                            this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                    },
+                    error: function () {
+                        if (!this.verified) {
+                            this.errored = true;
+                        } else {
+                            if (this.errorcount >= 1)
+                                this.errored = true;
+                            else {
+                                this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                                this.errorcount = 1;
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    }
+}
+
+function edit_proxy_json() {
+    $("#proxy_json_textbox").text(JSON.stringify(proxylist.proxylist, null, 4));
+    $("#proxy_json").modal('show');
+
+}
+
+function save_proxy_json() {
+    // bad idea? invalid json is a thing
+    var data;
+    try {
+        data = JSON.parse($("#proxy_json_textbox").text())
+    } catch (e) {
+        displayerror("Invalid json!");
+        return;
+    }
+
+    var err = false;
+    // Check if the json is correct
+    if (Array.isArray(data)) {
+        for (var i in data) {
+            var entry = data[i];
+            if (!entry.uri || !entry.state) {
+                err = true;
+                break;
+            }
+            try {
+                new URL(entry.uri);
+            } catch (error) {
+                err = true;
+                break;
+            }
+        }
+    } else err = true;
+
+    if (err) {
+        displayerror("Invalid format!");
+        return;
+    } else {
+        proxylist.proxylist = data;
+        $("#proxy_json").modal('hide');
+    }
+}
+
+function proxy_list_save() {
+    proxylist.import($("#proxy_list_input").text())
+}
+
 function parseErrors(data, report) {
     if (!data || (!data.success && !data.error.message && !data.error.steamerror)) {
         return "Unknown error!"
     }
-    if (data.success)
+    if (data.success == true)
         return;
     if (data.error.message)
         return data.error.message;
     if (data.error.steamerror)
-        parseSteamError(data.error.steamerror, report);
+        return parseSteamError(data.error.steamerror, report, data.proxy).error;
+    return "Unknown error!"
 }
 
 async function generateAccounts(count, proxylist, captcha, multigen, statuscb, generationcallback) {
@@ -348,11 +494,7 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
             await sleep(500);
         concurrent++;
         statuscb("Starting...", i);
-        generateAccount(captcha, proxylist ? proxylist.getProxy() : {
-            getURI: function () {
-                return null
-            }
-        }, statuscb, i).then(function (res) {
+        generateAccount(captcha, proxylist ? proxylist.getProxy() : undefined, statuscb, i).then(function (res) {
             generationcallback(res, res.id);
             accounts.push(res);
             change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
@@ -631,7 +773,8 @@ async function mass_generate_clicked() {
                 } catch (error) {
                     statuscb("Getting captcha solution failed!", id);
                     console.error(error);
-                    await sleep(3000);
+                    if (i == 0)
+                        await sleep(3000);
                 }
             }
         }
@@ -641,7 +784,7 @@ async function mass_generate_clicked() {
         var error = parseErrors(account, true);
         if (error) {
             alter_table(id, {
-                status: "error"
+                status: error
             })
             return;
         }
@@ -657,10 +800,10 @@ async function mass_generate_clicked() {
     var accounts = await generateAccounts(max_count, null, captcha, 1, statuscb, generationcallback);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
-        var error = parseErrors(account, true);
+        var error = parseErrors(account, false);
         if (error) {
             alter_table(i, {
-                status: "error"
+                status: error
             })
             continue;
         }
@@ -876,6 +1019,12 @@ function save_settings() {
         localStorage.setItem(id, value);
         $("#saved_success").show('slow')
     });
+    $('textarea').each(function () {
+        var id = $(this).attr('id');
+        var value = $(this).val();
+        localStorage.setItem(id, value);
+        $("#saved_success").show('slow')
+    });
 }
 
 function settings_help(page) {
@@ -900,6 +1049,11 @@ function settings_pressed() {
 
 function load_settings() {
     $('input[type="text"]').each(function () {
+        var id = $(this).attr('id');
+        var value = localStorage.getItem(id);
+        $(this).val(value);
+    });
+    $('textarea').each(function () {
         var id = $(this).attr('id');
         var value = localStorage.getItem(id);
         $(this).val(value);

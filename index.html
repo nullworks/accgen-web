@@ -165,6 +165,31 @@
                </div>
             </div>
          </div>
+          <div class="modal fade" id="proxy_json">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Additional Proxy Configuration</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                           aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div id="proxy_json_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
+                        <div class="card-body">
+                           <h5>Proxy Configuration</h5><br>
+                           <textarea id="proxy_json_textbox" style=" width: 100%; height: 10rem; "></textarea>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" onclick="save_proxy_json()"
+                        data-dismiss="modal">Save</button>
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
          <div class="modal fade" id="proxy_list_modal">
             <div class="modal-dialog">
                <div class="modal-content">
@@ -175,16 +200,18 @@
                      </button>
                   </div>
                   <div class="modal-body">
-                     <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
+                     <div id="proxy_list_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
                         <div class="card-body">
-                           <p>Enter your proxy list</p><br>
-                           <textarea id="proxy_list_input"></textarea>
+                           <h4>Enter your Proxies here</h4><br>
+                           <textarea id="proxy_list_input" style=" width: 100%; height: 10rem; "></textarea>
                         </div>
                      </div>
                   </div>
                   <div class="modal-footer">
-                     <button type="button" class="btn btn-primary" onclick="mass_generate_clicked()"
-                        data-dismiss="modal">Generate</button>
+                  <button type="button" class="btn btn-primary" onclick="edit_proxy_json()"
+                        data-dismiss="modal">Edit</button>
+                     <button type="button" class="btn btn-primary" onclick="save_settings()"
+                        data-dismiss="modal">Save</button>
                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                   </div>
                </div>
@@ -212,8 +239,7 @@
                                     checked=""></span><br>
                               <span style="padding-left: 7rem;">
                                  Use Proxies:
-                                 <!-- open modal "proxy_list_modal" on checked (use onchange) -->
-                                 <input type="checkbox" id="proxy_check" style="width: 1rem; height: 1rem"
+                                 <input type="checkbox" id="proxy_check" onchange='$("#proxy_list_modal").modal("show");'' style="width: 1rem; height: 1rem"
                                     checked=""></span><br>
                            </form>
                         </div>
