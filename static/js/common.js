@@ -122,10 +122,13 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     var proxy;
     if (ret.proxy) {
         if (!ret.proxy.proxy.uri) {
-            ret.error.message = 'No valid proxy found! Check the proxy list for banned proxies!';
+            ret.error.message = ret.proxy.proxy.emulated ? "Account generation stopped due to a previous error." : 'No valid proxy found! Check the proxy list for banned proxies!';
             return ret;
         }
-        proxy = ret.proxy.proxy.uri;
+        if (ret.proxy.proxy.emulated)
+            proxy = null;
+        else
+            proxy = ret.proxy.proxy.uri;
         console.log(ret.proxy)
     }
 
@@ -821,8 +824,51 @@ async function mass_generate_clicked() {
         })
     }
 
+    var proxy = $("#proxy_check:checked").val() ? proxylist : undefined;
+    if (!proxy) {
+        // emulate a proxylist
+        proxy = {
+            localproxy: {
+                proxy: {
+                    emulated: true,
+                    uri: "emulated",
+                    verify: function () {
+                        this.verified = true;
+                        this.bancounter = 0;
+                        this.errorcount = 0;
+                    },
+                    ratelimit: function () {
+                        this.uri = undefined;
+                    },
+                    ban: function () {
+                        if (!this.bancounter)
+                            this.bancounter = 1;
+                        else
+                            this.bancounter++;
+                        if (this.bancounter >= 3 && !this.verified)
+                            // likely to be banned
+                            this.uri = undefined;
+                        else if (this.bancounter >= 4 && this.verified)
+                            this.uri = undefined;
+                    },
+                    error: function () {
+                        if (!this.errorcount)
+                            this.errorcount = 1;
+                        else
+                            this.errorcount++;
+                        if (this.errorcount >= 3)
+                            this.uri = undefined;
+                    }
+                }
+            },
+            getProxy: function () {
+                return this.localproxy
+            }
+        }
+    }
+
     var valid_accounts = [];
-    var accounts = await generateAccounts(max_count, $("#proxy_check:checked").val() ? proxylist : undefined, captcha, 1, statuscb, generationcallback);
+    var accounts = await generateAccounts(max_count, proxy, captcha, 1, statuscb, generationcallback);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, false);
