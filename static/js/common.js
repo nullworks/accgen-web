@@ -119,22 +119,14 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         proxy: proxymgr
     }
 
-    if (typeof recaptcha_solution != "string") {
-        var res = await recaptcha_solution.getCaptchaSolution(id);
-        if (!res) {
-            ret.error.message = 'Getting captcha solution failed. Check your 2Captcha API key.';
-            return ret;
-        }
-        recaptcha_solution = res;
-    }
-
     var proxy;
     if (ret.proxy) {
-        if (!ret.proxy.proxy) {
+        if (!ret.proxy.proxy.uri) {
             ret.error.message = 'No valid proxy found! Check the proxy list for banned proxies!';
             return ret;
         }
         proxy = ret.proxy.proxy.uri;
+        console.log(ret.proxy)
     }
 
     var cookies = undefined;
@@ -161,7 +153,14 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     else
         gid = JSON.parse(gid).gid;
 
-    console.log(gid)
+    if (typeof recaptcha_solution != "string") {
+        var res = await recaptcha_solution.getCaptchaSolution(id);
+        if (!res) {
+            ret.error.message = 'Getting captcha solution failed. Check your 2Captcha API key.';
+            return ret;
+        }
+        recaptcha_solution = res;
+    }
 
     var err = undefined;
     var custom_email = undefined;
@@ -363,7 +362,40 @@ var proxylist = {
             return 0;
         })
         return {
-            proxy: proxies[0]
+            proxy: $.extend(proxies[0], {
+                verify: function () {
+                    this.verified = true;
+                    this.bancounter = 0;
+                    this.errorcount = 0;
+                },
+                ratelimit: function () {
+                    this.timeout = Date.now() + 12 * 60 * 60 * 1000
+                },
+                ban: function () {
+                    if (!this.bancounter)
+                        this.bancounter = 1;
+                    else
+                        this.bancounter++;
+                    if (this.bancounter >= 2 && !this.verified)
+                        // proxy likely to be banned
+                        this.banned = true;
+                    else if (this.bancounter >= 4 && this.verified)
+                        // proxy having a bad day?
+                        this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                },
+                error: function () {
+                    if (!this.verified) {
+                        this.errored = true;
+                    } else {
+                        if (this.errorcount >= 1)
+                            this.errored = true;
+                        else {
+                            this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                            this.errorcount = 1;
+                        }
+                    }
+                }
+            })
         }
     },
     import: function (text) {
@@ -383,89 +415,77 @@ var proxylist = {
                     uri: proxy,
                     errored: false,
                     banned: false,
-                    verify: function () {
-                        this.verified = true;
-                        this.bancounter = 0;
-                        this.errorcount = 0;
-                    },
-                    ratelimit: function () {
-                        this.timeout = Date.now() + 12 * 60 * 60 * 1000
-                    },
-                    ban: function () {
-                        if (!this.bancounter)
-                            this.bancounter = 1;
-                        else
-                            this.bancounter++;
-                        if (this.bancounter >= 2 && !this.verified)
-                            // proxy likely to be banned
-                            this.banned = true;
-                        else if (this.bancounter >= 4 && this.verified)
-                            // proxy having a bad day?
-                            this.timeout = Date.now() + 12 * 60 * 60 * 1000;
-                    },
-                    error: function () {
-                        if (!this.verified) {
-                            this.errored = true;
-                        } else {
-                            if (this.errorcount >= 1)
-                                this.errored = true;
-                            else {
-                                this.timeout = Date.now() + 12 * 60 * 60 * 1000;
-                                this.errorcount = 1;
-                            }
-                        }
-                    }
                 })
             }
         }
+    },
+    dump: function () {
+        localStorage.setItem("proxylist", JSON.stringify(this.proxylist))
+    },
+    load: function () {
+        var data = localStorage.getItem("proxylist");
+        if (proxylistLinter(data))
+            this.proxylist = JSON.parse(data);
     }
 }
 
 function edit_proxy_json() {
-    $("#proxy_json_textbox").text(JSON.stringify(proxylist.proxylist, null, 4));
+    if (proxylist.proxylist.length > 0)
+        $("#proxy_json_textbox").val(JSON.stringify(proxylist.proxylist, null, 4));
+    else
+        $("#proxy_json_textbox").val('');
     $("#proxy_json").modal('show');
 
 }
 
-function save_proxy_json() {
-    // bad idea? invalid json is a thing
+function proxylistLinter(list) {
+    // Verify if the proxy list is valid
     var data;
     try {
-        data = JSON.parse($("#proxy_json_textbox").text())
+        data = JSON.parse(list)
     } catch (e) {
-        displayerror("Invalid json!");
-        return;
+        return false;
     }
 
-    var err = false;
     // Check if the json is correct
     if (Array.isArray(data)) {
         for (var i in data) {
             var entry = data[i];
-            if (!entry.uri || !entry.state) {
-                err = true;
-                break;
+            if (!entry.uri) {
+                return false;
             }
             try {
                 new URL(entry.uri);
             } catch (error) {
-                err = true;
-                break;
+                return false;
             }
         }
-    } else err = true;
+    } else
+        return false;
+    return true;
+}
 
-    if (err) {
+function save_proxy_json() {
+    var data = $("#proxy_json_textbox").val();
+    $("#proxy_json").modal('hide');
+    if (data == "") {
+        proxylist.proxylist = [];
+        return;
+    }
+
+    if (!proxylistLinter(data)) {
         displayerror("Invalid format!");
         return;
     } else {
-        proxylist.proxylist = data;
+        proxylist.proxylist = JSON.parse(data);
+        proxylist.dump();
         $("#proxy_json").modal('hide');
     }
 }
 
 function proxy_list_save() {
-    proxylist.import($("#proxy_list_input").text())
+    proxylist.import($("#proxy_list_input").val())
+    $('#proxy_list_input').val('')
 }
 
 function parseErrors(data, report) {
@@ -477,7 +497,7 @@ function parseErrors(data, report) {
     if (data.error.message)
         return data.error.message;
     if (data.error.steamerror)
-        return parseSteamError(data.error.steamerror, report, data.proxy).error;
+        return parseSteamError(data.error.steamerror, report, report ? data.proxy : undefined).error;
     return "Unknown error!"
 }
 
@@ -790,7 +810,7 @@ async function mass_generate_clicked() {
             return;
         }
         alter_table(id, {
-            status: "Completed!",
+            status: "Finished!",
             username: account.account.login,
             password: account.account.password,
             email: account.account.email
@@ -798,7 +818,7 @@ async function mass_generate_clicked() {
     }
 
     var valid_accounts = [];
-    var accounts = await generateAccounts(max_count, $("#proxy_check:checked").val() && proxylist.proxylist.length > 0, captcha, 1, statuscb, generationcallback);
+    var accounts = await generateAccounts(max_count, $("#proxy_check:checked").val() ? proxylist : undefined, captcha, 1, statuscb, generationcallback);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, false);
@@ -937,6 +957,7 @@ function common_init() {
             args.splice(1, 0, 0);
             setTimeout(...args);
         };
+        proxylist.load();
     }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
