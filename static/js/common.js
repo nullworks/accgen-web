@@ -514,7 +514,8 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
 
     var accounts = [];
     var concurrent = 0;
-    change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
+    if (count > 1)
+        change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
 
     for (var i = 0; i < count; i++) {
         while (concurrent >= multigen)
@@ -525,7 +526,8 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
             if (generationcallback)
                 generationcallback(res, res.id);
             accounts.push(res);
-            change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
+            if (count > 1)
+                change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
             console.log(res);
             concurrent--;
         }, function (err) {
@@ -824,7 +826,7 @@ async function mass_generate_clicked() {
         })
     }
 
-    var proxy = $("#proxy_check:checked").val() ? proxylist : undefined;
+    var proxy = $("#proxy_check:checked").val() && typeof document.proxiedHttpRequest != "undefined" ? proxylist : undefined;
     if (!proxy) {
         // emulate a proxylist
         proxy = {
