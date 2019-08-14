@@ -495,7 +495,8 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
         concurrent++;
         statuscb("Starting...", i);
         generateAccount(captcha, proxylist ? proxylist.getProxy() : undefined, statuscb, i).then(function (res) {
-            generationcallback(res, res.id);
+            if (generationcallback)
+                generationcallback(res, res.id);
             accounts.push(res);
             change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
             console.log(res);
@@ -797,7 +798,7 @@ async function mass_generate_clicked() {
     }
 
     var valid_accounts = [];
-    var accounts = await generateAccounts(max_count, null, captcha, 1, statuscb, generationcallback);
+    var accounts = await generateAccounts(max_count, $("#proxy_check:checked").val() && proxylist.proxylist.length > 0, captcha, 1, statuscb, generationcallback);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, false);
