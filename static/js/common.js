@@ -26,7 +26,7 @@ function extend(obj, src) {
     return obj;
 }
 
-function httpRequest(options, proxy, cookies) {
+function httpRequest(options, proxy, cookies, timeout) {
     return new Promise(async function (resolve, reject) {
         if (typeof document.proxiedHttpRequest == "undefined" || !proxy)
             $.ajax(extend({
@@ -39,7 +39,7 @@ function httpRequest(options, proxy, cookies) {
                 }
             }, options));
         else {
-            document.proxiedHttpRequest(options, proxy, cookies, resolve, reject);
+            document.proxiedHttpRequest(options, proxy, cookies, resolve, reject, timeout);
         }
     });
 }
@@ -137,7 +137,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
-    }, proxy, cookies).catch(function () {});
+    }, proxy, cookies, 15000).catch(function () {});
 
     // no gid? error out
     if (!gid) {
@@ -367,9 +367,11 @@ var proxylist = {
                     this.verified = true;
                     this.bancounter = 0;
                     this.errorcount = 0;
+                    proxylist.dump();
                 },
                 ratelimit: function () {
-                    this.timeout = Date.now() + 12 * 60 * 60 * 1000
+                    this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                    proxylist.dump();
                 },
                 ban: function () {
                     if (!this.bancounter)
@@ -382,6 +384,7 @@ var proxylist = {
                     else if (this.bancounter >= 4 && this.verified)
                         // proxy having a bad day?
                         this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                    proxylist.dump();
                 },
                 error: function () {
                     if (!this.verified) {
@@ -394,6 +397,7 @@ var proxylist = {
                             this.errorcount = 1;
                         }
                     }
+                    proxylist.dump();
                 }
             })
         }
@@ -834,10 +838,12 @@ async function mass_generate_clicked() {
             password: account.account.password,
             email: account.account.email
         })
-        valid_accounts.push(account);
+        if (account.account)
+            valid_accounts.push(account.account);
     }
     change_visibility(false);
-    console.log(valid_accounts);
+    if ($("#down_check:checked").val() && valid_accounts.length >= 1)
+        download_account_list(valid_accounts);
 }
 
 /*Automatic generation end*/
