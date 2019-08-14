@@ -412,12 +412,11 @@ var proxylist = {
                 if (this.proxylist.find(o => o.uri == proxy))
                     continue;
                 this.proxylist.push({
-                    uri: proxy,
-                    errored: false,
-                    banned: false,
+                    uri: proxy
                 })
             }
         }
+        proxylist.dump();
     },
     dump: function () {
         localStorage.setItem("proxylist", JSON.stringify(this.proxylist))
@@ -470,6 +469,7 @@ function save_proxy_json() {
     $("#proxy_json").modal('hide');
     if (data == "") {
         proxylist.proxylist = [];
+        proxylist.dump();
         return;
     }
 
