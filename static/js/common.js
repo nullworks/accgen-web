@@ -766,8 +766,13 @@ async function mass_generate_clicked() {
 
     // Get accounts to generate (count)
     var max_count = $("#mass_gen_count").val();
+    var concurrency = $("#mass_gen_concurrency").val();
     if (!max_count || isNaN(max_count) || max_count < 1) {
         displayerror("Count must be a non 0 and non negative number!");
+        return false;
+    }
+    if (!concurrency || isNaN(concurrency) || concurrency < 1) {
+        displayerror("Concurrency must be a non 0 and non negative number!");
         return false;
     }
 
@@ -870,7 +875,7 @@ async function mass_generate_clicked() {
     }
 
     var valid_accounts = [];
-    var accounts = await generateAccounts(max_count, proxy, captcha, 1, statuscb, generationcallback);
+    var accounts = await generateAccounts(max_count, proxy, captcha, concurrency, statuscb, generationcallback);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, false);
@@ -892,6 +897,7 @@ async function mass_generate_clicked() {
     change_visibility(false);
     if ($("#down_check:checked").val() && valid_accounts.length >= 1)
         download_account_list(valid_accounts);
+    return false;
 }
 
 /*Automatic generation end*/

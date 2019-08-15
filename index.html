@@ -178,12 +178,12 @@
                      <div class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
                         <div class="card-body">
                            <form action="#" _lpchecked="1" style="text-align: left;">
-                              Number of accounts: <span style="padding-left: 13rem;"><input type="number"
-                                    id="mass_gen_count"
-                                    style="border-radius: 25px; color: #C0C0C0; background-color: #17191a ;width: 3rem;text-align: center;"></span><br><br>
-                              Download Accounts after generation: <span style="padding-left: 7rem;"><input
-                                    type="checkbox" id="down_check" style="width: 1rem; height: 1rem"
-                                    checked=""></span><br>
+                              Number of accounts: <input value="1" type="number" id="mass_gen_count"
+                                 style="border-radius: 25px; color: #C0C0C0; background-color: #17191a ;width: 3rem;text-align: center; float: right; margin-right:2rem"><br><br>
+                              Concurrency (how many at once): <input value="1" type="number" id="mass_gen_concurrency"
+                                 style="border-radius: 25px; color: #C0C0C0; background-color: #17191a ;width: 3rem;text-align: center; float: right; margin-right:2rem"><br><br>
+                              Download Accounts after generation: <input type="checkbox" id="down_check"
+                                 style="width: 1rem; height: 1rem; float: right; margin-right:3rem" checked=""><br>
                            </form>
                         </div>
                      </div>
@@ -227,7 +227,8 @@
                      <div id="proxy_list_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
                         <div class="card-body">
                            <h4>Enter your Proxies here</h4><br>
-                           <textarea id="proxy_list_input" style=" width: 100%; height: 25rem; " placeholder="Newline seperated list with the following format (scheme = http/https): scheme://[user:passowrd@]ip:port"></textarea>
+                           <textarea id="proxy_list_input" style=" width: 100%; height: 25rem; "
+                              placeholder="Newline seperated list with the following format (scheme = http/https): scheme://[user:passowrd@]ip:port"></textarea>
                         </div>
                      </div>
                   </div>
