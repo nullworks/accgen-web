@@ -514,7 +514,7 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
 
     var accounts = [];
     var concurrent = 0;
-    if (count > 1)
+    if (generationcallback)
         change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
 
     for (var i = 0; i < count; i++) {
@@ -526,7 +526,7 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
             if (generationcallback)
                 generationcallback(res, res.id);
             accounts.push(res);
-            if (count > 1)
+            if (generationcallback)
                 change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
             console.log(res);
             concurrent--;
