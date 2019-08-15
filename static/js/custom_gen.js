@@ -1,9 +1,9 @@
 "let strict";
 
-async function post_generate(account) {
-    change_gen_status_text("Applying custom generator settings...");
-    var data = await httpRequest({
-        url: `/userapi/patreon/customacc/${account.login}/${account.password}`,
+async function post_generate(account, update) {
+    update("Applying custom generator settings...");
+    await httpRequest({
+        url: `/userapi/patreon/customacc/${account.account.login}/${account.account.password}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
@@ -18,17 +18,13 @@ async function post_generate(account) {
         }),
         dataType: 'json'
     }).catch(function (resp) {
-        if (resp.error)
-            displayData(resp)
-        else
-            displayData({
-                error: "Unknown error!"
-            });
+        if (resp.error) {
+            account.error.message = resp.error;
+        } else {
+            account.error.message = "Unknown error!";
+        }
     });
-    if (!data)
-        return;
-    data.steamid = account.steamid;
-    return data;
+    return account;
 }
 
 function generate_pressed() {

@@ -334,13 +334,13 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         ret.error.message = 'Error returned by SAG backend! Check console for details!';
         return ret;
     }
-    if (account && typeof post_generate != "undefined") {
-        account = await post_generate(account);
+    ret.account = account;
+    if (ret.account && typeof post_generate != "undefined") {
+        ret = await post_generate(ret, update);
     }
     if (!account.error) {
         update("Success!");
         ret.success = true;
-        ret.account = account;
     }
     return ret;
 }
