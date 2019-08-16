@@ -338,7 +338,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     if (ret.account && typeof post_generate != "undefined") {
         ret = await post_generate(ret, update);
     }
-    if (!account.error) {
+    if (ret.account) {
         update("Success!");
         ret.success = true;
     }

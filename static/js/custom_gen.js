@@ -20,8 +20,10 @@ async function post_generate(account, update) {
     }).catch(function (resp) {
         if (resp.error) {
             account.error.message = resp.error;
+            account.account = null;
         } else {
             account.error.message = "Unknown error!";
+            account.account = null;
         }
     });
     return account;
