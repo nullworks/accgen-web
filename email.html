@@ -1,19 +1,6 @@
 <html lang="en">
 
 <head>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137480510-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-137480510-1');
-  </script>
-
   <meta charset="utf-8">
   <title>SAG - Email Access</title>
   <meta name="description" content="Access emails of accounts!">
@@ -32,30 +19,21 @@
     integrity="sha256-80n5dmervCuGISioxGlsumrwgMc8LJKT0wZybkLtkLM=" crossorigin="anonymous"></script>
   <script src="static/js/email.js"></script>
   <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
+    <li class="nav-item"> <a class="nav-link" href="/">Generator</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="custom_gen.html" onclick="gtag('event', 'custom gen');">Custom
-        Accounts</a>
+    <li class="nav-item"> <a class="nav-link" href="custom_gen.html">Custom Accounts</a>
     </li>
-    <li class="nav-item"> <a class="nav-link active" href="email.html" onclick="gtag('event', 'emailaccess');">Email
-        Access</a>
+    <li class="nav-item"> <a class="nav-link active" href="email.html">Email Access</a>
+    <li class="nav-item"> <a target="_blank" class="nav-link"
+        href="https://gitlab.com/nullworks/accgen/accgen-web/issues">Gitlab Issues</a>
     </li>
+    <li class="nav-item"><a class="nav-link" href="telegram.html">TG Announcement Channel</a></li>
     <li class="nav-item">
-      <a class="nav-link" href="https://gitlab.com/nullworks/accgen/accgen-web/issues"
-        onclick="gtag('event', 'Gitlab issues link');">Gitlab Issues</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="telegram.html" onclick="gtag('event', 'telegram channel link');">TG
-        Announcement
-        Channel</a>
-    </li>
-    <li class="nav-item">
-      <div style="line-height: 0;"><a href="https://patreon.com/steam_acc"
-          onclick="gtag('event', 'Become patreon button');"><img
-            src="https://i1.wp.com/spectraartspace.com/wp-content/uploads/2019/04/Become_a_patron_button.png"
-            style="height: 2.5rem;"></a>
+      <div style="line-height: 0;">
+        <a href="https://patreon.com/steam_acc">
+          <img src="https://i1.wp.com/spectraartspace.com/wp-content/uploads/2019/04/Become_a_patron_button.png"
+            style="height: 2.5rem;">
+        </a>
       </div>
     </li>
   </ul>
@@ -113,7 +91,7 @@
         <input type="password" id="password" class="form-control" name="password"
           placeholder="Enter Password of the steam account">
       </div>
-      <button type="submit" id="submit" onclick="gtag('event', 'email_recovery');EmailAccessCheck()"
+      <button type="submit" id="submit" onclick="EmailAccessCheck()"
         class="btn btn-primary">Submit</button>
     </div>
   </div>

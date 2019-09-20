@@ -1,8 +1,6 @@
 <html lang="en">
 
 <head>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-137480510-1"></script>
   <style>
     table {
       font-family: arial, sans-serif;
@@ -17,16 +15,6 @@
       padding: 8px;
     }
   </style>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-137480510-1');
-  </script>
   <meta charset="utf-8">
   <title>Steam Account Generator</title>
   <meta name="description" content="Generate Steam accounts with custom profile settings">
@@ -43,28 +31,20 @@
     integrity="sha256-CjSoeELFOcH0/uxWu6mC/Vlrc1AARqbm/jiiImDGV3s=" crossorigin="anonymous"></script>
   <script defer src="static/js/common.js"></script>
   <script defer src="static/js/custom_gen.js"></script>
-  <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM">
-  </script>
+  <script defer src="https://recaptcha.net/recaptcha/api.js?render=6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM"></script>
   <ul class="nav nav-tabs">
-    <li class="nav-item"> <a class="nav-link" href="/" onclick="gtag('event', 'homepage link');">Generator</a>
+    <li class="nav-item"> <a class="nav-link" href="/">Generator</a>
     </li>
-    <li class="nav-item"> <a class="nav-link active" href="custom_gen.html"
-        onclick="gtag('event', 'custom gen');">Custom
-        Accounts</a>
+    <li class="nav-item"> <a class="nav-link active" href="custom_gen.html">Custom Accounts</a>
     </li>
-    <li class="nav-item"> <a class="nav-link" href="email.html" onclick="gtag('event', 'emailaccess');">Email
-        Access</a>
+    <li class="nav-item"> <a class="nav-link" href="email.html">Email Access</a>
     <li class="nav-item"> <a target="_blank" class="nav-link"
-        href="https://gitlab.com/nullworks/accgen/accgen-web/issues"
-        onclick="gtag('event', 'Gitlab issues link');">Gitlab Issues</a>
+        href="https://gitlab.com/nullworks/accgen/accgen-web/issues">Gitlab Issues</a>
     </li>
-    <li class="nav-item"> <a class="nav-link" href="telegram.html" onclick="gtag('event', 'telegram channel link');">TG
-        Announcement
-        Channel</a>
-    </li>
+    <li class="nav-item"><a class="nav-link" href="telegram.html">TG Announcement Channel</a></li>
     <li class="nav-item">
       <div style="line-height: 0;">
-        <a href="https://patreon.com/steam_acc" onclick="gtag('event', 'Become patreon button');">
+        <a href="https://patreon.com/steam_acc">
           <img src="https://i1.wp.com/spectraartspace.com/wp-content/uploads/2019/04/Become_a_patron_button.png"
             style="height: 2.5rem;">
         </a>
@@ -442,9 +422,8 @@
               Password: <strong>nicepass</strong>
               <p></p>
             </h6>
-            <button id="electron_steam_signin" type="button"
-              onclick="gtag('event', 'electron_steam_signin');electronSteamSignIn()" class="btn btn-primary btn-lg"
-              style="display: none;">Sign in using Steam</button>
+            <button id="electron_steam_signin" type="button" onclick="electronSteamSignIn()"
+              class="btn btn-primary btn-lg" style="display: none;">Sign in using Steam</button>
           </div>
         </div>
       </div>
@@ -653,17 +632,15 @@
           </thead>
           <tbody id="genned_accs"></tbody>
         </table>
-        <button id="history_download_button" type="button"
-          onclick="gtag('event', 'history_download_pressed');history_download_pressed()"
+        <button id="history_download_button" type="button" onclick="history_download_pressed()"
           class="btn btn-primary btn-lg">Download user:password list</button>
       </div>
       <div id="control_buttons">
-        <button id="generate_button" type="button" onclick="gtag('event', 'newgen_gen_clicked');generate_pressed();"
+        <button id="generate_button" type="button" onclick="generate_pressed();"
           class="btn btn-primary btn-lg">Generate</button>
-        <button type="button" class="btn btn-primary btn-lg"
-          onclick="gtag('event', 'custom_domain_button');settings_pressed();" data-toggle="modal"
+        <button type="button" class="btn btn-primary btn-lg" onclick="settings_pressed();" data-toggle="modal"
           data-target="#settings_popup">Preferences</button>
-        <button id="history_button" type="button" onclick="gtag('event', 'show_genned_accs');history_pressed();"
+        <button id="history_button" type="button" onclick="history_pressed();"
           class="btn btn-primary btn-lg">History</button>
       </div>
       <div id="steam_iframe" style="display: none;">

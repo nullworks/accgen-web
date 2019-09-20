@@ -671,7 +671,6 @@ function GetBrowser() {
         return "Edge";
     if ((!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0)
         return "Opera";
-    gtag('event', 'newgen_unsupported_browser');
     return "Unsupported";
 }
 
@@ -1145,7 +1144,6 @@ function load_settings() {
 }
 
 async function save_clicked() {
-    gtag('event', 'settings_saved');
     if ($("#settings_twocap").val() != "") {
         var res = await httpRequest({
             url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
