@@ -1,9 +1,7 @@
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+var $ = require("jquery");
+var DOMPurify = require("dompurify");
 
-function EmailAccessCheck() {
-    $("#mass_generator").modal('hide');
+global.EmailAccessCheck = function EmailAccessCheck() {
     $("#recovered_email").hide("slow");
     displayerror(undefined);
     $("#submit").hide("slow");

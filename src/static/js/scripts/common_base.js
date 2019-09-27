@@ -1,23 +1,9 @@
 "let strict";
 
-function isElectron() {
-    // Renderer process
-    if (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') {
-        return true;
-    }
+var $ = require("jquery");
+var isElectron = require("is-electron");
 
-    // Main process
-    if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {
-        return true;
-    }
-
-    // Detect the user agent when the `nodeIntegration` option is set to true
-    if (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0) {
-        return true;
-    }
-
-    return false;
-}
+global.$ = $;
 
 function extend(obj, src) {
     for (var key in src) {
@@ -140,7 +126,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     // get a fresh gid instead
     var gid = await httpRequest({
         url: "https://store.steampowered.com/join/refreshcaptcha/"
-    }, proxy, cookies, 15000).catch(function () {});
+    }, proxy, cookies, 15000).catch(function () { });
 
     // no gid? error out
     if (!gid) {
@@ -435,7 +421,7 @@ var proxylist = {
     }
 }
 
-function edit_proxy_json() {
+global.edit_proxy_json = function () {
     if (proxylist.proxylist.length > 0)
         $("#proxy_json_textbox").val(JSON.stringify(proxylist.proxylist, null, 4));
     else
@@ -471,7 +457,7 @@ function proxylistLinter(list) {
     return true;
 }
 
-function save_proxy_json() {
+global.save_proxy_json = function () {
     var data = $("#proxy_json_textbox").val();
     $("#proxy_json").modal('hide');
     if (data == "") {
@@ -490,7 +476,7 @@ function save_proxy_json() {
     }
 }
 
-function proxy_list_save() {
+global.proxy_list_save = function () {
     proxylist.import($("#proxy_list_input").val())
     $('#proxy_list_input').val('')
 }
@@ -749,7 +735,7 @@ async function getRecaptchaSolution() {
         throw new Error("2Captcha error!");
 }
 
-async function mass_generate_clicked() {
+global.mass_generate_clicked = async function () {
     // Inline to limit scope
     function alter_table(id, data) {
         if (isNaN(id)) {
@@ -901,7 +887,7 @@ async function mass_generate_clicked() {
 
 /*Automatic generation end*/
 
-async function commonGeneratePressed() {
+global.commonGeneratePressed = async function () {
     if ($("#settings_twocap").val() != "") //2captcha key is set
     {
         change_visibility(2);
@@ -914,7 +900,7 @@ async function commonGeneratePressed() {
     document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
 }
 
-function commonChangeVisibility(pre_generate) {
+global.commonChangeVisibility = function (pre_generate) {
     if (pre_generate) {
         $('#mx_error').hide("slow");
         $('#saved_success').hide("slow");
@@ -968,7 +954,7 @@ function displayData(acc_data) {
     $("#generated_data").show("slow");
 }
 
-function electronSteamSignIn() {
+global.electronSteamSignIn = function () {
     document.startSteam(lastacc);
     $("#electron_steam_signin").hide("slow");
 }
@@ -995,7 +981,7 @@ async function isvalidmx(domain) {
     return true;
 }
 
-function common_init() {
+global.common_init = function () {
     if (isElectron()) {
         if (typeof document.ipc != "undefined") {
             document.ipc.on('alert-msg', (event, arg) => {
@@ -1028,7 +1014,7 @@ function common_init() {
     // Check if addon installed
     $.ajax({
         url: "https://store.steampowered.com/join/"
-    }).done(function () {}).fail(function (resp) {
+    }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
@@ -1057,7 +1043,7 @@ function displayhistorylist(data, showdownloadhistory) {
         $("#history_list").hide('slow');
 }
 
-function history_pressed() {
+global.history_pressed = function () {
     if ($("#history_list").is(":hidden"))
         displayhistorylist(JSON.parse(localStorage.getItem("genned_account")), true);
     else
@@ -1088,7 +1074,7 @@ function download_account_list(accounts) {
     download(`accounts–${date.getFullYear()}-${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.txt`, s);
 }
 
-function history_download_pressed() {
+global.history_download_pressed = function () {
     download_account_list(JSON.parse(localStorage.getItem("genned_account")));
     return false;
 }
@@ -1108,7 +1094,7 @@ function save_settings() {
     });
 }
 
-function settings_help(page) {
+global.settings_help = function (page) {
     switch (page) {
         case "gmail":
             window.open("https://github.com/nullworks/accgen-web/wiki/Using-Your-Gmail-address-with-Steam-Account-Generator");
@@ -1123,7 +1109,7 @@ function settings_help(page) {
     }
 }
 
-function settings_pressed() {
+global.settings_pressed = function () {
     change_visibility(2);
     return false;
 }
@@ -1143,7 +1129,7 @@ function load_settings() {
         $("#proxy-settings").show();
 }
 
-async function save_clicked() {
+global.save_clicked = async function () {
     if ($("#settings_twocap").val() != "") {
         var res = await httpRequest({
             url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
