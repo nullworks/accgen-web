@@ -6,13 +6,15 @@ function initSettings() {
         if (storage) {
             try {
                 cached_settings = JSON.parse(storage);
-                return;
+                if (!cached_settings)
+                    cached_settings = {};
             } catch (error) {
-                console.error(error);
+                cached_settings = {};
             }
         }
-        // If settings dont exist or cached_settings is invalid, use empty cached_settings object
-        cached_settings = {};
+        else
+            // If settings dont exist or cached_settings is invalid, use empty cached_settings object
+            cached_settings = {};
     }
 }
 
