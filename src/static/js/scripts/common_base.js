@@ -3,6 +3,7 @@
 global.$ = require("jquery");
 require("bootstrap");
 var isElectron = require("is-electron");
+var settings = require("./settings.js");
 
 function extend(obj, src) {
     for (var key in src) {
@@ -150,15 +151,19 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         recaptcha_solution = res;
     }
 
-    var err = undefined;
-    var custom_email = undefined;
+    var err = null;
+    var custom_email = null;
 
-    if ($("#settings_custom_domain").val() != "") {
-        if ($("#settings_custom_domain").val().includes("@")) {
-            var email_split = $("#settings_custom_domain").val().toLowerCase().split("@");
-            custom_email = email_split[0].replace(/\./g, '') + "@" + email_split[1];
-        } else
-            custom_email = makeid(10) + "@" + $("#settings_custom_domain").val().toLowerCase();
+    // custom scope so we dont leak variables
+    {
+        var custom_domain = settings.get("custom_domain");
+        if (custom_domain) {
+            if (custom_domain.includes("@")) {
+                var email_split = custom_domain.toLowerCase().split("@");
+                custom_email = email_split[0].replace(/\./g, '') + "@" + email_split[1];
+            } else
+                custom_email = makeid(10) + "@" + custom_domain.toLowerCase();
+        }
     }
 
     update("Getting registration data...");
@@ -233,7 +238,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
             contentType: 'application/json',
             data: JSON.stringify({
                 step: "getverify",
-                email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
+                email: custom_email ? custom_email : data.email
             }),
             success: function (returnData) {
                 resolve(returnData);
@@ -297,7 +302,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
                 step: "steamguard",
                 username: data.username,
                 password: data.password,
-                email: ($("#settings_custom_domain").val() != "") ? custom_email : data.email
+                email: custom_email ? custom_email : data.email
             }),
             success: function (returnData) {
                 resolve(returnData);
@@ -705,8 +710,9 @@ function changeText() {
 /*Automatic generation*/
 
 async function getRecaptchaSolution() {
+    var captcha_key = settings.get("captcha_key");
     var res = await httpRequest({
-        url: `https://2captcha.com/in.php?key=${$("#settings_twocap").val()}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
+        url: `https://2captcha.com/in.php?key=${captcha_key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
     }).catch(function (err) {
         console.log(err);
         throw new Error("2Captcha sent invalid or empty json!");
@@ -719,7 +725,7 @@ async function getRecaptchaSolution() {
     for (var i = 0; i < 20; i++) {
         await sleep(5000);
         var ans_res = await httpRequest({
-            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=get&id=${res.request}&json=1&header_acao=1`
+            url: `https://2captcha.com/res.php?key=${captcha_key}&action=get&id=${res.request}&json=1&header_acao=1`
         })
         console.log(ans_res)
         // Status could be error, 0 = not yet ready
@@ -887,7 +893,7 @@ global.mass_generate_clicked = async function () {
 /*Automatic generation end*/
 
 global.commonGeneratePressed = async function () {
-    if ($("#settings_twocap").val() != "") //2captcha key is set
+    if (settings.get("captcha_key")) //2captcha key is set
     {
         change_visibility(2);
         $("#mass_generator").modal('show');
@@ -989,7 +995,6 @@ global.common_init = function () {
             document.ipc.send("ready");
             console.log("Ready sent!");
         } else if (typeof ipc != "undefined") {
-            // FIXME: Fix a regression (2019-07-20), remove after 2019-09-20
             ipc.on('alert-msg', (event, arg) => {
                 on_status_received(arg);
             })
@@ -1011,15 +1016,15 @@ global.common_init = function () {
     registerevents();
 
     // Check if addon installed
-    $.ajax({
+    /*$.ajax({
         url: "https://store.steampowered.com/join/"
     }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
         $("#generate_button").hide();
-    });
-    load_settings()
+    });*/
+    settings.convert();
 }
 
 function displayhistorylist(data, showdownloadhistory) {
@@ -1078,21 +1083,6 @@ global.history_download_pressed = function () {
     return false;
 }
 
-function save_settings() {
-    $('input[type="text"]').each(function () {
-        var id = $(this).attr('id');
-        var value = $(this).val();
-        localStorage.setItem(id, value);
-        $("#saved_success").show('slow')
-    });
-    $('textarea').each(function () {
-        var id = $(this).attr('id');
-        var value = $(this).val();
-        localStorage.setItem(id, value);
-        $("#saved_success").show('slow')
-    });
-}
-
 global.settings_help = function (page) {
     switch (page) {
         case "gmail":
@@ -1110,28 +1100,16 @@ global.settings_help = function (page) {
 
 global.settings_pressed = function () {
     change_visibility(2);
+    $("#settings_custom_domain").val(settings.get("custom_domain"));
+    $("#settings_twocap").val(settings.get("captcha_key"));
     return false;
 }
 
-function load_settings() {
-    $('input[type="text"]').each(function () {
-        var id = $(this).attr('id');
-        var value = localStorage.getItem(id);
-        $(this).val(value);
-    });
-    $('textarea').each(function () {
-        var id = $(this).attr('id');
-        var value = localStorage.getItem(id);
-        $(this).val(value);
-    });
-    if (isElectron())
-        $("#proxy-settings").show();
-}
-
 global.save_clicked = async function () {
-    if ($("#settings_twocap").val() != "") {
+    var captcha_key = $("#settings_twocap").val();
+    if (captcha_key != "") {
         var res = await httpRequest({
-            url: `https://2captcha.com/res.php?key=${$("#settings_twocap").val()}&action=getbalance&header_acao=1`
+            url: `https://2captcha.com/res.php?key=${captcha_key}&action=getbalance&header_acao=1`
         }).catch(function (err_response, error) {
             $("#twocap_error").show("slow");
             $("#settings_twocap").val("");
@@ -1144,36 +1122,26 @@ global.save_clicked = async function () {
             return false;
         }
         $("#twocap_error").hide("slow");
-    } else
-        $("#twocap_error").hide("slow");
-
-    if ($("#settings_custom_domain").val() == "") {
-        $("#mx_error").hide("slow");
+        settings.set("captcha_key", captcha_key);
     } else {
-        if (!$("#settings_custom_domain").val().includes("@"))
-            if (await isvalidmx($("#settings_custom_domain").val())) {
+        $("#twocap_error").hide("slow");
+        settings.set("captcha_key", null);
+    }
+
+    var custom_domain = $("#settings_custom_domain").val();
+    if (custom_domain == "") {
+        $("#mx_error").hide("slow");
+        settings.set("custom_domain", null);
+    } else {
+        if (!custom_domain.includes("@"))
+            if (await isvalidmx(custom_domain)) {
                 $("#mx_error").hide("slow");
             } else {
                 $("#mx_error").show("slow");
                 $("#settings_custom_domain").val("");
                 return false;
             }
+        settings.set("custom_domain", custom_domain);
     }
-
-    if ($("#settings_proxy").val() != "") {
-        var proxy = $("#settings_proxy").val();
-        var res = await httpRequest({
-            url: "https://store.steampowered.com/join/refreshcaptcha/"
-        }, proxy).catch(function (e) {
-            console.log(e)
-        })
-        if (!res) {
-            $("#proxy_error").show("slow");
-            $("#settings_proxy").val("")
-            return false;
-        }
-    } else
-        $("#proxy_error").hide("slow");
-    save_settings();
     return false
 }
