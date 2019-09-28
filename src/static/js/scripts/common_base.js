@@ -4,6 +4,8 @@ global.$ = require("jquery");
 require("bootstrap");
 var isElectron = require("is-electron");
 var settings = require("./settings.js");
+var escape = require('escape-html');
+const Autolinker = require('autolinker');
 
 function extend(obj, src) {
     for (var key in src) {
@@ -619,7 +621,10 @@ function on_status_received(resp) {
     }
 
     if (resp.status) {
-        document.getElementById("accgen_status_msg").textContent = resp.status;
+        // Never trust anyone
+        var out = escape(resp.status);
+        out = Autolinker.link(out, { email: false, phone: false });
+        document.getElementById("accgen_status_msg").innerHTML = out;
         $("#accgen_status").show("slow");
     } else {
         $("#accgen_status").hide("slow");
@@ -1143,5 +1148,6 @@ global.save_clicked = async function () {
             }
         settings.set("custom_domain", custom_domain);
     }
-    return false
+    $("#saved_success").show("slow");
+    return false;
 }
