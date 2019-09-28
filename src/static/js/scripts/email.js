@@ -1,4 +1,5 @@
-var $ = require("jquery");
+global.$ = require("jquery");
+require("bootstrap");
 var DOMPurify = require("dompurify");
 
 global.EmailAccessCheck = function EmailAccessCheck() {

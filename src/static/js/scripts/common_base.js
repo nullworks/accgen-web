@@ -1,9 +1,8 @@
 "let strict";
 
-var $ = require("jquery");
+global.$ = require("jquery");
+require("bootstrap");
 var isElectron = require("is-electron");
-
-global.$ = $;
 
 function extend(obj, src) {
     for (var key in src) {
