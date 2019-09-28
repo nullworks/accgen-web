@@ -34,6 +34,8 @@ exports.set = function (setting, value) {
 
 // Convert from legacy settings system to modern settings system
 exports.convert = function () {
+    // Init in case cached_settings isn't valid currently
+    initSettings();
     // Check if we already converted our config
     if (exports.get("version"))
         return;
