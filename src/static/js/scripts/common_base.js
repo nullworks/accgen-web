@@ -1012,6 +1012,7 @@ global.common_init = function () {
             setTimeout(...args);
         };
         proxylist.load();
+
     }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
@@ -1030,6 +1031,8 @@ global.common_init = function () {
         $("#generate_button").hide();
     });*/
     settings.convert();
+    if (isElectron())
+        $("#proxy-settings").show();
 }
 
 function displayhistorylist(data, showdownloadhistory) {
