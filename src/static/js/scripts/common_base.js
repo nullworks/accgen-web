@@ -293,40 +293,64 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         return ret;
     }
 
-    update("Disabling steam guard and adding CS:GO...");
-    var account = await new Promise(function (resolve, reject) {
-        $.ajax({
-            url: '/userapi/recaptcha/addtask',
-            method: 'post',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                step: "steamguard",
-                username: data.username,
-                password: data.password,
-                email: custom_email ? custom_email : data.email
-            }),
-            success: function (returnData) {
-                resolve(returnData);
-            },
-            error: function (xhr, status, error) {
-                console.error(xhr);
-                reject(xhr.responseJSON);
-            }
+    var disableSteamGuard = settings.get("acc_steam_guard");
+    if (disableSteamGuard || settings.get("acc_apps_setting").trim().legnth > 0) {
+        var apps = settings.get("acc_apps_setting").match(/\d+/g);
+
+        if (disableSteamGuard && apps.length > 0) {
+            update("Disabling steam guard and activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"));
+        } else if (disableSteamGuard && apps.length <= 0) {
+            update("Disabling steam guard");
+        } else if (!disableSteamGuard && apps.length > 0) {
+            update("Activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"));
+        } else {
+            // Should never reach down here
+            update("What am I doing?");
+        }
+
+        var extraTask = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: '/userapi/recaptcha/addtask',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    step: "additional",
+                    username: data.username,
+                    password: data.password,
+                    email: custom_email ? custom_email : data.email,
+                    doSteamGuard: disableSteamGuard,
+                    activateApps: apps.map(a => parseInt(a))
+                }),
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
         });
-    }).catch(function (error) {
-        err = error ? error : true;
-        console.log(err);
-    });
-    if (err) {
-        if (err.error) {
-            ret.error.message = err.error;
+        if (err) {
+            if (err.error) {
+                ret.error.message = err.error;
+                return ret;
+            }
+            ret.error.message = 'Error returned by SAG backend! Check console for details!';
             return ret;
         }
-        ret.error.message = 'Error returned by SAG backend! Check console for details!';
-        return ret;
+        ret.account = extraTask.account;
+        ret.activation = extraTask.activation;
+    } else {
+        ret.account = {
+            ...data,
+            login: data.username
+        };
     }
-    ret.account = account;
+
     if (ret.account && typeof post_generate != "undefined") {
         ret = await post_generate(ret, update);
     }
@@ -958,8 +982,15 @@ function displayData(acc_data) {
         $("#electron_steam_signin").show();
     }
 
+    if (acc_data.activation) {
+        $("#acc_apps > span > strong").text(acc_data.activation.success.length + "/" + (acc_data.activation.success.length + acc_data.activation.fail.length));
+        $("#acc_apps").show();
+    } else {
+        $("#acc_apps").hide();
+    }
+
     $("#acc_login").html(`Login: <a id="acc_link" target="_blank"><strong>${acc_data.login}</strong></a>`)
-    $("#acc_link").attr("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
+    $("#acc_link")[acc_data.steamid ? "attr" : "removeAttr"]("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
     $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
     $("#generated_data").show("slow");
 }
@@ -990,6 +1021,24 @@ async function isvalidmx(domain) {
         return false;
     return true;
 }
+
+function appSettingsInfo() {
+    var rawApps = $("#settings_appids").val().match(/\d+(,$|)/g);
+    $("#settings_appids").val(rawApps.join(","));
+
+    var apps = $("#settings_appids").val().match(/\d+/g);
+
+    $("#acc_apps_setting > div > span").text(apps.length);
+
+    if (apps.length > 5) {
+        $("#acc_apps_setting > div").addClass("alert-warning");
+        $("#acc_apps_setting > div").removeClass("alert-success");
+    } else {
+        $("#acc_apps_setting > div").addClass("alert-success");
+        $("#acc_apps_setting > div").removeClass("alert-warning");
+    }
+}
+
 
 global.common_init = function () {
     if (isElectron()) {
@@ -1033,6 +1082,9 @@ global.common_init = function () {
     settings.convert();
     if (isElectron())
         $("#proxy-settings").show();
+
+    appSettingsInfo();
+    $("#settings_appids").on("input", appSettingsInfo);
 }
 
 function displayhistorylist(data, showdownloadhistory) {
@@ -1099,6 +1151,9 @@ global.settings_help = function (page) {
         case "mx":
             window.open("https://telegra.ph/file/5ceb2d563df573d3fa244.png");
             break;
+        case "f2plist":
+            window.open("https://steamdb.info/instantsearch/?refinementList%5Btags%5D%5B0%5D=Free%20to%20Play&refinementList%5BappType%5D%5B0%5D=Game");
+            break;
         default:
             console.log("Invalid settings page");
             break;
@@ -1110,10 +1165,15 @@ global.settings_pressed = function () {
     change_visibility(2);
     $("#settings_custom_domain").val(settings.get("custom_domain"));
     $("#settings_twocap").val(settings.get("captcha_key"));
+    $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steam_guard"));
+    $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps_setting"));
     return false;
 }
 
 global.save_clicked = async function () {
+    settings.set("acc_steam_guard", $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked"));
+    settings.set("acc_apps_setting", $("#acc_apps_setting > input[type=\"text\"]").val());
+
     var captcha_key = $("#settings_twocap").val();
     if (captcha_key != "") {
         var res = await httpRequest({
