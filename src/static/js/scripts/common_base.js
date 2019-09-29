@@ -1024,6 +1024,13 @@ async function isvalidmx(domain) {
 
 function appSettingsInfo() {
     var rawApps = $("#settings_appids").val().match(/\d+(,$|)/g);
+    if (!rawApps) {
+        $("#acc_apps_setting > div > span").text("0");
+        $("#acc_apps_setting > div").addClass("alert-warning");
+        $("#acc_apps_setting > div").removeClass("alert-success");
+        return;
+    }
+
     $("#settings_appids").val(rawApps.join(","));
 
     var apps = $("#settings_appids").val().match(/\d+/g);
@@ -1071,14 +1078,14 @@ global.common_init = function () {
     registerevents();
 
     // Check if addon installed
-    /*$.ajax({
+    $.ajax({
         url: "https://store.steampowered.com/join/"
     }).done(function () { }).fail(function (resp) {
         changeText();
         $("#addon_dl").show();
         $("#accgen_ui").hide();
         $("#generate_button").hide();
-    });*/
+    });
     settings.convert();
     if (isElectron())
         $("#proxy-settings").show();
@@ -1167,6 +1174,7 @@ global.settings_pressed = function () {
     $("#settings_twocap").val(settings.get("captcha_key"));
     $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steam_guard"));
     $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps_setting"));
+    $("#settings_appids").trigger("input");
     return false;
 }
 

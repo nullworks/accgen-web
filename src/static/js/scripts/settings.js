@@ -39,10 +39,15 @@ exports.convert = function () {
     // Init in case cached_settings isn't valid currently
     initSettings();
     // Check if we already converted our config
-    if (exports.get("version"))
-        return;
-    exports.set("version", 1);
-    exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
-    exports.set("captcha_key", localStorage.getItem("settings_twocap"));
-    exports.set("captcha_key_type", "2captcha");
+    if (!exports.get("version")) {
+        exports.set("version", 1);
+        exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
+        exports.set("captcha_key", localStorage.getItem("settings_twocap"));
+        exports.set("captcha_key_type", "2captcha");
+    }
+    if (exports.get("version") < 2) {
+        exports.set("version", 2);
+        exports.set("acc_apps_setting", "730");
+        exports.set("acc_steam_guard", true);
+    }
 }
