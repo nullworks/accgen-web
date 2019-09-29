@@ -14,7 +14,7 @@ global.extend = function (obj, src) {
     return obj;
 }
 
-function httpRequest(options, proxy, cookies, timeout) {
+global.httpRequest = function (options, proxy, cookies, timeout) {
     return new Promise(async function (resolve, reject) {
         if (typeof document.proxiedHttpRequest == "undefined" || !proxy)
             $.ajax(extend({
