@@ -7,7 +7,7 @@ var settings = require("./settings.js");
 var escape = require('escape-html');
 const Autolinker = require('autolinker');
 
-function extend(obj, src) {
+global.extend = function (obj, src) {
     for (var key in src) {
         if (src.hasOwnProperty(key)) obj[key] = src[key];
     }
