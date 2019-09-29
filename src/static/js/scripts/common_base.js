@@ -1012,6 +1012,7 @@ global.common_init = function () {
             setTimeout(...args);
         };
         proxylist.load();
+        $("#proxy-settings").show();
     }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
