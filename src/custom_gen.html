@@ -410,6 +410,10 @@
         <div id="generated_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
           <div class="card-header">Account information</div>
           <div class="card-body">
+            <h6 id="acc_apps" class="card-text" style="display: none;">
+              <span>Successfully activated <strong>0/0</strong> apps</span>
+              <p></p>
+            </h6>
             <h6 id="acc_login" class="card-text">
               Login: <a target="_blank" id="acc_link"><strong>niceaccount</strong></a>
               <p></p>
@@ -537,6 +541,19 @@
               <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
                 <div class="card-body">
                   <form id="settings_form" action="#">
+                    <h6 id="acc_steam_guard" class="card-text custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="settings_disable_steamguard" checked>
+                      <label class="custom-control-label" for="settings_disable_steamguard">Automatically disable Steam
+                        Guard</label>
+                    </h6><br>
+                    <h6 id="acc_apps_setting" class="card-text">
+                      <div class="alert alert-success">Detected <span>0</span>/5 apps</div>
+                      Free SubIDs to automatically add (Comma separated): <input type="text" id="settings_appids"
+                        class="form-control" value="730" placeholder="730,440,570" autocomplete="off"
+                        maxlength="1024"><br>
+                      <button id="help_button" type="button" onclick="settings_help('f2plist')"
+                        class="btn btn-primary btn-lg">List of F2P games</a>
+                    </h6><br>
                     <h6 id="acc_login" class="card-text">
                       Custom Domain/Gmail address: <input type="text" id="settings_custom_domain" class="form-control"
                         placeholder="Enter your custom domain or gmail address" autocomplete="off"><br>
@@ -575,46 +592,27 @@
             <table>
               <thead>
                 <tr>
-                  <th>ID</td>
+                  <th style="width: 5%;">ID</td>
                   <th>Username</td>
-                  <th>Password</td>
-                  <th>Email</td>
+                  <th style="width: 18%;">Password</td>
+                  <th style="width: 35%;">Email</td>
                   <th>Status</td>
                 </tr>
               </thead>
               <tbody id="status_table">
                 <!--
-                                 <tr>
-                                 <td>1</td>
-                                 <td>SampleUsername</td>
-                                 <td>SamplePassword</td>
-                                 <td>SampleEmail</td>
-                                 <td>Sample</td>
-                              </tr>
-      
-                            -->
+                       <tr>
+                       <td>1</td>
+                       <td>SampleUsername</td>
+                       <td>SamplePassword</td>
+                       <td>SampleEmail</td>
+                       <td>Sample</td>
+                    </tr>
+
+                  -->
               </tbody>
             </table>
 
-          </div>
-        </div>
-      </div>
-      <div id="generated_data" style="display: none;">
-        <div id="generated_accs_card" class="card border-dark mb-3" style="max-width: 33rem;margin:auto">
-          <div class="card-header">Account information</div>
-          <div class="card-body">
-            <h6 id="acc_login" class="card-text">
-              Login: <strong>niceaccount</strong>
-              <p></p>
-            </h6>
-            <h6 id="acc_pass" class="card-text">
-              Password: <strong>nicepass</strong>
-              <p></p>
-            </h6>
-            <h6 id="acc_email" class="card-text" style="display: none;">
-              E-Mail address: niceaccount@inboxkitten.com
-              <p></p>
-            </h6>
           </div>
         </div>
       </div>

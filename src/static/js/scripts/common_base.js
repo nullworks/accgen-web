@@ -294,14 +294,14 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     }
 
     var disableSteamGuard = settings.get("acc_steam_guard");
-    if (disableSteamGuard || settings.get("acc_apps_setting").trim().legnth > 0) {
+    if (disableSteamGuard || !settings.get("acc_apps_setting")) {
         var apps = settings.get("acc_apps_setting").match(/\d+/g);
 
-        if (disableSteamGuard && apps.length > 0) {
+        if (disableSteamGuard && apps && apps.length > 0) {
             update("Disabling steam guard and activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"));
-        } else if (disableSteamGuard && apps.length <= 0) {
+        } else if (disableSteamGuard && (!apps || apps.length <= 0)) {
             update("Disabling steam guard");
-        } else if (!disableSteamGuard && apps.length > 0) {
+        } else if (!disableSteamGuard && apps && apps.length > 0) {
             update("Activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"));
         } else {
             // Should never reach down here
