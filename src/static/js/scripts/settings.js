@@ -47,7 +47,7 @@ exports.convert = function () {
     }
     if (exports.get("version") < 2) {
         exports.set("version", 2);
-        exports.set("acc_apps_setting", "303386");
+        exports.set("acc_apps_setting", "32985");
         exports.set("acc_steam_guard", true);
     }
 }
