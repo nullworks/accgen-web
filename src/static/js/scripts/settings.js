@@ -34,20 +34,37 @@ exports.set = function (setting, value) {
     localStorage.setItem("settings", JSON.stringify(cached_settings));
 }
 
+function baseSettings() {
+    exports.set("version", 3);
+    exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
+    exports.set("captcha_key", localStorage.getItem("settings_twocap"));
+    exports.set("captcha_key_type", "2captcha");
+    exports.set("acc_apps_setting", "329385");
+    exports.set("acc_steam_guard", true);
+    console.log("Base settings configured!");
+}
+
 // Convert from legacy settings system to modern settings system
 exports.convert = function () {
     // Init in case cached_settings isn't valid currently
     initSettings();
     // Check if we already converted our config
-    if (!exports.get("version")) {
-        exports.set("version", 1);
-        exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
-        exports.set("captcha_key", localStorage.getItem("settings_twocap"));
-        exports.set("captcha_key_type", "2captcha");
-    }
-    if (exports.get("version") < 2) {
-        exports.set("version", 2);
-        exports.set("acc_apps_setting", "32985");
-        exports.set("acc_steam_guard", true);
+    if (!exports.get("version"))
+        baseSettings();
+    else {
+        if (exports.get("version") == 1) {
+            exports.set("version", 2);
+            exports.set("acc_apps_setting", "329385");
+            exports.set("acc_steam_guard", true);
+            console.log("Migrated from version 1 to version 2!");
+        }
+        // localStorage.setItem("settings", JSON.stringify({version: 2, acc_apps_setting: 32985}))
+        if (exports.get("version") == 2) {
+            exports.set("version", 3);
+            var subid = exports.get("acc_apps_setting");
+            if (subid == "32985" || subid == "303386")
+                exports.set("acc_apps_setting", "329385");
+            console.log("Migrated from version 2 to version 3!");
+        }
     }
 }
