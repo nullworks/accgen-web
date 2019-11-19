@@ -51,7 +51,8 @@
       </li>
    </ul>
    <script>
-      window.addEventListener("load", function () {
+      window.addEventListener("load", function ()
+      {
          init();
       });
    </script>
@@ -78,8 +79,8 @@
          </div>
       </div>
       <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center; padding-bottom: 3%">
-         <div class="alert alert-warning">We don't provide email access for <b>ALL</b> the accounts you make. We don't
-            recommend storing valuable items on the accounts.
+         <div class="alert alert-info">Check out our new disposable email service <a
+               href='https://email.cathook.club/'><b>HERE!</b></a>
          </div>
          <div class="container text-center">
             <div class="alert alert-success">
@@ -259,16 +260,18 @@
                         <div class="card-body">
                            <form id="settings_form" action="#">
                               <h6 id="acc_steam_guard" class="card-text custom-control custom-checkbox">
-                                 <input type="checkbox" class="custom-control-input" id="settings_disable_steamguard" checked>
-                                 <label class="custom-control-label" for="settings_disable_steamguard">Automatically disable Steam Guard</label>
+                                 <input type="checkbox" class="custom-control-input" id="settings_disable_steamguard"
+                                    checked>
+                                 <label class="custom-control-label" for="settings_disable_steamguard">Automatically
+                                    disable Steam Guard</label>
                               </h6><br>
                               <h6 id="acc_apps_setting" class="card-text">
                                  <div class="alert alert-success">Detected <span>0</span>/5 apps</div>
-                                 Free SubIDs to automatically add (Comma separated): <input type="text" id="settings_appids"
-                                    class="form-control" value="730" placeholder="730,440,570"
+                                 Free SubIDs to automatically add (Comma separated): <input type="text"
+                                    id="settings_appids" class="form-control" value="730" placeholder="730,440,570"
                                     autocomplete="off" maxlength="1024"><br>
-                              <button id="help_button" type="button" onclick="settings_help('f2plist')"
-                                 class="btn btn-primary btn-lg">List of F2P games</a>
+                                 <button id="help_button" type="button" onclick="settings_help('f2plist')"
+                                    class="btn btn-primary btn-lg">List of F2P games</a>
                               </h6><br>
                               <h6 id="acc_login" class="card-text">
                                  Custom Domain/Gmail address: <input type="text" id="settings_custom_domain"
