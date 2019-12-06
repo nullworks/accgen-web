@@ -169,14 +169,15 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     }
 
     update("Getting registration data...");
-    var data = await new Promise(function (resolve, reject) {
+    var data = await new Promise(async function (resolve, reject) {
         $.ajax({
             url: '/userapi/recaptcha/addtask',
             method: 'post',
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify({
-                step: "getdata"
+                step: "getdata",
+                token: await doRecapV3("getdata")
             }),
             success: function (returnData) {
                 resolve(returnData);
@@ -605,10 +606,14 @@ function registerevents() {
     }, false);
 }
 
+function doRecapV3(action) {
+    return grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
+        action: action
+    });
+}
+
 function report_email(email) {
-    grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
-        action: 'vote_email'
-    }).then(function (token) {
+    doRecapV3("vote_email").then(function (token) {
         $.ajax({
             url: '/userapi/recaptcha/bademail/' + token
         }).done(function (emailresp) {
