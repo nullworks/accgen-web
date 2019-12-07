@@ -176,8 +176,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify({
-                step: "getdata",
-                token: await doRecapV3("getdata")
+                step: "getdata"
             }),
             success: function (returnData) {
                 resolve(returnData);
@@ -295,7 +294,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     }
 
     var disableSteamGuard = settings.get("acc_steam_guard");
-    if (disableSteamGuard || !settings.get("acc_apps_setting")) {
+    if (disableSteamGuard || settings.get("acc_apps_setting").length) {
         var apps = settings.get("acc_apps_setting").match(/\d+/g);
 
         if (disableSteamGuard && apps && apps.length > 0) {
@@ -321,7 +320,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
                     password: data.password,
                     email: custom_email ? custom_email : data.email,
                     doSteamGuard: disableSteamGuard,
-                    activateApps: apps.map(a => parseInt(a))
+                    activateApps: apps ? apps.map(a => parseInt(a)) : null
                 }),
                 success: function (returnData) {
                     resolve(returnData);
