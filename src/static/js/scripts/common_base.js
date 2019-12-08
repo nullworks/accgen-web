@@ -1009,7 +1009,7 @@ function displayData(acc_data) {
     }
 
     if (acc_data.done)
-        addToHistory(acc_data);
+        addToHistory(acc_data.account);
     lastacc = acc_data;
 
     if (typeof document.startSteam != "undefined") {
