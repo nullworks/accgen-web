@@ -92,12 +92,13 @@ function parseSteamError(code, report, proxymgr) {
 }
 
 async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
-    function update(msg) {
-        statuscb(msg, id);
+    function update(msg, ret) {
+        statuscb(msg, id, ret);
     }
 
     var ret = {
         success: false,
+        done: true,
         account: null,
         error: {
             steamerror: null,
@@ -297,16 +298,26 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     if (disableSteamGuard || settings.get("acc_apps_setting").length) {
         var apps = settings.get("acc_apps_setting").match(/\d+/g);
 
+        ret.done = false;
+
+        ret.account = {
+            login: data.username,
+            password: data.password,
+            email: custom_email ? custom_email : data.email
+        }
+
         if (disableSteamGuard && apps && apps.length > 0) {
-            update("Disabling steam guard and activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"));
+            update("Disabling steam guard and activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"), ret);
         } else if (disableSteamGuard && (!apps || apps.length <= 0)) {
-            update("Disabling steam guard");
+            update("Disabling steam guard", ret);
         } else if (!disableSteamGuard && apps && apps.length > 0) {
-            update("Activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"));
+            update("Activating " + apps.length + " app" + (apps.length === 1 ? "" : "s"), ret);
         } else {
             // Should never reach down here
-            update("What am I doing?");
+            update("What am I doing?", ret);
         }
+
+        ret.done = true;
 
         var extraTask = await new Promise(function (resolve, reject) {
             $.ajax({
@@ -460,6 +471,20 @@ global.edit_proxy_json = function () {
 
 }
 
+global.copyDetails = async function (id) {
+    var data;
+    data = $(`#${id}`).text();
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val(data).select();
+    document.execCommand("copy");
+    $temp.remove();
+    $(`#${id}`).text("Copied!");
+    await sleep(1000);
+    $(`#${id}`).text(data);
+    return false;
+}
+
 function proxylistLinter(list) {
     // Verify if the proxy list is valid
     var data;
@@ -591,17 +616,20 @@ function registerevents() {
 
         change_visibility(true);
         var recap_token = e.data.split(";")[0];
-        var account = (await generateAccounts(1, null, recap_token, null, function statuscb(msg, id) {
+        var account = (await generateAccounts(1, null, recap_token, null, function statuscb(msg, id, ret) {
             change_gen_status_text(msg);
+            if (ret)
+                displayData(ret);
         }))[0];
         var error = parseErrors(account, true);
         if (error) {
             displayData({
-                error: error
+                parsederror: error,
+                done: true
             });
             return;
         }
-        displayData(account.account);
+        displayData(account);
     }, false);
 }
 
@@ -971,15 +999,17 @@ function addToHistory(acc_data) {
 var lastacc;
 
 function displayData(acc_data) {
-    change_visibility(false);
+    if (acc_data.done)
+        change_visibility(false);
 
-    if (acc_data.error) {
+    if (acc_data.parsederror) {
         $("#generate_error").show("slow")
-        $("#generate_error_text").html(acc_data.error)
+        $("#generate_error_text").html(acc_data.parsederror)
         return;
     }
 
-    addToHistory(acc_data);
+    if (acc_data.done)
+        addToHistory(acc_data);
     lastacc = acc_data;
 
     if (typeof document.startSteam != "undefined") {
@@ -993,9 +1023,9 @@ function displayData(acc_data) {
         $("#acc_apps").hide();
     }
 
-    $("#acc_login").html(`Login: <a id="acc_link" target="_blank"><strong>${acc_data.login}</strong></a>`)
-    $("#acc_link")[acc_data.steamid ? "attr" : "removeAttr"]("href", `https://steamcommunity.com/profiles/${acc_data.steamid}`);
-    $("#acc_pass").html(`Password: <strong>${acc_data.password}</strong>`)
+    $("#details_username").text(acc_data.account.login);
+    $("#details_password").text(acc_data.account.password);
+
     $("#generated_data").show("slow");
 }
 
