@@ -482,7 +482,6 @@ global.copyDetails = async function (id) {
     $(`#${id}`).text("Copied!");
     await sleep(1000);
     $(`#${id}`).text(data);
-    return false;
 }
 
 function proxylistLinter(list) {
