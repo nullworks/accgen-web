@@ -782,7 +782,7 @@ async function getRecaptchaSolution() {
         throw new Error("2Captcha sent invalid json!");
     console.log("2captcha requestid: " + res.request);
     await sleep(10000);
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 30; i++) {
         await sleep(5000);
         var ans_res = await httpRequest({
             url: `https://2captcha.com/res.php?key=${captcha_key}&action=get&id=${res.request}&json=1&header_acao=1`
