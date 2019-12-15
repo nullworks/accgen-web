@@ -1124,6 +1124,7 @@ async function setupGmail() {
     if (!result.success) {
         $("#email_service_progress").hide('slow');
         $("#email_service_message > strong").text(`There was an issue setting up automated Gmail Forwarding: ${result.reason || result.error}`)
+        lock_email_service_selection = false;
         return;
     }
     settings.set("email_gmail", result.email);
