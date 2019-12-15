@@ -2,9 +2,10 @@
 
 global.$ = require("jquery");
 require("bootstrap");
-var isElectron = require("is-electron");
-var settings = require("./settings.js");
-var escape = require('escape-html');
+const isElectron = require("is-electron");
+const settings = require("./settings.js");
+global.accgen_settings = settings;
+const escape = require('escape-html');
 const Autolinker = require('autolinker');
 
 global.extend = function (obj, src) {
@@ -29,6 +30,18 @@ global.httpRequest = function (options, proxy, cookies, timeout) {
         else {
             document.proxiedHttpRequest(options, proxy, cookies, resolve, reject, timeout);
         }
+    });
+}
+
+// Code to communicate with the addon
+var g_id = 0;
+function messageAddon(data) {
+    var id = g_id++;
+    document.dispatchEvent(new CustomEvent("addon", { "detail": { id: id, data: data } }));
+    return new Promise(function (resolve, reject) {
+        document.addEventListener("addon_reply", function (event) {
+            resolve(JSON.parse(event.detail).data);
+        });
     });
 }
 
@@ -155,19 +168,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     }
 
     var err = null;
-    var custom_email = null;
-
-    // custom scope so we dont leak variables
-    {
-        var custom_domain = settings.get("custom_domain");
-        if (custom_domain) {
-            if (custom_domain.includes("@")) {
-                var email_split = custom_domain.toLowerCase().split("@");
-                custom_email = email_split[0].replace(/\./g, '') + "@" + email_split[1];
-            } else
-                custom_email = makeid(10) + "@" + custom_domain.toLowerCase();
-        }
-    }
+    var custom_email = getEmail();
 
     update("Getting registration data...");
     var data = await new Promise(async function (resolve, reject) {
@@ -468,7 +469,6 @@ global.edit_proxy_json = function () {
     else
         $("#proxy_json_textbox").val('');
     $("#proxy_json").modal('show');
-
 }
 
 global.copyDetails = async function (id) {
@@ -728,7 +728,14 @@ function AddonsNotSupported() {
     window.location = "legacy.html";
 }
 
-function changeText() {
+function changeText(isinstalled) {
+    if (isinstalled) {
+        $("#email_service_option_gmail > img")
+            .css("opacity", "0.4")
+            .css("filter", "alpha(opacity=40)");
+        $("#email_service_option_gmail > figcaption > p").text("You need addon version 3.0 or above to enable gmail support.");
+        return;
+    }
     switch (GetBrowser()) {
         case "Firefox":
             if (isIOS())
@@ -968,6 +975,7 @@ global.commonGeneratePressed = async function () {
 global.commonChangeVisibility = function (pre_generate) {
     if (pre_generate) {
         $('#mx_error').hide("slow");
+        $('#gmail_error').hide("slow");
         $('#saved_success').hide("slow");
         $('#proxy_error').hide("slow");
         $('#twocap_error').hide("slow");
@@ -1079,6 +1087,50 @@ function appSettingsInfo() {
     }
 }
 
+var lock_email_service_selection = false;
+
+async function setProvider(provider) {
+    settings.set("email_provider", provider);
+    setTimeout(() => {
+        $("#email_service_modal").modal('hide');
+        $("#email_service_message").hide('slow');
+        setTimeout(() => {
+            lock_email_service_selection = false;
+        }, 1000);
+    }, 3000);
+}
+
+global.setUseAccgenMail = function () {
+    if (lock_email_service_selection)
+        return;
+    lock_email_service_selection = true;
+    $("#email_service_message > strong").text("Using accgen email service.");
+    $("#email_service_message").show('slow');
+    setProvider("accgen");
+}
+
+async function setupGmail() {
+    if (lock_email_service_selection)
+        return;
+    lock_email_service_selection = true;
+    console.log("Setup gmail clicked");
+    // TODO: check for consent
+    //show progress bar
+    $("#email_service_progress").show('slow');
+    $("#email_service_message > strong").text("Setting up gmail forwarding...");
+    $("#email_service_message").show('slow');
+    var result = await messageAddon({ task: "setupGmail" });
+    console.log(result)
+    if (!result.success) {
+        $("#email_service_progress").hide('slow');
+        $("#email_service_message > strong").text(`There was an issue setting up automated Gmail Forwarding: ${result.reason || result.error}`)
+        return;
+    }
+    settings.set("email_gmail", result.email);
+    setProvider("gmail");
+    $("#email_service_progress").hide('slow');
+    $("#email_service_message > strong").text(`Automated gmail forwarding was set up for ${result.email}.${result.reason ? ` Reason: ${result.reason}` : ""}`)
+}
 
 global.common_init = function () {
     if (isElectron()) {
@@ -1087,12 +1139,6 @@ global.common_init = function () {
                 on_status_received(arg);
             })
             document.ipc.send("ready");
-            console.log("Ready sent!");
-        } else if (typeof ipc != "undefined") {
-            ipc.on('alert-msg', (event, arg) => {
-                on_status_received(arg);
-            })
-            ipc.send("ready");
             console.log("Ready sent!");
         }
         // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
@@ -1110,15 +1156,38 @@ global.common_init = function () {
     perform_status_check();
     registerevents();
 
-    // Check if addon installed
-    $.ajax({
-        url: "https://store.steampowered.com/join/"
-    }).done(function () { }).fail(function (resp) {
-        changeText();
-        $("#addon_dl").show();
-        $("#accgen_ui").hide();
-        $("#generate_button").hide();
-    });
+    Promise.race([
+        messageAddon({ task: "version" }),
+        // Auto respond if it takes longer than 500 ms
+        new Promise(function (resolve, reject) {
+            setTimeout(resolve, 500);
+        })
+    ]).then(function (ret) {
+        // Version older than 3.0, or not installed
+        if (!ret) {
+            // Check if addon installed using the old method, legacy
+            $.ajax({
+                url: "https://store.steampowered.com/join/"
+            }).done(function () {
+                console.log("Version older than 3.0 detected!");
+                changeText(true);
+                if (!settings.get("email_provider"))
+                    $("#email_service_modal").modal('show');
+            }).fail(function (resp) {
+                changeText();
+                $("#addon_dl").show();
+                $("#accgen_ui").hide();
+                $("#generate_button").hide();
+                console.log("No addon installed!");
+            });
+        } else {
+            console.log("Version 3.0 or above found!")
+            $("#email_service_option_gmail > img").click(setupGmail);
+            if (!settings.get("email_provider"))
+                $("#email_service_modal").modal('show');
+        }
+    })
+
     settings.convert();
     if (isElectron())
         $("#proxy-settings").show();
@@ -1201,14 +1270,69 @@ global.settings_help = function (page) {
     }
 }
 
+async function getEmail() {
+    switch (settings.get("email_provider")) {
+        case "accgen":
+            return null;
+        case "custom_domain":
+            var custom_domain = settings.get("email_domain");
+            if (custom_domain) {
+                if (custom_domain.includes("@")) {
+                    var email_split = custom_domain.toLowerCase().split("@");
+                    return email_split[0].replace(/\./g, '') + "@" + email_split[1];
+                } else
+                    return makeid(10) + "@" + custom_domain.toLowerCase();
+            }
+        case "gmail":
+            return settings.get("email_gmail");
+        default:
+            return null;
+    }
+}
+
 global.settings_pressed = function () {
     change_visibility(2);
-    $("#settings_custom_domain").val(settings.get("custom_domain"));
+    $("#settings_custom_domain").val(settings.get("email_domain"));
     $("#settings_twocap").val(settings.get("captcha_key"));
     $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steam_guard"));
     $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps_setting"));
     $("#settings_appids").trigger("input");
     return false;
+}
+
+global.custom_domain_clicked = async function () {
+    if (lock_email_service_selection)
+        return false;
+    lock_email_service_selection = true;
+    $('#custom_domain_service_modal').modal('show');
+}
+
+global.save_domain = async function () {
+    $("#email_service_progress").show('slow');
+    $("#email_service_message > strong").text("Setting up custom domain...");
+    $("#email_service_message").show('slow');
+    var custom_domain = $("#settings_custom_domain").val();
+    if (custom_domain == "") {
+        //settings.set("email_domain", null);
+        lock_email_service_selection = false;
+        $("#email_service_message").hide('slow');
+        $("#email_service_progress").hide('slow');
+        settings.set("email_domain", custom_domain);
+    } else {
+        if (!custom_domain.includes("@"))
+            if (await isvalidmx(custom_domain)) {
+            } else {
+                $("#settings_custom_domain").val("");
+                lock_email_service_selection = false;
+                $("#email_service_message > strong").text("Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings might take a few minutes to propagate.");
+                $("#email_service_progress").hide('slow');
+                return false;
+            }
+        $("#email_service_progress").hide('slow');
+        settings.set("email_domain", custom_domain);
+        $("#email_service_message > strong").text("Custom domain set up.");
+        setProvider('custom_domain');
+    }
 }
 
 global.save_clicked = async function () {
@@ -1235,22 +1359,6 @@ global.save_clicked = async function () {
     } else {
         $("#twocap_error").hide("slow");
         settings.set("captcha_key", null);
-    }
-
-    var custom_domain = $("#settings_custom_domain").val();
-    if (custom_domain == "") {
-        $("#mx_error").hide("slow");
-        settings.set("custom_domain", null);
-    } else {
-        if (!custom_domain.includes("@"))
-            if (await isvalidmx(custom_domain)) {
-                $("#mx_error").hide("slow");
-            } else {
-                $("#mx_error").show("slow");
-                $("#settings_custom_domain").val("");
-                return false;
-            }
-        settings.set("custom_domain", custom_domain);
     }
     $("#saved_success").show("slow");
     return false;
