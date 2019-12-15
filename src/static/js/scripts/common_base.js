@@ -1270,7 +1270,7 @@ global.settings_help = function (page) {
     }
 }
 
-async function getEmail() {
+function getEmail() {
     switch (settings.get("email_provider")) {
         case "accgen":
             return null;
