@@ -84,10 +84,14 @@ function parseSteamError(code, report, proxymgr) {
                 error: 'Steam is limitting account creations from your IP or this email address (if using Gmail). Try again later.'
             };
         case 101:
+            return {
+                error: 'Captcha invalid'
+            };
+        case 105:
             if (proxymgr)
                 proxymgr.proxy.ban();
             return {
-                error: 'Captcha failed or IP banned by steam (vpn?)'
+                error: proxymgr && !proxymgr.proxy.emulated ? "Proxy IP banned by steam. Removed from proxy list." : "Your IP is banned by steam. Try disabling your VPN."
             };
         case 17:
             if (report)
@@ -396,7 +400,6 @@ var proxylist = {
             proxy: $.extend(proxies[0], {
                 verify: function () {
                     this.verified = true;
-                    this.bancounter = 0;
                     this.errorcount = 0;
                     proxylist.dump();
                 },
@@ -405,16 +408,8 @@ var proxylist = {
                     proxylist.dump();
                 },
                 ban: function () {
-                    if (!this.bancounter)
-                        this.bancounter = 1;
-                    else
-                        this.bancounter++;
-                    if (this.bancounter >= 2 && !this.verified)
-                        // proxy likely to be banned
-                        this.banned = true;
-                    else if (this.bancounter >= 4 && this.verified)
-                        // proxy having a bad day?
-                        this.timeout = Date.now() + 12 * 60 * 60 * 1000;
+                    // proxy is banned
+                    this.banned = true;
                     proxylist.dump();
                 },
                 error: function () {
@@ -898,22 +893,13 @@ global.mass_generate_clicked = async function () {
                     uri: "emulated",
                     verify: function () {
                         this.verified = true;
-                        this.bancounter = 0;
                         this.errorcount = 0;
                     },
                     ratelimit: function () {
                         this.uri = undefined;
                     },
                     ban: function () {
-                        if (!this.bancounter)
-                            this.bancounter = 1;
-                        else
-                            this.bancounter++;
-                        if (this.bancounter >= 3 && !this.verified)
-                            // likely to be banned
-                            this.uri = undefined;
-                        else if (this.bancounter >= 4 && this.verified)
-                            this.uri = undefined;
+                        this.uri = undefined;
                     },
                     error: function () {
                         if (!this.errorcount)
