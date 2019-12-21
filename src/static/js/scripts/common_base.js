@@ -85,10 +85,10 @@ function parseSteamError(code, report, proxymgr) {
             };
         case 101:
             return {
-                error: 'Captcha invalid'
+                error: 'Captcha invalid!'
             };
         case 105:
-            if (proxymgr)
+            if (proxymgr && report)
                 proxymgr.proxy.ban();
             return {
                 error: proxymgr && !proxymgr.proxy.emulated ? "Proxy IP banned by steam. Removed from proxy list." : "Your IP is banned by steam. Try disabling your VPN."
@@ -122,20 +122,20 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
             message: null
         },
         id: id,
-        proxy: proxymgr
+        proxymgr: proxymgr
     }
 
     var proxy;
-    if (ret.proxy) {
-        if (!ret.proxy.proxy.uri) {
-            ret.error.message = ret.proxy.proxy.emulated ? "Account generation stopped due to a previous error." : 'No valid proxy found! Check the proxy list for banned proxies!';
+    if (ret.proxymgr) {
+        if (!ret.proxymgr.proxy.uri) {
+            ret.error.message = ret.proxymgr.proxy.emulated ? "Account generation stopped due to a previous error." : 'No valid proxy found! Check the proxy list for banned proxies!';
             return ret;
         }
-        if (ret.proxy.proxy.emulated)
+        if (ret.proxymgr.proxy.emulated)
             proxy = null;
         else
-            proxy = ret.proxy.proxy.uri;
-        console.log(ret.proxy)
+            proxy = ret.proxymgr.proxy.uri;
+        console.log(ret.proxymgr)
     }
 
     var cookies = undefined;
@@ -150,8 +150,8 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
 
     // no gid? error out
     if (!gid) {
-        if (ret.proxy)
-            ret.proxy.proxy.error();
+        if (ret.proxymgr)
+            ret.proxymgr.proxy.error();
         ret.error.message = !proxy ? "Invalid data recieved from steam!" : "Proxy couldn't contact Steam!";
         return ret;
     }
@@ -232,8 +232,8 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
             ret.error.steamerror = ajaxverifyemail.success;
             return ret;
         } else {
-            if (ret.proxy)
-                ret.proxy.proxy.verify();
+            if (ret.proxymgr)
+                ret.proxymgr.proxy.verify();
         }
     }
 
@@ -539,7 +539,7 @@ function parseErrors(data, report) {
     if (data.error.message)
         return data.error.message;
     if (data.error.steamerror)
-        return parseSteamError(data.error.steamerror, report, report ? data.proxy : undefined).error;
+        return parseSteamError(data.error.steamerror, report, data.proxymgr).error;
     return "Unknown error!"
 }
 
