@@ -103,7 +103,7 @@ function parseSteamError(code, report, proxymgr) {
             return {};
         default:
             return {
-                error: 'Error while creating the Steam account! Check console for details!'
+                error: `Error while creating the Steam account! Steam error code ${code}!`
             };
     }
 }
