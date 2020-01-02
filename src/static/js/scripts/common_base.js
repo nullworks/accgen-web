@@ -32,7 +32,6 @@ global.httpRequest = function (options, proxy, cookies, timeout) {
         }
     });
 }
-const Snowflakes = require('magic-snowflakes');
 
 // Code to communicate with the addon
 var g_id = 0;
@@ -1122,7 +1121,6 @@ async function setupGmail() {
 }
 
 global.common_init = function () {
-    Snowflakes();
     if (isElectron()) {
         if (typeof document.ipc != "undefined") {
             document.ipc.on('alert-msg', (event, arg) => {
