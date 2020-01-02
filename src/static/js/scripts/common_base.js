@@ -84,9 +84,10 @@ function parseSteamError(code, report, proxymgr) {
             return {
                 error: 'Steam is limitting account creations from your IP or this email address (if using Gmail). Try again later.'
             };
+        case 2:
         case 101:
             return {
-                error: 'Captcha invalid!'
+                error: 'Captcha solved incorrectly!'
             };
         case 105:
             if (proxymgr && report)
