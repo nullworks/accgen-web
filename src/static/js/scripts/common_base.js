@@ -86,7 +86,7 @@ function parseSteamError(code, report, proxymgr) {
         case 2:
         case 101:
             return {
-                error: 'Captcha solved incorrectly!'
+                error: 'Captcha provider solved the captcha incorrectly!'
             };
         case 105:
             if (proxymgr && report)
@@ -166,7 +166,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     if (typeof recaptcha_solution != "string") {
         var res = await recaptcha_solution.getCaptchaSolution(id);
         if (!res) {
-            ret.error.message = 'Getting captcha solution failed. Check your 2Captcha API key.';
+            ret.error.message = 'Getting captcha solution failed. Make sure your key is valid and your host matches 2captcha\'s api.';
             return ret;
         }
         recaptcha_solution = res;
@@ -779,11 +779,17 @@ async function getRecaptchaSolution() {
         url: `${captcha_host}/in.php?key=${captcha_key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
     }).catch(function (err) {
         console.log(err);
-        throw new Error("Captcha Service sent invalid or empty json!");
+        throw new Error("Failed to connect to Captcha provider");
     });
+    try {
+        if (typeof res == 'string')
+            res = JSON.parse(res);
+    } catch (err) {
+        throw new Error("Captcha Service send invalid json!");
+    }
 
     if (!res.request)
-        throw new Error("Captcha Service sent invalid json!");
+        throw new Error("Captcha Provider sent invalid json!");
     console.log("Captcha Service requestid: " + res.request);
     await sleep(10000);
     for (var i = 0; i < 30; i++) {
@@ -791,6 +797,12 @@ async function getRecaptchaSolution() {
         var ans_res = await httpRequest({
             url: `${captcha_host}/res.php?key=${captcha_key}&action=get&id=${res.request}&json=1&header_acao=1`
         })
+        try {
+            if (typeof ans_res == 'string')
+                ans_res = JSON.parse(ans_res);
+        } catch (err) {
+            throw new Error("Captcha Service send invalid json!");
+        }
         console.log(ans_res)
         // Status could be error, 0 = not yet ready
         if (ans_res.status == 0)
