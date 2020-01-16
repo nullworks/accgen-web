@@ -774,21 +774,22 @@ function changeText(isinstalled) {
 
 async function getRecaptchaSolution() {
     var captcha_key = settings.get("captcha_key");
+    var captcha_host = settings.get("captcha_host")
     var res = await httpRequest({
-        url: `https://2captcha.com/in.php?key=${captcha_key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
+        url: `${captcha_host}/in.php?key=${captcha_key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
     }).catch(function (err) {
         console.log(err);
-        throw new Error("2Captcha sent invalid or empty json!");
+        throw new Error("Captcha Service sent invalid or empty json!");
     });
 
     if (!res.request)
-        throw new Error("2Captcha sent invalid json!");
-    console.log("2captcha requestid: " + res.request);
+        throw new Error("Captcha Service sent invalid json!");
+    console.log("Captcha Service requestid: " + res.request);
     await sleep(10000);
     for (var i = 0; i < 30; i++) {
         await sleep(5000);
         var ans_res = await httpRequest({
-            url: `https://2captcha.com/res.php?key=${captcha_key}&action=get&id=${res.request}&json=1&header_acao=1`
+            url: `${captcha_host}/res.php?key=${captcha_key}&action=get&id=${res.request}&json=1&header_acao=1`
         })
         console.log(ans_res)
         // Status could be error, 0 = not yet ready
@@ -800,7 +801,7 @@ async function getRecaptchaSolution() {
     if (res.status == 1)
         return res.request;
     else
-        throw new Error("2Captcha error!");
+        throw new Error("Captcha Service error!");
 }
 
 global.mass_generate_clicked = async function () {
@@ -1282,6 +1283,7 @@ global.settings_pressed = function () {
     change_visibility(2);
     $("#settings_custom_domain").val(settings.get("email_domain"));
     $("#settings_twocap").val(settings.get("captcha_key"));
+    $("#settings_caphost").val(settings.get("captcha_host"));
     $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steam_guard"));
     $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps_setting"));
     $("#settings_appids").trigger("input");
@@ -1328,9 +1330,10 @@ global.save_clicked = async function () {
     settings.set("acc_apps_setting", $("#acc_apps_setting > input[type=\"text\"]").val());
 
     var captcha_key = $("#settings_twocap").val();
+    var captcha_host = ($("#settings_caphost").val() != '') ? $("#settings_caphost").val() : "https://2captcha.com";
     if (captcha_key != "") {
         var res = await httpRequest({
-            url: `https://2captcha.com/res.php?key=${captcha_key}&action=getbalance&header_acao=1`
+            url: `${captcha_host}/res.php?key=${captcha_key}&action=getbalance&header_acao=1`
         }).catch(function (err_response, error) {
             $("#twocap_error").show("slow");
             $("#settings_twocap").val("");
@@ -1344,6 +1347,7 @@ global.save_clicked = async function () {
         }
         $("#twocap_error").hide("slow");
         settings.set("captcha_key", captcha_key);
+        settings.set("captcha_host", captcha_host);
     } else {
         $("#twocap_error").hide("slow");
         settings.set("captcha_key", null);

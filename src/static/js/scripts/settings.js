@@ -35,9 +35,10 @@ exports.set = function (setting, value) {
 }
 
 function baseSettings() {
-    exports.set("version", 3);
+    exports.set("version", 4);
     exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
     exports.set("captcha_key", localStorage.getItem("settings_twocap"));
+    exports.set("captcha_host", "https://2captcha.com");
     exports.set("captcha_key_type", "2captcha");
     exports.set("acc_apps_setting", "329385");
     exports.set("acc_steam_guard", true);
@@ -65,6 +66,11 @@ exports.convert = function () {
             if (subid == "32985" || subid == "303386")
                 exports.set("acc_apps_setting", "329385");
             console.log("Migrated from version 2 to version 3!");
+        }
+        if (exports.get("version") == 3) {
+            exports.set("version", 4);
+            exports.set("captcha_host", "https://2captcha.com");
+            console.log("Migrated from version 3 to version 4!");
         }
     }
 }
