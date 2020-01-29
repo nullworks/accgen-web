@@ -118,6 +118,10 @@
       <div id="generate_error" class="alert alert-danger" style="display: none;"> <strong>An error has
           occured:</strong>
         <div id="generate_error_text"></div>
+        <h6 class="card-text">
+          <button id="generate_error_emailprovider" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+            data-target="#email_service_modal">Change Email Provider</button>
+        </h6>
       </div>
 
       <div id="custom_gen_form" class="card border-dark mb-3"
@@ -413,16 +417,16 @@
           <div class="card-body">
             <h6 id="acc_apps" class="card-text" style="display: none;">
               <span>Successfully activated <strong>0/0</strong> apps</span>
-           </h6>
-           <h6 class="card-text">
+            </h6>
+            <h6 class="card-text">
               Login: <a href="#"><strong><span id="details_username"
-                       onclick="copyDetails('details_username'); return false">niceaccount</span></strong></a>
-           </h6>
-           <h6 class="card-text">
+                    onclick="copyDetails('details_username'); return false">niceaccount</span></strong></a>
+            </h6>
+            <h6 class="card-text">
               Password: <a href="#"><strong><span id="details_password"
-                       onclick="copyDetails('details_password'); return false">nicepass</span></strong></a>
-           </h6>
-           <button id="electron_steam_signin" type="button" onclick="electronSteamSignIn()"
+                    onclick="copyDetails('details_password'); return false">nicepass</span></strong></a>
+            </h6>
+            <button id="electron_steam_signin" type="button" onclick="electronSteamSignIn()"
               class="btn btn-primary btn-lg" style="display: none;">Sign in using Steam</button>
           </div>
         </div>

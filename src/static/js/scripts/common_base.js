@@ -97,6 +97,8 @@ function parseSteamError(code, report, proxymgr) {
         case 17:
             if (report)
                 report_email();
+            if (!proxymgr)
+                $("#generate_error_emailprovider").show();
             return {
                 error: 'Steam has banned the domain. Please use Gmail or Custom domain'
             };
@@ -980,6 +982,7 @@ global.commonChangeVisibility = function (pre_generate) {
         $('#proxy_error').hide("slow");
         $('#twocap_error').hide("slow");
         $('#generate_error').hide("slow");
+        $("#generate_error_emailprovider").hide("slow");
         $('#generated_data').hide("slow");
         $('#history_list').hide("slow");
         $('#steam_iframe').hide("slow");
