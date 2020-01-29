@@ -549,6 +549,8 @@ function parseErrors(data, report) {
 async function generateAccounts(count, proxylist, captcha, multigen, statuscb, generationcallback) {
     if (!multigen)
         multigen = 1;
+    // Complete hack. TODO: Replace with less hacky code in the future.
+    var emailbanned = false;
 
     var accounts = [];
     var concurrent = 0;
@@ -560,6 +562,20 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
             await sleep(500);
         concurrent++;
         statuscb("Starting...", i);
+        if (emailbanned) {
+            // Complete hack. TODO: Replace with less hacky code in the future.
+            var res = {
+                success: false,
+                error: {
+                    message: "Account generation stopped due to a previous error."
+                }
+            };
+            accounts.push(res);
+            if (generationcallback)
+                generationcallback(res, i);
+            concurrent--;
+            continue;
+        }
         generateAccount(captcha, proxylist ? proxylist.getProxy() : undefined, statuscb, i).then(function (res) {
             if (generationcallback)
                 generationcallback(res, res.id);
@@ -567,6 +583,9 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
             if (generationcallback)
                 change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
             console.log(res);
+            // Complete hack. TODO: Replace with less hacky code in the future.
+            if (res.error.steamerror == 17)
+                emailbanned = true;
             concurrent--;
         }, function (err) {
             accounts.push({
