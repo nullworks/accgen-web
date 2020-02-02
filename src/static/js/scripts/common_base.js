@@ -1171,7 +1171,7 @@ global.common_init = function () {
             setTimeout(...args);
         };
         proxylist.load();
-
+        $("#electron_ad").hide();
     }
     if (localStorage.getItem("genned_account") != null) {
         $('#history_button').show();
