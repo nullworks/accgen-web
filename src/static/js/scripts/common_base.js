@@ -637,7 +637,8 @@ function registerevents() {
             if (ret)
                 displayData(ret);
         }))[0];
-        var error = parseErrors(account, true);
+        // Find errors and report banned domain if accgen email service in use
+        var error = parseErrors(account, settings.get("email_provider") == "accgen");
         if (error) {
             displayData({
                 parsederror: error,
@@ -903,7 +904,7 @@ global.mass_generate_clicked = async function () {
     }
 
     function generationcallback(account, id) {
-        var error = parseErrors(account, true);
+        var error = parseErrors(account, settings.get("email_provider") == "accgen");
         if (error) {
             alter_table(id, {
                 status: error
