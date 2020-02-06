@@ -5,8 +5,6 @@ require("bootstrap");
 const isElectron = require("is-electron");
 const settings = require("./settings.js");
 global.accgen_settings = settings;
-const escape = require('escape-html');
-const Autolinker = require('autolinker');
 
 global.extend = function (obj, src) {
     for (var key in src) {
@@ -694,11 +692,16 @@ function on_status_received(resp) {
     }
 
     if (resp.status) {
-        // Never trust anyone
-        var out = escape(resp.status);
-        out = Autolinker.link(out, { email: false, phone: false });
-        document.getElementById("accgen_status_msg").innerHTML = out;
-        $("#accgen_status").show("slow");
+        Promise.all([
+            import(/* webpackChunkName: "status" */ "autolinker"),
+            import(/* webpackChunkName: "status" */ "escape-html"),
+        ]).then(([Autolinker, escape]) => {
+            // Never trust anyone
+            var out = escape.default(resp.status);
+            out = Autolinker.default.link(out, { email: false, phone: false });
+            document.getElementById("accgen_status_msg").innerHTML = out;
+            $("#accgen_status").show("slow");
+        });
     } else {
         $("#accgen_status").hide("slow");
     }

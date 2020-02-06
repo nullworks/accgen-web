@@ -4,18 +4,19 @@
   "repository": "https://gitlab.com/nullworks/accgen/accgen-web",
   "author": "nullworks",
   "license": "AGPL-3.0-or-later",
-  "private": false,
+  "private": true,
   "scripts": {
-    "build": "mkdir -p public && rsync -a --delete-after --delete-excluded --exclude 'static/js/scripts' ./src/ ./public && browserify ./src/static/js/scripts/common_base.js -o ./public/static/js/common.js"
+    "build": "rm -r public && webpack"
   },
   "dependencies": {
     "autolinker": "^3.11.0",
     "bootstrap": "^4.3.1",
-    "browserify": "^16.5.0",
-    "dompurify": "^2.0.3",
+    "copy-webpack-plugin": "^5.1.1",
     "escape-html": "^1.0.3",
     "is-electron": "^2.2.0",
     "jquery": "^3.4.1",
-    "popper.js": "^1.15.0"
+    "popper.js": "^1.15.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   }
 }
