@@ -5,6 +5,7 @@ require("bootstrap");
 const isElectron = require("is-electron");
 const settings = require("./settings.js");
 global.accgen_settings = settings;
+const dynamic = require("./dynamicloading.js");
 
 global.extend = function (obj, src) {
     for (var key in src) {
@@ -648,8 +649,9 @@ function registerevents() {
     }, false);
 }
 
-function doRecapV3(action) {
-    return grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
+async function doRecapV3(action) {
+    await dynamic.loadRecaptchaV3();
+    return await grecaptcha.execute('6LfG55kUAAAAANVoyH7VqYns6j_ZpxB35phXF0bM', {
         action: action
     });
 }
