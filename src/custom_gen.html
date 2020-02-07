@@ -118,8 +118,8 @@
           occured:</strong>
         <div id="generate_error_text"></div>
         <h6 class="card-text">
-          <button id="generate_error_emailprovider" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
-            data-target="#email_service_modal">Change Email Provider</button>
+          <button id="generate_error_emailprovider" type="button" class="btn btn-primary btn-lg"
+            onclick="selectEmailServicePressed()">Change Email Provider</button>
         </h6>
       </div>
 
@@ -531,6 +531,8 @@
           </div>
         </div>
       </div>
+
+      <!--Preferences modal-->
       <div class="modal fade" id="settings_popup">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -541,13 +543,13 @@
               </button>
             </div>
             <div class="modal-body">
-              <div id="custom_domain_div" class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
+              <div class="card border-dark mb-3" style="max-width: 33rem;margin:auto;">
                 <div class="card-body">
                   <form id="settings_form" action="#">
                     <h6 id="acc_steam_guard" class="card-text custom-control custom-checkbox">
                       <input type="checkbox" class="custom-control-input" id="settings_disable_steamguard" checked>
-                      <label class="custom-control-label" for="settings_disable_steamguard">Automatically disable Steam
-                        Guard</label>
+                      <label class="custom-control-label" for="settings_disable_steamguard">Automatically
+                        disable Steam Guard</label>
                     </h6><br>
                     <h6 id="acc_apps_setting" class="card-text">
                       <div class="alert alert-success">Detected <span>0</span>/5 apps</div>
@@ -557,17 +559,19 @@
                       <button id="help_button" type="button" onclick="settings_help('f2plist')"
                         class="btn btn-primary btn-lg">List of F2P games</a>
                     </h6><br>
-                    <h6 id="acc_login" class="card-text">
-                      Custom Domain/Gmail address: <input type="text" id="settings_custom_domain" class="form-control"
-                        placeholder="Enter your custom domain or gmail address" autocomplete="off"><br>
-                      <button id="help_button" type="button" onclick="settings_help('mx')"
-                        class="btn btn-primary btn-lg">Custom domain Help</button>
-                      <button id="help_button" type="button" onclick="settings_help('gmail')"
-                        class="btn btn-primary btn-lg">Gmail setup Help</button>
+                    <h6 class="card-text">
+                      <button id="help_button" type="button" class="btn btn-primary btn-lg"
+                        onclick="selectEmailServicePressed()">Select Email
+                        Provider</button>
                     </h6><br>
-                    <h6 id="twocap-settings" class="card-text">
-                      2Captcha Key: <input type="text" id="settings_twocap" class="form-control"
-                        placeholder="Enter your 2Captcha key" autocomplete="off"><br>
+                    <h6 class="card-text">
+                      Captcha Key: <input type="text" id="settings_twocap" class="form-control"
+                        placeholder="Enter your Captcha key" autocomplete="off"><br>
+                    </h6>
+                    <h6 class="card-text">
+                      Captcha Host: <input type="text" id="settings_caphost" class="form-control"
+                        placeholder="Enter the Captcha host [Must Match 2captcha's API]" autocomplete="off"
+                        value="https://2captcha.com"><br>
                     </h6>
                     <br>
                     <h6 class="card-text">
@@ -587,6 +591,81 @@
           </div>
         </div>
       </div>
+      <!--End of preferences modal-->
+
+      <!--Email service selection-->
+      <div class="modal fade" id="email_service_modal" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Email Service</h5>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col">
+                  <figure id="email_service_option_gmail">
+                    <img class="img-thumbnail img-fluid rounded" src=""></img>
+                    <figcaption><b>Gmail</b>
+                      <p>Fully automatically set up gmail forwarding of steam emails</p>
+                    </figcaption>
+                  </figure>
+                </div>
+                <div class="col">
+                  <figure id="email_service_option_custom">
+                    <img class="img-thumbnail rounded img-fluid" onclick="custom_domain_clicked();" src=""></img>
+                          <figcaption><b>Custom domain</b><br>Add your own domain for full control
+                          </figcaption>
+                       </figure>
+                    </div>
+                    <div class=" col">
+                    <figure id="email_service_option_accgen">
+                      <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
+                      <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
+                      </figcaption>
+                    </figure>
+                </div>
+              </div>
+              <div id="email_service_message" class="alert alert-warning" style="display: none">
+                <strong></strong>
+              </div>
+              <br>
+              <div id="email_service_progress" class="" style="display: none;">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                </div>
+              </div>
+              <div class="modal-footer">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="custom_domain_service_modal" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Custom Domain Settings</h5>
+            </div>
+            <div class="modal-body">
+              Custom domain settings:
+              <input type="text" id="settings_custom_domain" class="form-control"
+                placeholder="Enter your custom domain or gmail address" autocomplete="off">
+              <br>
+              <button id="help_button" type="button" onclick="settings_help('mx')" class="btn btn-primary btn-lg">Custom
+                domain Help</button>
+              <br>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="save_domain()" data-dismiss="modal">Save
+                  changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--End of email service selection-->
+
       <div id="generation_status" style="display: none;">
         <div id="generation_status_card" class="card border-dark mb-3" style="margin:auto">
           <div class="card-header">Account generation Status</div>

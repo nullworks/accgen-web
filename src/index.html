@@ -106,7 +106,7 @@
                               </h6><br>
                               <h6 class="card-text">
                                  <button id="help_button" type="button" class="btn btn-primary btn-lg"
-                                    data-toggle="modal" data-target="#email_service_modal">Select Email
+                                    onclick="selectEmailServicePressed()">Select Email
                                     Provider</button>
                               </h6><br>
                               <h6 class="card-text">
@@ -144,37 +144,30 @@
                <div class="modal-content">
                   <div class="modal-header">
                      <h5 class="modal-title">Email Service</h5>
-                     <!--   <button data-dismiss="modal" class="close" type="button">
-                        <span aria-hidden="true">×</span>
-                        <span class="sr-only">Close</span>
-                    </button> -->
                   </div>
                   <div class="modal-body">
                      <div class="row">
                         <div class="col">
                            <figure id="email_service_option_gmail">
-                              <img class="img-thumbnail img-fluid rounded"
-                                 src="https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/logo_gmail_color_1x_web_512dp.png"></img>
+                              <img class="img-thumbnail img-fluid rounded" src=""></img>
                               <figcaption><b>Gmail</b>
                                  <p>Fully automatically set up gmail forwarding of steam emails</p>
                               </figcaption>
                            </figure>
                         </div>
                         <div class="col">
-                           <figure>
-                              <img class="img-thumbnail rounded img-fluid" onclick="custom_domain_clicked();"
-                                 src="https://i.imgur.com/XfXeovs.png"></img>
+                           <figure id="email_service_option_custom">
+                              <img class="img-thumbnail rounded img-fluid" onclick="custom_domain_clicked();" src=""></img>
                               <figcaption><b>Custom domain</b><br>Add your own domain for full control
                               </figcaption>
                            </figure>
                         </div>
-                        <div class="col">
-                           <figure>
-                              <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()"
-                                 src="./static/sag-cat.png"></img>
-                              <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
-                              </figcaption>
-                           </figure>
+                        <div class=" col">
+                              <figure id="email_service_option_accgen">
+                                 <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
+                                 <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
+                                 </figcaption>
+                              </figure>
                         </div>
                      </div>
                      <div id="email_service_message" class="alert alert-warning" style="display: none">
@@ -199,9 +192,6 @@
                <div class="modal-content">
                   <div class="modal-header">
                      <h5 class="modal-title">Custom Domain Settings</h5>
-                     <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
-                           aria-hidden="true">&times;</span>
-                     </button>-->
                   </div>
                   <div class="modal-body">
                      Custom domain settings:
@@ -265,7 +255,7 @@
             <div id="generate_error_text"></div>
             <h6 class="card-text">
                <button id="generate_error_emailprovider" type="button" class="btn btn-primary btn-lg"
-                  data-toggle="modal" data-target="#email_service_modal">Change Email Provider</button>
+                  onclick="selectEmailServicePressed()">Change Email Provider</button>
             </h6>
          </div>
          <div id="generated_data" style="display: none;">
@@ -445,7 +435,7 @@
          </div>
          <div id="steam_iframe" style="display: none;">
             <iframe id="steam_iframe_innerdiv" height="700px" width="400px" scrolling="no" style="padding-left: 3rem;"
-               frameborder="0"></iframe>
+               frameborder="0" src="about:blank"></iframe>
          </div>
          <div id="generate_progress" style="display: none;">
             <h5>Please wait, generating...</h5>

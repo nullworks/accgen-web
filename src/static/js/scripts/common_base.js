@@ -993,10 +993,18 @@ global.commonGeneratePressed = async function () {
         $("#mass_generator").modal('show');
         return;
     }
-    if ($("#steam_iframe").is(":hidden"))
+    if ($("#steam_iframe").is(":hidden")) {
         change_visibility(2);
+        document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
+    }
+    else
+        document.getElementById('steam_iframe_innerdiv').src = "about:blank";
     $("#steam_iframe").toggle("slow")
-    document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
+}
+
+global.selectEmailServicePressed = function () {
+    dynamic.loadEmailServiceImages();
+    $("#email_service_modal").modal('show');
 }
 
 global.commonChangeVisibility = function (pre_generate) {
@@ -1010,9 +1018,12 @@ global.commonChangeVisibility = function (pre_generate) {
         $("#generate_error_emailprovider").hide("slow");
         $('#generated_data').hide("slow");
         $('#history_list').hide("slow");
-        $('#steam_iframe').hide("slow");
         $("#generation_status").hide("slow");
         displayerror(undefined);
+
+        // Unload the steam recaptcha
+        $('#steam_iframe').hide("slow");
+        document.getElementById('steam_iframe_innerdiv').src = "about:blank";
 
         if (pre_generate == 1) {
             $('#control_buttons').hide();
@@ -1201,7 +1212,7 @@ global.common_init = function () {
                 console.log("Version older than 3.0 detected!");
                 changeText(true);
                 if (!settings.get("email_provider"))
-                    $("#email_service_modal").modal('show');
+                    selectEmailServicePressed();
             }).fail(function (resp) {
                 changeText();
                 $("#addon_dl").show();
@@ -1213,7 +1224,7 @@ global.common_init = function () {
             console.log("Version 3.0 or above found!")
             $("#email_service_option_gmail > img").click(setupGmail);
             if (!settings.get("email_provider"))
-                $("#email_service_modal").modal('show');
+                selectEmailServicePressed();
         }
     })
 
