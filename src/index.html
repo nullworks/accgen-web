@@ -158,17 +158,18 @@
                         </div>
                         <div class="col">
                            <figure id="email_service_option_custom">
-                              <img class="img-thumbnail rounded img-fluid" onclick="custom_domain_clicked();" src=""></img>
+                              <img class="img-thumbnail rounded img-fluid" onclick="custom_domain_clicked();"
+                                 src=""></img>
                               <figcaption><b>Custom domain</b><br>Add your own domain for full control
                               </figcaption>
                            </figure>
                         </div>
                         <div class=" col">
-                              <figure id="email_service_option_accgen">
-                                 <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
-                                 <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
-                                 </figcaption>
-                              </figure>
+                           <figure id="email_service_option_accgen">
+                              <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
+                              <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
+                              </figcaption>
+                           </figure>
                         </div>
                      </div>
                      <div id="email_service_message" class="alert alert-warning" style="display: none">
@@ -445,6 +446,10 @@
                   aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
             </div>
             <span id="generate_status">If you see this, its a bug!</span>
+            <span id="generate_stop">
+               <br>
+               <button type="button" class="btn btn-primary btn-lg">Stop</button>
+            </span>
          </div>
       </div>
    </div>

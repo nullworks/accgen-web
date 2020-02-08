@@ -549,32 +549,37 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
     if (!multigen)
         multigen = 1;
     // Complete hack. TODO: Replace with less hacky code in the future.
-    var emailbanned = false;
+    var stopped = false;
 
     var accounts = [];
     var concurrent = 0;
     if (generationcallback)
         change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
 
+    $('#generate_stop > button').unbind("click");
+    $('#generate_stop > button').click(function () {
+        $('#generate_stop').hide("slow");
+        stopped = "Account generation stopped."
+    });
+
     for (var i = 0; i < count; i++) {
-        while (concurrent >= multigen)
-            await sleep(500);
-        concurrent++;
-        statuscb("Starting...", i);
-        if (emailbanned) {
+        if (stopped) {
             // Complete hack. TODO: Replace with less hacky code in the future.
             var res = {
                 success: false,
                 error: {
-                    message: "Account generation stopped due to a previous error."
+                    message: stopped
                 }
             };
             accounts.push(res);
             if (generationcallback)
                 generationcallback(res, i);
-            concurrent--;
             continue;
         }
+        while (concurrent >= multigen)
+            await sleep(500);
+        concurrent++;
+        statuscb("Starting...", i);
         generateAccount(captcha, proxylist ? proxylist.getProxy() : undefined, statuscb, i).then(function (res) {
             if (generationcallback)
                 generationcallback(res, res.id);
@@ -584,7 +589,7 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
             console.log(res);
             // Complete hack. TODO: Replace with less hacky code in the future.
             if (res.error.steamerror == 17)
-                emailbanned = true;
+                stopped = "Account generation stopped because the email domain in use is banned.";
             concurrent--;
         }, function (err) {
             accounts.push({
@@ -847,7 +852,7 @@ global.mass_generate_clicked = async function () {
     // Inline to limit scope
     function alter_table(id, data) {
         if (isNaN(id)) {
-            console.log("Invalid ID");
+            console.error("Invalid ID");
             return;
         }
 
@@ -875,15 +880,16 @@ global.mass_generate_clicked = async function () {
         $("#status_table").append(
             `<tr>
             <td>${i}</td>
-            <td>null</td>
-            <td>null</td>
-            <td>null</td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td>Waiting...</td>
             </tr>`
         );
 
     // Show progress bar and hide other things
     change_visibility(true);
+    $('#generate_stop').show();
     $("#generation_status").show("slow");
 
     function statuscb(msg, id) {
@@ -1019,6 +1025,7 @@ global.commonChangeVisibility = function (pre_generate) {
         $('#generated_data').hide("slow");
         $('#history_list').hide("slow");
         $("#generation_status").hide("slow");
+        $('#generate_stop').hide("slow");
         displayerror(undefined);
 
         // Unload the steam recaptcha
