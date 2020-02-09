@@ -31,15 +31,15 @@
    <script defer src="static/js/common.bundle.js"></script>
    <script defer src="static/js/index.js"></script>
    <ul class="nav nav-tabs">
-      <li class="nav-item"> <a class="nav-link active" href="/">Generator</a>
+      <li class="nav-item"> <a class="nav-link active" onclick="return changeurl()" href="custom_gen.html">Generator</a>
       </li>
-      <li class="nav-item"> <a class="nav-link" href="custom_gen.html">Custom Accounts</a>
+      <li class="nav-item"> <a class="nav-link" onclick="return changeurl()" href="custom_gen.html">Custom Accounts</a>
       </li>
-      <li class="nav-item"> <a class="nav-link" href="https://email.cathook.club/sag-email.html">Email Access</a>
+      <li class="nav-item"> <a class="nav-link" onclick="return changeurl()" href="https://email.cathook.club/sag-email.html">Email Access</a>
       <li class="nav-item"> <a target="_blank" class="nav-link"
             href="https://gitlab.com/nullworks/accgen/accgen-web/issues" rel="noopener">Gitlab Issues</a>
       </li>
-      <li class="nav-item"><a class="nav-link" href="telegram.html">TG Announcement Channel</a></li>
+      <li class="nav-item"><a class="nav-link" target="_blank" href="telegram.html">TG Announcement Channel</a></li>
       <li class="nav-item">
          <div style="line-height: 0;">
             <a target="_blank" href="https://patreon.com/steam_acc" rel="noopener">
@@ -76,7 +76,31 @@
             </strong>
          </div>
       </div>
+
       <div id="accgen_ui" style="color: rgb(205, 199, 188); text-align: center; padding-bottom: 3%">
+         <!--Leave modal-->
+         <div class="modal fade" id="exit_page_modal" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Warning: You are about to cancel an in progress account generation!</h5>
+                  </div>
+                  <div class="modal-body">
+                     <b>You are about to cancel an in progress account generation.<br>You will not keep any currently
+                        generating accounts.</b>
+                     <br><br>
+                     <button type="button" class="btn btn-success" data-dismiss="modal">Stay</button>
+                     <button id="exit_page_modal_graceful" type="button" class="btn btn-primary" onclick="save_domain()"
+                        data-dismiss="modal">Stop
+                        generation gracefully</button>
+                     <button id="exit_page_modal_exit" type="button" class="btn btn-danger" onclick="save_domain()"
+                        data-dismiss="modal">Leave
+                        anyway</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+
          <!--Preferences modal-->
          <div class="modal fade" id="settings_popup">
             <div class="modal-dialog">
@@ -217,7 +241,7 @@
             indefinitely.
          </div>
          <div id="electron_ad" class="alert alert-success">
-            Check out our open source <b>electron app with proxy support</b> <a
+            Check out our open source <b>electron app with proxy support</b> <a onclick="return changeurl()"
                href='https://gitlab.com/nullworks/accgen/accgen-electron-app/-/jobs/artifacts/master/browse/dist?job=build'>HERE!</a>
          </div>
          <br>
@@ -398,19 +422,8 @@
                         </tr>
                      </thead>
                      <tbody id="status_table">
-                        <!--
-                           <tr>
-                           <td>1</td>
-                           <td>SampleUsername</td>
-                           <td>SamplePassword</td>
-                           <td>SampleEmail</td>
-                           <td>Sample</td>
-                        </tr>
-
-                      -->
                      </tbody>
                   </table>
-
                </div>
             </div>
          </div>
@@ -432,7 +445,7 @@
                class="btn btn-primary btn-lg">Generate</button>
             <button type="button" class="btn btn-primary btn-lg" onclick="settings_pressed();" data-toggle="modal"
                data-target="#settings_popup">Preferences</button>
-            <button id="history_button" type="button" onclick="history_pressed();"
+            <button id="history_button" style="display:none" type="button" onclick="history_pressed();"
                class="btn btn-primary btn-lg">History</button>
          </div>
          <div id="steam_iframe" style="display: none;">
