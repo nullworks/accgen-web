@@ -368,7 +368,7 @@ function perform_status_check() {
     })
 }
 
-function sleep(ms) {
+global.sleep  = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -850,10 +850,6 @@ global.changeurl = function (exit) {
     return true;
 }
 
-global.bruh = function (a) {
-    generation.activegeneration = a;
-}
-
 global.common_init = function () {
     if (isElectron()) {
         if (typeof document.ipc != "undefined") {
@@ -924,6 +920,7 @@ global.common_init = function () {
         $(window).trigger("accgen.stopgeneration");
     });
     $("#exit_page_modal_exit").click(function () {
+        generation.activegeneration = false;
         window.location = changeurl_url;
     });
     window.addEventListener('beforeunload', function (e) {

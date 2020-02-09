@@ -316,7 +316,7 @@ exports.generateAccounts = async function (count, proxylist, captcha, multigen, 
 
     // Complete hack. TODO: Replace with less hacky code in the future.
     var stopped = false;
-    exports.activegeneration = multigen;
+    exports.activegeneration = count;
 
     $(window).on("accgen.stopgeneration", function () {
         stopped = "Account generation stopped."
