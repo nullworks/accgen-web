@@ -167,7 +167,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     if (typeof recaptcha_solution != "string") {
         var res = await recaptcha_solution.getCaptchaSolution(id);
         if (!res) {
-            ret.error.message = 'Getting captcha solution failed. Make sure your key is valid and your host matches 2captcha\'s api.';
+            ret.error.message = 'Getting captcha solution failed. Make sure your api key is valid and your host supports a "2captcha like" api.';
             return ret;
         }
         recaptcha_solution = res;
@@ -538,9 +538,9 @@ function parseErrors(data, report) {
     }
     if (data.success == true)
         return;
-    if (data.error.message)
+    if (data.error && data.error.message)
         return data.error.message;
-    if (data.error.steamerror)
+    if (data.error && data.error.steamerror)
         return parseSteamError(data.error.steamerror, report, data.proxymgr).error;
     return "Unknown error!"
 }
@@ -548,21 +548,25 @@ function parseErrors(data, report) {
 async function generateAccounts(count, proxylist, captcha, multigen, statuscb, generationcallback) {
     if (!multigen)
         multigen = 1;
-    // Complete hack. TODO: Replace with less hacky code in the future.
-    var stopped = false;
 
     var accounts = [];
     var concurrent = 0;
     if (generationcallback)
-        change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
+        change_gen_status_text(`Mass generation in progress... 0/${count}`);
+
+    // Complete hack. TODO: Replace with less hacky code in the future.
+    var stopped = false;
 
     $('#generate_stop > button').unbind("click");
     $('#generate_stop > button').click(function () {
         $('#generate_stop').hide("slow");
         stopped = "Account generation stopped."
+        change_gen_status_text("Stopping account generation...");
     });
 
     for (var i = 0; i < count; i++) {
+        while (concurrent >= multigen && !stopped)
+            await sleep(500);
         if (stopped) {
             // Complete hack. TODO: Replace with less hacky code in the future.
             var res = {
@@ -571,25 +575,26 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
                     message: stopped
                 }
             };
-            accounts.push(res);
+            accounts[i] = res;
             if (generationcallback)
                 generationcallback(res, i);
             continue;
         }
-        while (concurrent >= multigen)
-            await sleep(500);
         concurrent++;
         statuscb("Starting...", i);
         generateAccount(captcha, proxylist ? proxylist.getProxy() : undefined, statuscb, i).then(function (res) {
             if (generationcallback)
                 generationcallback(res, res.id);
-            accounts.push(res);
+            accounts[res.id] = res;
             if (generationcallback)
-                change_gen_status_text(`Mass generation in progress... ${accounts.length}/${count}`);
+                change_gen_status_text(`Mass generation in progress... ${accounts.filter(String).length}/${count}`);
             console.log(res);
             // Complete hack. TODO: Replace with less hacky code in the future.
-            if (res.error.steamerror == 17)
+            if (res.error.steamerror == 17) {
                 stopped = "Account generation stopped because the email domain in use is banned.";
+                if (generationcallback)
+                    change_gen_status_text("Stopping account generation, email domain banned...");
+            }
             concurrent--;
         }, function (err) {
             accounts.push({
@@ -606,14 +611,6 @@ async function generateAccounts(count, proxylist, captcha, multigen, statuscb, g
         await sleep(500);
     console.log(accounts)
     return accounts;
-    /*if (count == 1) {
-        account = accounts[0];
-        if (!account.success) {
-            if (account.message) {
-
-            }
-        }
-    }*/
 }
 
 function registerevents() {
@@ -971,6 +968,9 @@ global.mass_generate_clicked = async function () {
         var error = parseErrors(account, false);
         if (error) {
             alter_table(i, {
+                username: "",
+                password: "",
+                email: "",
                 status: error
             })
             continue;
