@@ -408,36 +408,6 @@
           <h6 class="card-text" style="display: grid;">Profile Bio: <textarea name="acc_bio" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);"></textarea>
           </h6>
-          <h6 class="card-text" style="display: grid;">
-            <span style="font-family: inherit; font-size: 0.9375rem; --darkreader-inline-color: inherit;">Profile
-              Privacy:
-            </span>
-            <select name="profile_privacy" id="profile_privacy" class="card-text" style="width: 100%">
-              <option value="3">Public</option>
-              <option value="2">Friends</option>
-              <option value="1">Private</option>
-            </select>
-          </h6>
-          <h6 class="card-text" style="display: grid;">
-            <span style="font-family: inherit; font-size: 0.9375rem; --darkreader-inline-color: inherit;">Comments
-              Privacy:
-            </span>
-            <select name="comments_privacy" id="comments_privacy" class="card-text" style="width: 100%">
-              <option value="3">Public</option>
-              <option value="2">Friends</option>
-              <option value="1">Private</option>
-            </select>
-          </h6>
-          <h6 class="card-text" style="display: grid;">
-            <span style="font-family: inherit; font-size: 0.9375rem; --darkreader-inline-color: inherit;">Inventory
-              Privacy:
-            </span>
-            <select name="inv_privacy" id="inv_privacy" class="card-text" style="width: 100%">
-              <option value="3">Public</option>
-              <option value="2">Friends</option>
-              <option value="1">Private</option>
-            </select>
-          </h6>
         </div>
       </div>
 
@@ -644,16 +614,16 @@
                 <div class="col">
                   <figure id="email_service_option_custom">
                     <img class="img-thumbnail rounded img-fluid" onclick="custom_domain_clicked();" src=""></img>
-                    <figcaption><b>Custom domain</b><br>Add your own domain for full control
-                    </figcaption>
-                  </figure>
-                </div>
-                <div class=" col">
-                  <figure id="email_service_option_accgen">
-                    <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
-                    <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
-                    </figcaption>
-                  </figure>
+                          <figcaption><b>Custom domain</b><br>Add your own domain for full control
+                          </figcaption>
+                       </figure>
+                    </div>
+                    <div class=" col">
+                    <figure id="email_service_option_accgen">
+                      <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
+                      <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
+                      </figcaption>
+                    </figure>
                 </div>
               </div>
               <div id="email_service_message" class="alert alert-warning" style="display: none">
