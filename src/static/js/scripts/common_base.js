@@ -408,7 +408,7 @@ function changeText(isinstalled) {
         $("#email_service_option_gmail > img")
             .css("opacity", "0.4")
             .css("filter", "alpha(opacity=40)");
-        $("#email_service_option_gmail > figcaption > p").text("You need addon version 4.0 or above to enable gmail support.");
+        $("#email_service_option_gmail > figcaption > p").text("You need addon version 5.0 or above to enable gmail support.");
         return;
     }
     switch (GetBrowser()) {
@@ -826,7 +826,7 @@ async function setupGmail() {
     var address = await gmail.getGmailAddress();
     if (!address) {
         $("#email_service_progress").hide('slow');
-        $("#email_service_message > strong").text(`There was an issue setting up automated Gmail: Communication with gmail failed.`);
+        $("#email_service_message > strong").text(`There was an issue setting up automated Gmail: Communication with gmail failed. Firefox users should disable "enhanced privacy protection" for this page.`);
         lock_email_service_selection = false;
         return;
     }
