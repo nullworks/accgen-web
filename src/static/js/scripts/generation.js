@@ -46,6 +46,22 @@ function stringifyQueryString(params) {
     return queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
 }
 
+async function gmailV2DisableSteamGuard(update) {
+    update("Waiting for steam guard disable email...");
+    var email = await gmail.waitForSteamEmail(true);
+    if (!email)
+        return;
+    var disableLink = "https://store.steampowered.com/account/steamguarddisableverification?stoken=" +
+        email.split("steamguarddisableverification?stoken=")[1].split("\n")[0];
+    update("Confirming steam guard disabling...");
+    var res = await httpRequest({
+        url: disableLink
+    }, null, null).catch(function () {
+        console.log(err);
+    });
+    return res && !res.includes("Unable to disable Steam Guard!");
+}
+
 async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     function update(msg, ret) {
         statuscb(msg, id, ret);
@@ -314,22 +330,11 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         ret.activation = extraTask.activation;
 
         if (isClientSideGmail) {
-            update("Waiting for steam guard disable email...");
-            var email = await gmail.waitForSteamEmail(true);
-            var disableLink = "https://store.steampowered.com/account/steamguarddisableverification?stoken=" +
-                email.split("steamguarddisableverification?stoken=")[1].split("\n")[0];
-
-            update("Confirming steam guard disabling...");
-            await httpRequest({
-                url: disableLink
-            }, null, null).catch(function () {
-                err = error ? error : true;
-                console.log(err);
-            });
-            if (err) {
-                ret.error.message = 'Error while creating the Steam account! Check console for details!';
-                return ret;
-            }
+            if (!await gmailV2DisableSteamGuard(update))
+                if (!await gmailV2DisableSteamGuard(update)) {
+                    ret.error.message = 'Unable to disable steam guard.';
+                    return ret;
+                }
         }
 
     } else {
