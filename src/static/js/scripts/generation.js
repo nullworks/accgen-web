@@ -111,6 +111,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
 
     var err = null;
     var custom_email = getEmail();
+    var isClientSideGmail = settings.get("email_provider") == "gmailv2";
 
     update("Getting registration data...");
     var data = await new Promise(async function (resolve, reject) {
@@ -176,7 +177,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     }
 
     var verifydata;
-    if (settings.get("email_provider") != "gmailv2") {
+    if (isClientSideGmail) {
         update("Fetching email from email server...");
         verifydata = await new Promise(function (resolve, reject) {
             $.ajax({
@@ -285,6 +286,8 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
                     password: data.password,
                     email: custom_email ? custom_email : data.email,
                     doSteamGuard: disableSteamGuard,
+                    // Signal to worker that it should not expect steam guard disable emails in it's inbox, since these are handled on the client
+                    noCheckInbox: isClientSideGmail,
                     activateApps: apps ? apps.map(a => parseInt(a)) : null
                 }),
                 success: function (returnData) {
@@ -309,6 +312,26 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         }
         ret.account = extraTask.account;
         ret.activation = extraTask.activation;
+
+        if (isClientSideGmail) {
+            update("Waiting for steam guard disable email...");
+            var email = await gmail.waitForSteamEmail(true);
+            var disableLink = "https://store.steampowered.com/account/steamguarddisableverification?stoken=" +
+                email.split("steamguarddisableverification?stoken=")[1].split("\n")[0];
+
+            update("Confirming steam guard disabling...");
+            await httpRequest({
+                url: disableLink
+            }, null, null).catch(function () {
+                err = error ? error : true;
+                console.log(err);
+            });
+            if (err) {
+                ret.error.message = 'Error while creating the Steam account! Check console for details!';
+                return ret;
+            }
+        }
+
     } else {
         ret.account = {
             ...data,
