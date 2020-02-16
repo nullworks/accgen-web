@@ -1,4 +1,5 @@
 const settings = require("./settings.js");
+const gmail = require("./gmail.js");
 
 function makeid(length) {
     var result = '';
@@ -24,9 +25,20 @@ function getEmail() {
                     return makeid(10) + "@" + custom_domain.toLowerCase();
             }
         case "gmail":
+        case "gmailv2":
             return settings.get("email_gmail");
         default:
             return null;
+    }
+}
+
+async function getVerifyGmailv2() {
+    var email = await gmail.waitForSteamEmail(false);
+    if (!email)
+        return { error: "No email recieved. Try running the gmail setup again." };
+    return {
+        creationid: email.split("newaccountverification?stoken=")[1].split("\n")[0].split("&creationid=")[1],
+        verifylink: "https://store.steampowered.com/account/newaccountverification?stoken=" + email.split("newaccountverification?stoken=")[1].split("\n")[0]
     }
 }
 
@@ -163,29 +175,40 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         }
     }
 
-    update("Fetching email from email server...");
-    var verifydata = await new Promise(function (resolve, reject) {
-        $.ajax({
-            url: '/userapi/recaptcha/addtask',
-            method: 'post',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                step: "getverify",
-                email: custom_email ? custom_email : data.email
-            }),
-            success: function (returnData) {
-                resolve(returnData);
-            },
-            error: function (xhr, status, error) {
-                console.error(xhr);
-                reject(xhr.responseJSON);
-            }
+    var verifydata;
+    if (settings.get("email_provider") != "gmailv2") {
+        update("Fetching email from email server...");
+        verifydata = await new Promise(function (resolve, reject) {
+            $.ajax({
+                url: '/userapi/recaptcha/addtask',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    step: "getverify",
+                    email: custom_email ? custom_email : data.email
+                }),
+                success: function (returnData) {
+                    resolve(returnData);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    reject(xhr.responseJSON);
+                }
+            });
+        }).catch(function (error) {
+            err = error ? error : true;
+            console.log(err);
         });
-    }).catch(function (error) {
-        err = error ? error : true;
-        console.log(err);
-    });
+    }
+    else {
+        update("Fetching email from gmail...");
+        var res = await getVerifyGmailv2();
+        if (res.error)
+            err = res;
+        else
+            verifydata = res;
+    }
     if (err) {
         if (err.error) {
             ret.error.message = err.error;

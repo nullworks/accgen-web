@@ -7,6 +7,7 @@ const settings = require("./settings.js");
 global.accgen_settings = settings;
 const dynamic = require("./dynamicloading.js");
 const generation = require("./generation.js");
+const gmail = require("./gmail.js");
 
 global.extend = function (obj, src) {
     for (var key in src) {
@@ -368,7 +369,7 @@ function perform_status_check() {
     })
 }
 
-global.sleep  = function (ms) {
+global.sleep = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -407,7 +408,7 @@ function changeText(isinstalled) {
         $("#email_service_option_gmail > img")
             .css("opacity", "0.4")
             .css("filter", "alpha(opacity=40)");
-        $("#email_service_option_gmail > figcaption > p").text("You need addon version 3.0 or above to enable gmail support.");
+        $("#email_service_option_gmail > figcaption > p").text("You need addon version 4.0 or above to enable gmail support.");
         return;
     }
     switch (GetBrowser()) {
@@ -818,14 +819,21 @@ async function setupGmail() {
     console.log(result)
     if (!result.success) {
         $("#email_service_progress").hide('slow');
-        $("#email_service_message > strong").text(`There was an issue setting up automated Gmail Forwarding: ${result.reason || result.error}`)
+        $("#email_service_message > strong").text(`There was an issue setting up Gmail: ${result.reason || result.error}`)
         lock_email_service_selection = false;
         return;
     }
-    settings.set("email_gmail", result.email);
-    setProvider("gmail");
+    var address = await gmail.getGmailAddress();
+    if (!address) {
+        $("#email_service_progress").hide('slow');
+        $("#email_service_message > strong").text(`There was an issue setting up automated Gmail: Communication with gmail failed.`);
+        lock_email_service_selection = false;
+        return;
+    }
+    settings.set("email_gmail", address);
+    setProvider("gmailv2");
     $("#email_service_progress").hide('slow');
-    $("#email_service_message > strong").text(`Automated gmail forwarding was set up for ${result.email}.${result.reason ? ` Reason: ${result.reason}` : ""}`)
+    $("#email_service_message > strong").text(`Automated gmail forwarding was set up for ${address}.`)
 }
 
 var changeurl_url = null;
@@ -902,7 +910,10 @@ global.common_init = function () {
             });
         } else {
             console.log("Version 3.0 or above found!")
-            $("#email_service_option_gmail > img").click(setupGmail);
+            if (!ret.apiversion || ret.apiversion < 2)
+                changeText(true);
+            else
+                $("#email_service_option_gmail > img").click(setupGmail);
             if (!settings.get("email_provider"))
                 selectEmailServicePressed();
         }
