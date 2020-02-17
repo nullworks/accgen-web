@@ -193,7 +193,7 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     }
 
     var verifydata;
-    if (isClientSideGmail) {
+    if (!isClientSideGmail) {
         update("Fetching email from email server...");
         verifydata = await new Promise(function (resolve, reject) {
             $.ajax({
