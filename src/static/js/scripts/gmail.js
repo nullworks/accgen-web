@@ -62,7 +62,7 @@ function getEmailID(elem) {
 function isRelevantEmail(elem) {
     if (elem.find("author>email")[0].innerHTML != "noreply@steampowered.com")
         return;
-    var title = elem.children("title")[0].innerHTML;
+    return true;
 }
 
 async function latestSteamEmail() {
