@@ -33,7 +33,7 @@ function getEmail() {
 }
 
 async function getVerifyGmailv2() {
-    var email = await gmail.waitForSteamEmail(false);
+    var email = await gmail.waitForSteamEmail();
     if (!email)
         return { error: "No email recieved. Try running the gmail setup again." };
     return {
@@ -48,7 +48,7 @@ function stringifyQueryString(params) {
 
 async function gmailV2DisableSteamGuard(update) {
     update("Waiting for steam guard disable email...");
-    var email = await gmail.waitForSteamEmail(true);
+    var email = await gmail.waitForSteamEmail();
     if (!email)
         return;
     var disableLink = "https://store.steampowered.com/account/steamguarddisableverification?stoken=" +
@@ -128,6 +128,9 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     var err = null;
     var custom_email = getEmail();
     var isClientSideGmail = settings.get("email_provider") == "gmailv2";
+
+    if (isClientSideGmail)
+        gmail.updateTimeStamp();
 
     update("Getting registration data...");
     var data = await new Promise(async function (resolve, reject) {

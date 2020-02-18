@@ -33,6 +33,10 @@ async function getGmailIndex() {
 
 var latestdate = Date.now();
 
+exports.updateTimeStamp = function () {
+    latestdate = Date.now();
+}
+
 // Returns an array of new emails
 async function anyNewEmails() {
     var index = (await getGmailIndex());
@@ -55,28 +59,27 @@ function getEmailID(elem) {
     ).get("message_id");
 }
 
-function isRelevantEmail(elem, steamguard) {
+function isRelevantEmail(elem) {
     if (elem.find("author>email")[0].innerHTML != "noreply@steampowered.com")
         return;
     var title = elem.children("title")[0].innerHTML;
-    return steamguard ? title == "Disable Steam Guard Confirmation" : title == "New Steam Account Email Verification";
 }
 
-async function latestSteamEmail(steamguard) {
+async function latestSteamEmail() {
     var emails = await anyNewEmails();
     for (var i = emails.length; i--;) {
         var email = emails[i];
-        if (!isRelevantEmail(email, steamguard))
+        if (!isRelevantEmail(email))
             continue;
         return getEmailID(email);
     }
 }
 
-exports.waitForSteamEmail = async function (steamguard) {
+exports.waitForSteamEmail = async function () {
     // Wait max 20 seconds
     for (var i = 0; i <= 2; i++) {
         await sleep(5000);
-        var email = await latestSteamEmail(steamguard)
+        var email = await latestSteamEmail()
         if (email)
             return getEmailByID(email)
     }
