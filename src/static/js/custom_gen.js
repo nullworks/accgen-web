@@ -21,7 +21,11 @@ async function post_generate(account, update) {
             {
                 profile: $("select[name=profile_privacy]").val(),
                 comments: $("select[name=comments_privacy]").val(),
-                inventory: $("select[name=inv_privacy]").val()
+                inventory: $("select[name=inv_privacy]").val(),
+                inventoryGifts: $('#invgifts_priv').val(),
+                gameDetails: $('#gameDetails_priv').val(),
+                playtime: $('#playtime_priv').val(),
+                friendsList: $('#friendsList_priv').val()
             }
         }),
         dataType: 'json'
@@ -52,6 +56,10 @@ function generate_pressed() {
         profile_priv: $('#profile_privacy').val(),
         comments_priv: $('#comments_privacy').val(),
         inventory_priv: $('#inv_privacy').val(),
+        invgifts_priv: $('#invgifts_priv').val(),
+        gameDetails_priv: $('#gameDetails_priv').val(),
+        playtime_priv: $('#playtime_priv').val(),
+        friendsList_priv: $('#friendsList_priv').val()
     }))
 }
 
@@ -78,6 +86,11 @@ function init() {
         $('#profile_privacy').val(data.profile_priv);
         $('#comments_privacy').val(data.comments_priv);
         $('#inv_privacy').val(data.inventory_priv);
+        $('#invgifts_priv').val(data.invgifts_priv);
+        $('#gameDetails_priv').val(data.gameDetails_priv);
+        $('#playtime_priv').val(data.playtime_priv);
+        $('#friendsList_priv').val(data.friendsList_priv);
+
     }
 
     $.ajax({
