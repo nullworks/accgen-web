@@ -574,7 +574,8 @@ global.mass_generate_clicked = async function () {
             username: account.account.login,
             password: account.account.password,
             email: account.account.email
-        })
+        });
+        addToMassHistory(account.account);
     }
 
     var proxy = $("#proxy_check:checked").val() && typeof document.proxiedHttpRequest != "undefined" ? proxylist : undefined;
@@ -697,6 +698,13 @@ function addToHistory(acc_data) {
         localStorage.setItem("genned_account", JSON.stringify([]))
     }
     localStorage.setItem("genned_account", JSON.stringify(JSON.parse(localStorage.getItem("genned_account")).concat(acc_data)));
+}
+
+function addToMassHistory(acc_data) {
+    if (localStorage.getItem("mass_genned_account") == null) {
+        localStorage.setItem("mass_genned_account", JSON.stringify([]))
+    }
+    localStorage.setItem("mass_genned_account", JSON.stringify(JSON.parse(localStorage.getItem("mass_genned_account")).concat(acc_data)));
 }
 
 var lastacc;
