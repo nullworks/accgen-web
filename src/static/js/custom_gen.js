@@ -48,7 +48,10 @@ function generate_pressed() {
         state: $("input[name=acc_state]").val(),
         city: $("input[name=acc_city]").val(),
         customURL: $("input[name=acc_profileurl]").val(),
-        image: $("input[name=acc_profileimage]").val()
+        image: $("input[name=acc_profileimage]").val(),
+        profile_priv: $('#profile_privacy').val(),
+        comments_priv: $('#comments_privacy').val(),
+        inventory_priv: $('#inv_privacy').val(),
     }))
 }
 
@@ -72,6 +75,9 @@ function init() {
         $("input[name=acc_city]").val(data.city);
         $("input[name=acc_profileurl]").val(data.customURL);
         $("input[name=acc_profileimage]").val(data.image);
+        $('#profile_privacy').val(data.profile_priv);
+        $('#comments_privacy').val(data.comments_priv);
+        $('#inv_privacy').val(data.inventory_priv);
     }
 
     $.ajax({
