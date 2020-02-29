@@ -2,7 +2,7 @@
 
 global.$ = require("jquery");
 require("bootstrap");
-const isElectron = require("is-electron");
+const isElectron = require("is-electron")();
 const settings = require("./settings.js");
 global.accgen_settings = settings;
 const dynamic = require("./dynamicloading.js");
@@ -846,13 +846,16 @@ var changeurl_url = null;
 global.changeurl = function (exit) {
     if (!exit)
         changeurl_url = window.event.target.href;
+    else
+        changeurl_url = "exit"
     if (generation.activegeneration) {
         if (generation.activegeneration > 1)
             $("#exit_page_modal_graceful").show();
         else
             $("#exit_page_modal_graceful").hide();
         if (exit) {
-            $("#exit_page_modal_exit").hide();
+            if (!isElectron)
+                $("#exit_page_modal_exit").hide();
             exit.preventDefault();
             exit.returnValue = '';
         }
@@ -865,7 +868,7 @@ global.changeurl = function (exit) {
 }
 
 global.common_init = function () {
-    if (isElectron()) {
+    if (isElectron) {
         if (typeof document.ipc != "undefined") {
             document.ipc.on('alert-msg', (event, arg) => {
                 on_status_received(arg);
@@ -925,7 +928,7 @@ global.common_init = function () {
         }
     })
 
-    if (isElectron())
+    if (isElectron)
         $("#proxy-settings").show();
 
     // Add generator stop events and exit events
@@ -938,7 +941,10 @@ global.common_init = function () {
     });
     $("#exit_page_modal_exit").click(function () {
         generation.activegeneration = false;
-        window.location = changeurl_url;
+        if (changeurl_url == "exit")
+            window.close();
+        else
+            window.location = changeurl_url;
     });
     window.addEventListener('beforeunload', function (e) {
         global.changeurl(e);
