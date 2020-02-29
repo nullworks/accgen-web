@@ -22,9 +22,9 @@ async function post_generate(account, update) {
                 profile: $("select[name=profile_privacy]").val(),
                 comments: $("select[name=comments_privacy]").val(),
                 inventory: $("select[name=inv_privacy]").val(),
-                inventoryGifts: $('#invgifts_priv').val(),
+                inventoryGifts: $('#invgifts_priv').val() == "true",
                 gameDetails: $('#gameDetails_priv').val(),
-                playtime: $('#playtime_priv').val(),
+                playtime: $('#playtime_priv').val() == "true",
                 friendsList: $('#friendsList_priv').val()
             }
         }),
