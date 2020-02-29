@@ -96,6 +96,15 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
     if (typeof document.toughCookie != "undefined")
         cookies = new document.toughCookie.CookieJar();
 
+    if (typeof recaptcha_solution != "string") {
+        var res = await recaptcha_solution.getCaptchaSolution(id);
+        if (!res) {
+            ret.error.message = 'Getting captcha solution failed. Make sure your api key is valid and your host supports a "2captcha like" api.';
+            return ret;
+        }
+        recaptcha_solution = res;
+    }
+
     update("Getting GID...");
     // get a fresh gid instead
     var gid = await httpRequest({
@@ -115,15 +124,6 @@ async function generateAccount(recaptcha_solution, proxymgr, statuscb, id) {
         gid = gid.gid
     else
         gid = JSON.parse(gid).gid;
-
-    if (typeof recaptcha_solution != "string") {
-        var res = await recaptcha_solution.getCaptchaSolution(id);
-        if (!res) {
-            ret.error.message = 'Getting captcha solution failed. Make sure your api key is valid and your host supports a "2captcha like" api.';
-            return ret;
-        }
-        recaptcha_solution = res;
-    }
 
     var err = null;
     var custom_email = getEmail();
