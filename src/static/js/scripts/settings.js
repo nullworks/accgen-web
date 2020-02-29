@@ -35,12 +35,12 @@ exports.set = function (setting, value) {
 }
 
 function baseSettings() {
-    exports.set("version", 4);
+    exports.set("version", 5);
     exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
     exports.set("captcha_key", localStorage.getItem("settings_twocap"));
     exports.set("captcha_host", "https://2captcha.com");
     exports.set("captcha_key_type", "2captcha");
-    exports.set("acc_apps_setting", "329385");
+    exports.set("acc_apps_setting", "303386");
     exports.set("acc_steam_guard", true);
     console.log("Base settings configured!");
 }
@@ -59,7 +59,6 @@ exports.convert = function () {
             exports.set("acc_steam_guard", true);
             console.log("Migrated from version 1 to version 2!");
         }
-        // localStorage.setItem("settings", JSON.stringify({version: 2, acc_apps_setting: 32985}))
         if (exports.get("version") == 2) {
             exports.set("version", 3);
             var subid = exports.get("acc_apps_setting");
@@ -71,6 +70,13 @@ exports.convert = function () {
             exports.set("version", 4);
             exports.set("captcha_host", "https://2captcha.com");
             console.log("Migrated from version 3 to version 4!");
+        }
+        if (exports.get("version") == 4) {
+            exports.set("version", 5);
+            var subid = exports.get("acc_apps_setting");
+            if (subid == "329385")
+                exports.set("acc_apps_setting", "303386");
+            console.log("Migrated from version 4 to version 5!");
         }
     }
 }
