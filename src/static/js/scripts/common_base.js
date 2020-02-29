@@ -668,7 +668,6 @@ global.commonChangeVisibility = function (pre_generate) {
         $('#mx_error').hide("slow");
         $('#gmail_error').hide("slow");
         $('#saved_success').hide("slow");
-        $('#proxy_error').hide("slow");
         $('#twocap_error').hide("slow");
         $('#generate_error').hide("slow");
         $("#generate_error_emailprovider").hide("slow");
