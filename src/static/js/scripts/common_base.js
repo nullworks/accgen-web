@@ -770,8 +770,8 @@ global.settings_pressed = function () {
     $("#settings_custom_domain").val(settings.get("email_domain"));
     $("#settings_twocap").val(settings.get("captcha_key"));
     $("#settings_caphost").val(settings.get("captcha_host"));
-    $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steam_guard"));
-    $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps_setting"));
+    $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steamguard"));
+    $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps"));
     $("#settings_appids").trigger("input");
     return false;
 }
@@ -812,8 +812,8 @@ global.save_domain = async function () {
 }
 
 global.save_clicked = async function () {
-    settings.set("acc_steam_guard", $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked"));
-    settings.set("acc_apps_setting", $("#acc_apps_setting > input[type=\"text\"]").val());
+    settings.set("acc_steamguard", $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked"));
+    settings.set("acc_apps", $("#acc_apps_setting > input[type=\"text\"]").val());
 
     var captcha_key = $("#settings_twocap").val();
     var captcha_host = ($("#settings_caphost").val() != '') ? $("#settings_caphost").val() : "https://2captcha.com";

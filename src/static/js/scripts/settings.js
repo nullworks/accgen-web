@@ -94,6 +94,7 @@ exports.convert = function () {
             exports.set("acc_steamguard", exports.get("acc_steam_guard"));
             exports.unset("acc_steam_guard");
             exports.unset("acc_apps_setting");
+            console.log("Migrated from version 5 to version 6!");
         }
     }
 }
