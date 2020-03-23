@@ -18,6 +18,16 @@ function initSettings() {
     }
 }
 
+exports.unset = function (setting) {
+    // Init in case cached_settings isn't valid currently
+    initSettings();
+    try {
+        delete cached_settings[setting];
+        localStorage.setItem("settings", JSON.stringify(cached_settings));
+    } catch (error) {
+    }
+}
+
 exports.get = function (setting) {
     // Init in case cached_settings isn't valid currently
     initSettings();
@@ -35,13 +45,13 @@ exports.set = function (setting, value) {
 }
 
 function baseSettings() {
-    exports.set("version", 5);
+    exports.set("version", 6);
     exports.set("custom_domain", localStorage.getItem("settings_custom_domain"));
     exports.set("captcha_key", localStorage.getItem("settings_twocap"));
     exports.set("captcha_host", "https://2captcha.com");
     exports.set("captcha_key_type", "2captcha");
-    exports.set("acc_apps_setting", "303386");
-    exports.set("acc_steam_guard", true);
+    exports.set("acc_apps", "303386");
+    exports.set("acc_steamguard", true);
     console.log("Base settings configured!");
 }
 
@@ -77,6 +87,13 @@ exports.convert = function () {
             if (subid == "329385")
                 exports.set("acc_apps_setting", "303386");
             console.log("Migrated from version 4 to version 5!");
+        }
+        if (exports.get("version") == 5) {
+            exports.set("version", 6);
+            exports.set("acc_apps", exports.get("acc_apps_setting"));
+            exports.set("acc_steamguard", exports.get("acc_steam_guard"));
+            exports.unset("acc_steam_guard");
+            exports.unset("acc_apps_setting");
         }
     }
 }

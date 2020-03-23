@@ -19,4 +19,12 @@ module.exports = {
       { from: 'static/js/*', context: "src/"},
     ]),
   ],
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
 };

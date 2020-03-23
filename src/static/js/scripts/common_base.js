@@ -2,12 +2,13 @@
 
 global.$ = require("jquery");
 require("bootstrap");
-const isElectron = require("is-electron")();
+const isElectron = typeof document.ipc !== 'undefined' || typeof document.sagelectron !== 'undefined';
 const settings = require("./settings.js");
 global.accgen_settings = settings;
 const dynamic = require("./dynamicloading.js");
 const generation = require("./generation.js");
 const gmail = require("./gmail.js");
+const CaptchaAPI = require("./lib/librecaptcha").CaptchaAPI;
 
 global.extend = function (obj, src) {
     for (var key in src) {
@@ -16,21 +17,18 @@ global.extend = function (obj, src) {
     return obj;
 }
 
+// TODO: remove
 global.httpRequest = function (options, proxy, cookies, timeout) {
     return new Promise(async function (resolve, reject) {
-        if (typeof document.proxiedHttpRequest == "undefined" || !proxy)
-            $.ajax(extend({
-                success: function (returnData) {
-                    resolve(returnData);
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr, error);
-                    reject(xhr.responseJSON || xhr.responseText, error);
-                }
-            }, options));
-        else {
-            document.proxiedHttpRequest(options, proxy, cookies, resolve, reject, timeout);
-        }
+        $.ajax(extend({
+            success: function (returnData) {
+                resolve(returnData);
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr, error);
+                reject(xhr.responseJSON || xhr.responseText, error);
+            }
+        }, options));
     });
 }
 
@@ -68,136 +66,19 @@ function displayerror(errortext) {
         $("#generic_error").hide("slow");
 }
 
-function parseSteamError(code, report, proxymgr) {
-    switch (code) {
-        case 13:
-            return {
-                error: 'The email chosen by our system was invalid. Please Try again.'
-            };
-        case 14:
-            return {
-                error: 'The account name our system chose was not available. Please Try again.'
-            };
-        case 84:
-            if (proxymgr)
-                proxymgr.proxy.ratelimit();
-            return {
-                error: 'Steam is limitting account creations from your IP or this email address (if using Gmail). Try again later.'
-            };
-        case 101:
-            return {
-                error: 'Captcha provider solved the captcha incorrectly!'
-            };
-        case 105:
-            if (proxymgr && report)
-                proxymgr.proxy.ban();
-            return {
-                error: proxymgr && !proxymgr.proxy.emulated ? "Proxy IP banned by steam. Removed from proxy list." : "Your IP is banned by steam. Try disabling your VPN."
-            };
-        case 17:
-            if (report)
-                report_email();
-            if (!proxymgr)
-                $("#generate_error_emailprovider").show();
-            return {
-                error: 'Steam has banned the domain. Please use Gmail or Custom domain'
-            };
-        case 1:
-            return {};
-        default:
-            return {
-                error: `Error while creating the Steam account! Steam error code ${code}!`
-            };
+function parseSteamError(code, report, proxy) {
+    var res = generation.parseSteamError(code);
+    if (res.reportemail && report)
+        report_email();
+    return {
+        error: proxy ? res.proxymessage || res.message : res.message
     }
 }
 
-var proxylist = {
-    proxylist: [],
-    getProxy: function () {
-        var proxies = this.proxylist;
-        var time = Date.now();
-        // Filter out proxies that are on timeout or banned
-        proxies = proxies.filter(function (value) {
-            return !value.banned && !value.errored && (!value.timeout || value.timeout < time);
-        })
-        // sort proxies, verified goes to the top
-        proxies.sort(function (a, b) {
-            if (a.verified == b.verified)
-                return 0;
-            if (a.verified)
-                return -1;
-            if (b.verified)
-                return 1;
-            return 0;
-        })
-        return {
-            proxy: $.extend(proxies[0], {
-                verify: function () {
-                    this.verified = true;
-                    this.errorcount = 0;
-                    proxylist.dump();
-                },
-                ratelimit: function () {
-                    this.timeout = Date.now() + 12 * 60 * 60 * 1000;
-                    proxylist.dump();
-                },
-                ban: function () {
-                    // proxy is banned
-                    this.banned = true;
-                    proxylist.dump();
-                },
-                error: function () {
-                    if (!this.verified) {
-                        this.errored = true;
-                    } else {
-                        if (this.errorcount >= 1)
-                            this.errored = true;
-                        else {
-                            this.timeout = Date.now() + 12 * 60 * 60 * 1000;
-                            this.errorcount = 1;
-                        }
-                    }
-                    proxylist.dump();
-                }
-            })
-        }
-    },
-    import: function (text) {
-        var proxies = text.split("\n");
-        for (var i in proxies) {
-            var err = false;
-            var proxy = proxies[i];
-            try {
-                new URL(proxy);
-            } catch (error) {
-                err = true;
-            }
-            if (!err) {
-                if (this.proxylist.find(o => o.uri == proxy))
-                    continue;
-                this.proxylist.push({
-                    uri: proxy
-                })
-            }
-        }
-        proxylist.dump();
-    },
-    dump: function () {
-        localStorage.setItem("proxylist", JSON.stringify(this.proxylist))
-    },
-    load: function () {
-        var data = localStorage.getItem("proxylist");
-        if (proxylistLinter(data))
-            this.proxylist = JSON.parse(data);
-    }
-}
-
-global.edit_proxy_json = function () {
-    if (proxylist.proxylist.length > 0)
-        $("#proxy_json_textbox").val(JSON.stringify(proxylist.proxylist, null, 4));
-    else
-        $("#proxy_json_textbox").val('');
-    $("#proxy_json").modal('show');
+global.proxylist_edit = function () {
+    import(/* webpackChunkName: "proxy" */ "./proxy.js").then(function (proxy) {
+        proxy.openEditor();
+    });
 }
 
 global.copyDetails = async function (id) {
@@ -213,57 +94,6 @@ global.copyDetails = async function (id) {
     $(`#${id}`).text(data);
 }
 
-function proxylistLinter(list) {
-    // Verify if the proxy list is valid
-    var data;
-    try {
-        data = JSON.parse(list)
-    } catch (e) {
-        return false;
-    }
-
-    // Check if the json is correct
-    if (Array.isArray(data)) {
-        for (var i in data) {
-            var entry = data[i];
-            if (!entry.uri) {
-                return false;
-            }
-            try {
-                new URL(entry.uri);
-            } catch (error) {
-                return false;
-            }
-        }
-    } else
-        return false;
-    return true;
-}
-
-global.save_proxy_json = function () {
-    var data = $("#proxy_json_textbox").val();
-    $("#proxy_json").modal('hide');
-    if (data == "") {
-        proxylist.proxylist = [];
-        proxylist.dump();
-        return;
-    }
-
-    if (!proxylistLinter(data)) {
-        displayerror("Invalid format!");
-        return;
-    } else {
-        proxylist.proxylist = JSON.parse(data);
-        proxylist.dump();
-        $("#proxy_json").modal('hide');
-    }
-}
-
-global.proxy_list_save = function () {
-    proxylist.import($("#proxy_list_input").val())
-    $('#proxy_list_input').val('')
-}
-
 function parseErrors(data, report) {
     if (!data || (!data.success && !data.error.message && !data.error.steamerror)) {
         return "Unknown error!"
@@ -273,7 +103,7 @@ function parseErrors(data, report) {
     if (data.error && data.error.message)
         return data.error.message;
     if (data.error && data.error.steamerror)
-        return parseSteamError(data.error.steamerror, report, data.proxymgr).error;
+        return parseSteamError(data.error.steamerror, report, data.proxy).error;
     return "Unknown error!"
 }
 
@@ -284,7 +114,7 @@ function registerevents() {
 
     eventer(messageEvent, async function (e) {
         if (e.origin != "https://store.steampowered.com")
-            return
+            return;
         if (e.data == "recaptcha-setup")
             return;
         if (typeof e.data !== 'string' || e.data.length < 200)
@@ -297,7 +127,7 @@ function registerevents() {
 
         change_visibility(true);
         var recap_token = e.data.split(";")[0];
-        var account = (await generation.generateAccounts(1, null, recap_token, null, function statuscb(msg, id, ret) {
+        var account = (await generation.generateAccounts(1, recap_token, null, function statuscb(msg, id, ret) {
             change_gen_status_text(msg);
             if (ret)
                 displayData(ret);
@@ -449,51 +279,6 @@ function changeText(isinstalled) {
 }
 
 /*Automatic generation*/
-
-async function getRecaptchaSolution() {
-    var captcha_key = settings.get("captcha_key");
-    var captcha_host = settings.get("captcha_host")
-    var res = await httpRequest({
-        url: `${captcha_host}/in.php?key=${captcha_key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`
-    }).catch(function (err) {
-        console.log(err);
-        throw new Error("Failed to connect to Captcha provider");
-    });
-    try {
-        if (typeof res == 'string')
-            res = JSON.parse(res);
-    } catch (err) {
-        throw new Error("Captcha Service send invalid json!");
-    }
-
-    if (!res.request)
-        throw new Error("Captcha Provider sent invalid json!");
-    console.log("Captcha Service requestid: " + res.request);
-    await sleep(10000);
-    for (var i = 0; i < 30; i++) {
-        await sleep(5000);
-        var ans_res = await httpRequest({
-            url: `${captcha_host}/res.php?key=${captcha_key}&action=get&id=${res.request}&json=1&header_acao=1`
-        })
-        try {
-            if (typeof ans_res == 'string')
-                ans_res = JSON.parse(ans_res);
-        } catch (err) {
-            throw new Error("Captcha Service send invalid json!");
-        }
-        console.log(ans_res)
-        // Status could be error, 0 = not yet ready
-        if (ans_res.status == 0)
-            continue;
-        res = ans_res;
-        break;
-    }
-    if (res.status == 1)
-        return res.request;
-    else
-        throw new Error("Captcha Service error!");
-}
-
 global.mass_generate_clicked = async function () {
     // Inline to limit scope
     function alter_table(id, data) {
@@ -544,21 +329,7 @@ global.mass_generate_clicked = async function () {
         });
     }
 
-    var captcha = {
-        getCaptchaSolution: async function (id) {
-            for (var i = 0; i < 2; i++) {
-                try {
-                    statuscb("Getting captcha solution...", id);
-                    return await getRecaptchaSolution();
-                } catch (error) {
-                    statuscb("Getting captcha solution failed!", id);
-                    console.error(error);
-                    if (i == 0)
-                        await sleep(3000);
-                }
-            }
-        }
-    }
+    var captcha = CaptchaAPI(settings.get("captcha_host"), settings.get("captcha_key"));
 
     function generationcallback(account, id) {
         var error = parseErrors(account, settings.get("email_provider") == "accgen");
@@ -577,42 +348,8 @@ global.mass_generate_clicked = async function () {
         addToMassHistory(account.account);
     }
 
-    var proxy = $("#proxy_check:checked").val() && typeof document.proxiedHttpRequest != "undefined" ? proxylist : undefined;
-    if (!proxy) {
-        // emulate a proxylist
-        proxy = {
-            localproxy: {
-                proxy: {
-                    emulated: true,
-                    uri: "emulated",
-                    verify: function () {
-                        this.verified = true;
-                        this.errorcount = 0;
-                    },
-                    ratelimit: function () {
-                        this.uri = undefined;
-                    },
-                    ban: function () {
-                        this.uri = undefined;
-                    },
-                    error: function () {
-                        if (!this.errorcount)
-                            this.errorcount = 1;
-                        else
-                            this.errorcount++;
-                        if (this.errorcount >= 3)
-                            this.uri = undefined;
-                    }
-                }
-            },
-            getProxy: function () {
-                return this.localproxy
-            }
-        }
-    }
-
     var valid_accounts = [];
-    var accounts = await generation.generateAccounts(max_count, proxy, captcha, concurrency, statuscb, generationcallback, change_gen_status_text);
+    var accounts = await generation.generateAccounts(max_count, captcha, concurrency, statuscb, generationcallback, change_gen_status_text, $("#proxy_check:checked").val() && typeof document.sagelectron != "undefined");
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, false);
@@ -655,7 +392,6 @@ global.commonGeneratePressed = async function () {
     }
     else
         document.getElementById('steam_iframe_innerdiv').src = "about:blank";
-    $("#steam_iframe").toggle("slow")
 }
 
 global.selectEmailServicePressed = function () {
@@ -721,7 +457,7 @@ function displayData(acc_data) {
         addToHistory(acc_data.account);
     lastacc = acc_data;
 
-    if (typeof document.startSteam != "undefined") {
+    if (typeof document.sagelectron != "undefined") {
         $("#electron_steam_signin").show();
     }
 
@@ -739,7 +475,7 @@ function displayData(acc_data) {
 }
 
 global.electronSteamSignIn = function () {
-    document.startSteam(lastacc);
+    document.sagelectron.startSteam(lastacc);
     $("#electron_steam_signin").hide("slow");
 }
 
@@ -848,8 +584,8 @@ global.changeurl = function (exit) {
         changeurl_url = window.event.target.href;
     else
         changeurl_url = "exit"
-    if (generation.activegeneration) {
-        if (generation.activegeneration > 1)
+    if (generation.generator.activegeneration) {
+        if (generation.generator.activegeneration > 1)
             $("#exit_page_modal_graceful").show();
         else
             $("#exit_page_modal_graceful").hide();
@@ -867,80 +603,80 @@ global.changeurl = function (exit) {
     return true;
 }
 
-global.common_init = function () {
-    if (isElectron) {
-        if (typeof document.ipc != "undefined") {
-            document.ipc.on('alert-msg', (event, arg) => {
-                on_status_received(arg);
-            })
-            document.ipc.send("ready");
-            console.log("Ready sent!");
-        }
-        // https://github.com/sindresorhus/set-immediate-shim, setImmediate polyfill
-        window.setImmediate = typeof setImmediate === 'function' ? setImmediate : (...args) => {
-            args.splice(1, 0, 0);
-            setTimeout(...args);
-        };
-        proxylist.load();
-        $("#electron_ad").hide();
-    }
-    if (localStorage.getItem("genned_account") != null) {
-        $('#history_button').show();
-    }
-    setInterval(perform_status_check, 10000);
-    perform_status_check();
-    registerevents();
-
+global.common_init = async function () {
+    // Convert configs from older to newer versions
     settings.convert();
 
-    Promise.race([
-        messageAddon({ task: "version" }),
-        // Auto respond if it takes longer than 500 ms
-        new Promise(function (resolve, reject) {
-            setTimeout(resolve, 500);
-        })
-    ]).then(function (ret) {
-        // Version older than 3.0, or not installed
-        if (!ret) {
-            // Check if addon installed using the old method, legacy
-            $.ajax({
-                url: "https://store.steampowered.com/join/"
-            }).done(function () {
-                console.log("Version older than 3.0 detected!");
-                changeText(true);
-                if (!settings.get("email_provider"))
-                    selectEmailServicePressed();
-            }).fail(function (resp) {
-                changeText();
-                $("#addon_dl").show();
-                $("#accgen_ui").hide();
-                $("#generate_button").hide();
-                console.log("No addon installed!");
+    setInterval(perform_status_check, 10000);
+    perform_status_check();
+
+    // Check addon install status and version of addon and take appropriate action
+    // Enable extra electron features
+    if (isElectron) {
+        var ipc = document.ipc || (document.sagelectron ? document.sagelectron.ipc : null);
+        if (ipc) {
+            ipc.on('alert-msg', (event, arg) => {
+                on_status_received(arg);
             });
-        } else {
+            ipc.send("ready");
+            console.log("Ready sent!");
+        }
+        // Electron app needs to be updated to continue
+        if (typeof document.sagelectron === "undefined") {
+            $("#electron_update").show();
+            $("#accgen_ui").hide();
+            return;
+        }
+        $("#electron_ad").hide();
+        $("#proxy-settings").show();
+
+        // Electron app does not support gmail.
+        changeText(true);
+    }
+    else {
+        var addoncheck = await Promise.race([
+            messageAddon({ task: "version" }),
+            // Auto respond if it takes longer than 500 ms
+            new Promise(function (resolve, reject) {
+                setTimeout(resolve, 500);
+            })
+        ]);
+        if (addoncheck) {
             console.log("Version 3.0 or above found!")
-            if (!ret.apiversion || ret.apiversion < 2)
+            if (!addoncheck.apiversion || addoncheck.apiversion < 2)
                 changeText(true);
             else
                 $("#email_service_option_gmail > img").click(setupGmail);
-            if (!settings.get("email_provider"))
-                selectEmailServicePressed();
         }
-    })
+        // Version older than 3.0 or not installed and not electron
+        else {
+            changeText();
+            $("#addon_dl").show();
+            $("#accgen_ui").hide();
+            console.log("No addon installed!");
+            return;
+        }
+    }
 
-    if (isElectron)
-        $("#proxy-settings").show();
+    if (localStorage.getItem("genned_account") != null) {
+        $('#history_button').show();
+    }
+
+    registerevents();
+
+    if (!settings.get("email_provider"))
+        selectEmailServicePressed();
 
     // Add generator stop events and exit events
     $('#generate_stop > button').click(function () {
         $('#generate_stop').hide("slow");
-        $(window).trigger("accgen.stopgeneration");
+        generation.generator.events.emit("stopgeneration");
     });
     $("#exit_page_modal_graceful").click(function () {
-        $(window).trigger("accgen.stopgeneration");
+        generation.generator.events.emit("stopgeneration");
     });
     $("#exit_page_modal_exit").click(function () {
-        generation.activegeneration = false;
+        generation.generator.activegeneration = false;
         if (changeurl_url == "exit")
             window.close();
         else
@@ -1082,6 +818,7 @@ global.save_clicked = async function () {
     var captcha_key = $("#settings_twocap").val();
     var captcha_host = ($("#settings_caphost").val() != '') ? $("#settings_caphost").val() : "https://2captcha.com";
     if (captcha_key != "") {
+        // TODO: move to librecaptcha
         var res = await httpRequest({
             url: `${captcha_host}/res.php?key=${captcha_key}&action=getbalance&header_acao=1`
         }).catch(function (err_response, error) {
@@ -1105,3 +842,10 @@ global.save_clicked = async function () {
     $("#saved_success").show("slow");
     return false;
 }
+
+// https://stackoverflow.com/a/46932935
+$('.modal').on("hidden.bs.modal", function (e) {
+    if ($('.modal:visible').length) {
+        $('body').addClass('modal-open');
+    }
+});

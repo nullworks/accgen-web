@@ -29,27 +29,40 @@
   <link href="static/favicon.ico" rel="icon" type="image/x-icon">
   <script defer src="static/js/common.bundle.js"></script>
   <script defer src="static/js/custom_gen.js"></script>
-  <ul class="nav nav-tabs">
-    <li class="nav-item"> <a class="nav-link" onclick="return changeurl()" href="/">Generator</a>
-    </li>
-    <li class="nav-item"> <a class="nav-link active" onclick="return changeurl()" href="custom_gen.html">Custom
-        Accounts</a>
-    </li>
-    <li class="nav-item"> <a class="nav-link" onclick="return changeurl()"
-        href="https://email.cathook.club/sag-email.html">Email Access</a>
-    <li class="nav-item"> <a target="_blank" class="nav-link"
-        href="https://gitlab.com/nullworks/accgen/accgen-web/issues" rel="noopener">Gitlab Issues</a>
-    </li>
-    <li class="nav-item"><a class="nav-link" target="_blank" href="telegram.html">TG Announcement Channel</a></li>
-    <li class="nav-item">
-      <div style="line-height: 0;">
-        <a target="_blank" href="https://patreon.com/steam_acc" rel="noopener">
-          <img src="https://i1.wp.com/spectraartspace.com/wp-content/uploads/2019/04/Become_a_patron_button.png"
-            style="height: 2.5rem;">
-        </a>
-      </div>
-    </li>
-  </ul>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+      aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor01">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" onclick="return changeurl()" href="/">Generator</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" onclick="return changeurl()" href="custom_gen.html">Custom Accounts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="return changeurl()" href="https://email.cathook.club/sag-email.html">Email
+            Access</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" target="_blank" href="telegram.html">TG Announcment Channel</a>
+        </li>
+        <li class="nav-item">
+          <div style="padding-top: 0.5rem;padding-left: 0.2rem">
+            <a target="_blank" href="https://patreon.com/steam_acc" rel="noopener">
+              <img src="https://i1.wp.com/spectraartspace.com/wp-content/uploads/2019/04/Become_a_patron_button.png"
+                style="height: 2.5rem;">
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <script>
     window.addEventListener("load", function () {
       init();
