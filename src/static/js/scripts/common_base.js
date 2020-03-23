@@ -392,6 +392,7 @@ global.commonGeneratePressed = async function () {
     }
     else
         document.getElementById('steam_iframe_innerdiv').src = "about:blank";
+    $("#steam_iframe").toggle("slow");
 }
 
 global.selectEmailServicePressed = function () {
