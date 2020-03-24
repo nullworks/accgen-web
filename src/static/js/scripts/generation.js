@@ -28,7 +28,7 @@ function getEmail(accgen_email) {
 }
 
 async function getVerifyGmailv2() {
-    var email = await gmail.waitForSteamEmail();
+    var email = await gmail.waitForSteamEmail(false);
     if (!email)
         return { error: "No email recieved. Try running the gmail setup again." };
     return {
@@ -38,9 +38,9 @@ async function getVerifyGmailv2() {
 }
 
 async function gmailV2DisableSteamGuard() {
-    var email = await gmail.waitForSteamEmail();
+    var email = await gmail.waitForSteamEmail(true);
     if (!email)
-        return;
+        return false;
     var disableLink = "https://store.steampowered.com/account/steamguarddisableverification?stoken=" +
         email.split("steamguarddisableverification?stoken=")[1].split("\n")[0];
     try {
@@ -142,7 +142,12 @@ async function accgen_doAdditional(username, password, email, doSteamGuard, apps
         },
     }));
     if (doSteamGuard && settings.get("email_provider") == "gmailv2")
-        gmailV2DisableSteamGuard();
+        if (!await gmailV2DisableSteamGuard())
+            if (!await gmailV2DisableSteamGuard()) {
+                var resp = libsteam.getBaseResponse();
+                resp.error.message = "Failed to disable steam guard using GMail!";
+                return resp;
+            }
 
     return accgen_handleReponse(err, res);
 }
@@ -187,6 +192,7 @@ exports.parseSteamError = function (code) {
     }
 }
 
+// Gets called by libgenerate to check if it should stop mass-generation for whatever reason. Example: Banned IP when not using proxies, banned domain
 function handleErrors(res, proxy) {
     if (!res.success) {
         if (res.error.steamerror) {
@@ -211,5 +217,5 @@ exports.generateAccounts = async function (count, captcha, multigen, statuscb, g
     var getProxy = null;
     if (useproxy)
         getProxy = (await import(/* webpackChunkName: "proxy" */ "./proxy.js")).getProxy;
-    return await generator.generateAccounts(fetch, handleErrors, count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, { acc_steamguard: settings.get("acc_steamguard"), acc_apps: settings.get("acc_apps") }, getProxy);
+    return await generator.generateAccounts(fetch, handleErrors, count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, { acc_steamguard: settings.get("acc_steamguard"), acc_apps: settings.get("acc_apps") }, getProxy, typeof post_generate != "undefined" ? post_generate : null);
 }

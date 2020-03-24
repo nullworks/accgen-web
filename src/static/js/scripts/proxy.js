@@ -14,8 +14,8 @@ function saveList(text) {
 async function check(proxy) {
     // check if proxy can connect to steam
     try {
-        await getProxiedFetch(proxy.uri)("https://store.steampowered.com/join/refreshcaptcha/", { timeout: 5000 });
-        return true;
+        var res = await getProxiedFetch(proxy)("https://store.steampowered.com/join/refreshcaptcha/", { timeout: 5000 });
+        return typeof (await res.json()).gid != "undefined";
     } catch (error) {
         return false;
     }
@@ -44,12 +44,8 @@ exports.openEditor = function () {
     $("#proxy_edit").modal('show');
 }
 
-exports.getRawProxy = function () {
-    return proxylist.getProxy();
-}
-
-exports.getProxy = function () {
-    var proxy = proxylist.getProxy();
+exports.getProxy = async function () {
+    var proxy = await proxylist.getProxy();
     if (!proxy)
         return;
     else return { proxy: proxy, fetch: getProxiedFetch(proxy.uri) };

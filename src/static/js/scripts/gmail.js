@@ -59,27 +59,28 @@ function getEmailID(elem) {
     ).get("message_id");
 }
 
-function isRelevantEmail(elem) {
+function isRelevantEmail(elem, steamguard) {
     if (elem.find("author>email")[0].innerHTML != "noreply@steampowered.com")
         return;
-    return true;
+    var title = elem.children("title")[0].innerHTML;
+    return steamguard ? title == "Disable Steam Guard Confirmation" : title == "New Steam Account Email Verification";
 }
 
-async function latestSteamEmail() {
+async function latestSteamEmail(steamguard) {
     var emails = await anyNewEmails();
     for (var i = emails.length; i--;) {
         var email = emails[i];
-        if (!isRelevantEmail(email))
+        if (!isRelevantEmail(email, steamguard))
             continue;
         return getEmailID(email);
     }
 }
 
-exports.waitForSteamEmail = async function () {
+exports.waitForSteamEmail = async function (steamguard) {
     // Wait max 20 seconds
     for (var i = 0; i <= 2; i++) {
         await sleep(5000);
-        var email = await latestSteamEmail()
+        var email = await latestSteamEmail(steamguard);
         if (email)
             return getEmailByID(email)
     }

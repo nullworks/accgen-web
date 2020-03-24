@@ -59,6 +59,9 @@ exports.steam_getGid = async function (fetch) {
     var [err, res] = await to(repeated_fetch(fetch, "https://store.steampowered.com/join/refreshcaptcha/", {
         mode: "cors",
         credentials: "include",
+        headers: {
+            'Accept-Language': 'en-US',
+        },
     }));
 
     var response = getBaseResponse();
@@ -85,6 +88,7 @@ exports.steam_requestVerify = async function (fetch, email, gid, recaptcha_solut
         }).toString(),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept-Language': 'en-US',
         },
     }));
 
@@ -111,6 +115,9 @@ exports.steam_verifyEmail = async function (fetch, link) {
     var [err, res] = await to(repeated_fetch(fetch, link, {
         mode: "cors",
         credentials: "include",
+        headers: {
+            'Accept-Language': 'en-US',
+        },
     }));
     var response = getBaseResponse();
     if (err)
@@ -127,6 +134,9 @@ exports.steam_disableGuard = async function (fetch, token) {
     var [err, res] = await to(repeated_fetch(fetch, "https://store.steampowered.com/account/steamguarddisableverification?stoken=" + token, {
         mode: "cors",
         credentials: "include",
+        headers: {
+            'Accept-Language': 'en-US',
+        },
     }));
     var response = getBaseResponse();
     if (err)
@@ -152,6 +162,7 @@ exports.steam_createAccount = async function (fetch, username, password, creatio
         }).toString(),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept-Language': 'en-US',
         },
     }));
 

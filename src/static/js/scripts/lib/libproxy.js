@@ -250,7 +250,7 @@ exports.newList = function (input, save, check) {
         getEmulated: function () {
             return getNewEmulatedProxy();
         },
-        getProxy: function () {
+        getProxy: async function () {
             var proxies = this.proxies;
             // Filter out invalid proxies
             proxies = proxies.filter(function (value) {
@@ -260,7 +260,7 @@ exports.newList = function (input, save, check) {
             if (!check)
                 return proxies[0];
             for (var i in proxies) {
-                if (check(proxies[i].uri)) {
+                if (await check(proxies[i].uri)) {
                     proxies[i].errors = 0;
                     return proxies[i];
                 }
