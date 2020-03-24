@@ -47,6 +47,9 @@ async function gmailV2DisableSteamGuard() {
         var res = await fetch(disableLink, {
             mode: "cors",
             credentials: "include",
+            headers: {
+                'Accept-Language': 'en-US',
+            },
         })
         return res.ok && !(await res.text()).includes("Unable to disable Steam Guard!");
     } catch (error) {
