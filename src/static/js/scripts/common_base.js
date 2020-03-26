@@ -84,6 +84,8 @@ global.proxylist_edit = function () {
 global.copyDetails = async function (id) {
     var data;
     data = $(`#${id}`).text();
+    if(data == "Copied!")
+        return
     var $temp = $("<input>");
     $("body").append($temp);
     $temp.val(data).select();
