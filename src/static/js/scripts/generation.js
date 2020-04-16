@@ -208,6 +208,8 @@ function handleErrors(res, proxy) {
             }
         }
     }
+    else
+        if (proxy) proxy.verify();
     return false;
 }
 
