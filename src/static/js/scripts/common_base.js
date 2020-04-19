@@ -66,10 +66,10 @@ function displayerror(errortext) {
         $("#generic_error").hide("slow");
 }
 
-function parseSteamError(code, report, proxy) {
+function parseSteamError(code, report, proxy, account) {
     var res = generation.parseSteamError(code);
     if (res.reportemail && report)
-        report_email();
+        report_email(account.email);
     return {
         error: proxy ? res.proxymessage || res.message : res.message
     }
@@ -105,7 +105,7 @@ function parseErrors(data, report) {
     if (data.error && data.error.message)
         return data.error.message;
     if (data.error && data.error.steamerror)
-        return parseSteamError(data.error.steamerror, report, data.proxy).error;
+        return parseSteamError(data.error.steamerror, report, data.proxy, data.account).error;
     return "Unknown error!"
 }
 
@@ -157,9 +157,9 @@ async function doRecapV3(action) {
 function report_email(email) {
     doRecapV3("vote_email").then(function (token) {
         $.ajax({
-            url: '/userapi/recaptcha/bademail/' + token
-        }).done(function (emailresp) {
-            console.log("Log: email reported ban");
+            url: `/userapi/recaptcha/bademail/${encodeURIComponent(token)}/${encodeURIComponent(email)}`
+        }).done(function () {
+            console.log("Log: email ban reported");
         })
     })
 }
@@ -803,7 +803,7 @@ global.save_domain = async function () {
             } else {
                 $("#settings_custom_domain").val("");
                 lock_email_service_selection = false;
-                $("#email_service_message > strong").text("Your MX Settings are invalid. Please check Help for the correct settings. Note that DNS settings might take a few minutes to propagate.");
+                $("#email_service_message > strong").text("Your MX Settings are invalid. Check help for the correct settings. Please make sure that you only have 1 mx entry. You can verify your settings using a utility like mxtoolbox.");
                 $("#email_service_progress").hide('slow');
                 return false;
             }

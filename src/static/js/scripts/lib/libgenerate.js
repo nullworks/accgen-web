@@ -91,6 +91,7 @@ class Generator {
             return ret;
         }
         acc_data = acc_data.response;
+        ret.account = acc_data;
 
         var email = acc_data.email;
 
