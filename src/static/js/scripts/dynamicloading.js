@@ -25,7 +25,8 @@ exports.loadRecaptchaV3 = function () {
 }
 
 exports.loadEmailServiceImages = function () {
-    $("#email_service_option_gmail > img").attr("src","https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/logo_gmail_color_1x_web_512dp.png");
-    $("#email_service_option_custom > img").attr("src","https://i.imgur.com/XfXeovs.png");
-    $("#email_service_option_accgen > img").attr("src","./static/sag-cat.png");
+    $("#email_service_option_gmail > img").attr("src", "https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/logo_gmail_color_1x_web_512dp.png");
+    $("#email_service_option_custom > img").attr("src", "https://i.imgur.com/XfXeovs.png");
+    $("#email_service_option_accgen > img").attr("src", "./static/sag-cat.png");
+    $("#email_service_option_patreon > img").attr("src", "./static/Patreon_Mark_Coral.jpg");
 }

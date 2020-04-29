@@ -94,17 +94,17 @@ function init() {
     }
 
     $.ajax({
-        url: '/patreon/check',
-        type: 'GET'
+        url: '/userapi/patreon/check',
+        type: 'GET',
+        dataType: "json"
     }).done(function (data) {
         /*  0 - success
             1 - login
             2 - needs to pledge
             3 - unknown error
         */
-        data = parseInt(data);
 
-        switch (data) {
+        switch (data.customgen) {
             case 1:
                 $('#patreon_signin').show();
                 $('#accgen_ui').hide();

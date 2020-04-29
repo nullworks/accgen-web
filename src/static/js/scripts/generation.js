@@ -7,6 +7,7 @@ const to = require("await-to-js").default;
 function getEmail(accgen_email) {
     switch (settings.get("email_provider")) {
         case "accgen":
+        case "premium":
             return accgen_email;
         case "custom_domain":
             var custom_domain = settings.get("email_domain");
@@ -84,7 +85,8 @@ async function accgen_getData() {
     var [err, res] = await to(fetch("/userapi/recaptcha/addtask", {
         method: "POST",
         body: JSON.stringify({
-            step: "getdata"
+            step: "getdata",
+            premium: settings.get("email_provider") == "premium"
         }),
         headers: {
             'Content-Type': 'application/json',
@@ -159,11 +161,11 @@ exports.parseSteamError = function (code) {
     switch (code) {
         case 13:
             return {
-                message: 'The email chosen by our system was invalid. Please Try again.',
+                message: 'The email chosen was invalid. Please make sure you don\'t include invalid characters in your custom domain field.',
             };
         case 14:
             return {
-                message: 'The account name our system chose was not available. Please Try again.'
+                message: 'The account name is not available. Please try again.'
             };
         case 84:
             return {
@@ -184,7 +186,7 @@ exports.parseSteamError = function (code) {
             };
         case 17:
             return {
-                message: 'Steam has banned the domain. Please use Gmail or Custom domain',
+                message: 'Steam has banned this email service/domain. Please select another email service/domain.',
                 reportemail: true,
                 cancel: true
             };

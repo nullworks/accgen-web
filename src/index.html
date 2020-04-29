@@ -194,9 +194,29 @@
          </div>
          <!--End of preferences modal-->
 
+         <!--Premium setup modal-->
+         <div class="modal fade" id="premium_email_modal" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title">Premium Email Service</h5>
+                  </div>
+                  <div class="modal-body">
+                     <div class="alert alert-warning">
+                        <a id="premium_email_modal_message">If you see this it's a bug!</a>
+                     </div>
+                     <a>Alternatively, use another email provider.</a>
+                     <button type="button" class="btn btn-primary btn-lg" onclick="selectEmailServicePressed()">Change
+                        Email Provider</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!--End of premium setup modal-->
+
          <!--Email service selection-->
          <div class="modal fade" id="email_service_modal" data-backdrop="static" data-keyboard="false">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog">
                <div class="modal-content">
                   <div class="modal-header">
                      <h5 class="modal-title">Email Service</h5>
@@ -219,10 +239,20 @@
                               </figcaption>
                            </figure>
                         </div>
-                        <div class=" col">
+                     </div>
+                     <div class="row">
+                        <div class="col">
                            <figure id="email_service_option_accgen">
                               <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail()" src=""></img>
                               <figcaption><b>Accgen email service</b><br>Will not work during valve business hours
+                              </figcaption>
+                           </figure>
+                        </div>
+                        <div class="col">
+                           <figure id="email_service_option_patreon">
+                              <img class="img-thumbnail rounded img-fluid" onclick="setUseAccgenMail(true)"
+                                 src=""></img>
+                              <figcaption><b>Premium email service</b><br>Constantly working domains
                               </figcaption>
                            </figure>
                         </div>

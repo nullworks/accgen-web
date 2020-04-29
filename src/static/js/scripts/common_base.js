@@ -84,7 +84,7 @@ global.proxylist_edit = function () {
 global.copyDetails = async function (id) {
     var data;
     data = $(`#${id}`).text();
-    if(data == "Copied!")
+    if (data == "Copied!")
         return
     var $temp = $("<input>");
     $("body").append($temp);
@@ -532,6 +532,7 @@ var lock_email_service_selection = false;
 
 async function setProvider(provider) {
     settings.set("email_provider", provider);
+    checkPatreonStatus();
     setTimeout(() => {
         $("#email_service_modal").modal('hide');
         $("#email_service_message").hide('slow');
@@ -541,13 +542,41 @@ async function setProvider(provider) {
     }, 3000);
 }
 
-global.setUseAccgenMail = function () {
+async function checkPatreonStatus() {
+    if (settings.get("email_provider") != "premium") {
+        $("#premium_email_modal").modal("hide");
+        return;
+    }
+    try {
+        var result = await (await fetch("/userapi/patreon/check")).json();
+        if (!result.emailservice.success) {
+            $("#premium_email_modal").modal("show");
+            $("#premium_email_modal_message").text(result.emailservice.message);
+            if (result.emailservice.url)
+                $("#premium_email_modal_message").attr("href", result.emailservice.url);
+            else
+                $("#premium_email_modal_message").removeAttr("href");
+        }
+    } catch (error) {
+        $("#premium_email_modal").modal("show");
+        $("#premium_email_modal_message").text("Unknown error while checking patreon status!");
+    }
+}
+
+global.setUseAccgenMail = function (patreon) {
     if (lock_email_service_selection)
         return;
     lock_email_service_selection = true;
-    $("#email_service_message > strong").text("Using accgen email service.");
-    $("#email_service_message").show('slow');
-    setProvider("accgen");
+    if (patreon) {
+        $("#email_service_message > strong").text("Using premium email service.");
+        $("#email_service_message").show('slow');
+        setProvider("premium");
+    }
+    else {
+        $("#email_service_message > strong").text("Using accgen email service.");
+        $("#email_service_message").show('slow');
+        setProvider("accgen");
+    }
 }
 
 async function setupGmail() {
@@ -669,6 +698,8 @@ global.common_init = async function () {
 
     if (!settings.get("email_provider"))
         selectEmailServicePressed();
+    else
+        checkPatreonStatus();
 
     // Add generator stop events and exit events
     $('#generate_stop > button').click(function () {
