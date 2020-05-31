@@ -756,7 +756,7 @@ global.settings_help = function (page) {
             window.open("https://github.com/nullworks/accgen-web/wiki/Using-Your-Gmail-address-with-Steam-Account-Generator");
             break;
         case "mx":
-            window.open("https://telegra.ph/file/5ceb2d563df573d3fa244.png");
+            window.open("https://telegra.ph/file/ef5bf460819c458292671.png");
             break;
         case "f2plist":
             window.open("https://steamdb.info/instantsearch/?refinementList%5Btags%5D%5B0%5D=Free%20to%20Play&refinementList%5BappType%5D%5B0%5D=Game");
