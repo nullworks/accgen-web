@@ -157,7 +157,7 @@ async function doRecapV3(action) {
 function report_email(email) {
     doRecapV3("vote_email").then(function (token) {
         $.ajax({
-            url: `/userapi/recaptcha/bademail/${encodeURIComponent(token)}/${encodeURIComponent(email)}`
+            url: `/userapi/generator/bademail/${encodeURIComponent(token)}/${encodeURIComponent(email)}`
         }).done(function () {
             console.log("Log: email ban reported");
         })
@@ -488,7 +488,7 @@ async function isvalidmx(domain) {
         return false;
     var res = await new Promise(function (resolve, reject) {
         $.ajax({
-            url: "/userapi/isvalidmx/" + domain,
+            url: "/userapi/generator/isvalidmx/" + domain,
             success: function (returnData) {
                 resolve(returnData);
             },

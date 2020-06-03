@@ -81,7 +81,7 @@ async function accgen_handleReponse(err, res) {
 }
 
 async function accgen_getData() {
-    var [err, res] = await to(fetch("/userapi/recaptcha/addtask", {
+    var [err, res] = await to(fetch("/userapi/generator/addtask", {
         method: "POST",
         body: JSON.stringify({
             step: "getdata"
@@ -99,7 +99,7 @@ async function accgen_getData() {
 
 async function accgen_getVerify(email) {
     if (settings.get("email_provider") != "gmailv2") {
-        var [err, res] = await to(fetch("/userapi/recaptcha/addtask", {
+        var [err, res] = await to(fetch("/userapi/generator/addtask", {
             method: "POST",
             body: JSON.stringify({
                 step: "getverify",
@@ -127,7 +127,7 @@ async function accgen_getVerify(email) {
 }
 
 async function accgen_doAdditional(username, password, email, doSteamGuard, apps) {
-    var [err, res] = await to(fetch("/userapi/recaptcha/addtask", {
+    var [err, res] = await to(fetch("/userapi/generator/addtask", {
         method: "POST",
         body: JSON.stringify({
             step: "additional",
