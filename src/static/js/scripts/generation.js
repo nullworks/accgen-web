@@ -30,7 +30,7 @@ function getEmail(accgen_email) {
 async function getVerifyGmailv2() {
     var email = await gmail.waitForSteamEmail(false);
     if (!email)
-        return { error: "No email recieved. Try running the gmail setup again." };
+        return { error: "No email received. Try running the gmail setup again." };
     return {
         creationid: email.split("newaccountverification?stoken=")[1].split("\n")[0].split("&creationid=")[1],
         verifylink: "https://store.steampowered.com/account/newaccountverification?stoken=" + email.split("newaccountverification?stoken=")[1].split("\n")[0]
