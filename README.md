@@ -1,6 +1,6 @@
 Source code for https://accgen.cathook.club. Primary repository located at https://gitlab.com/nullworks/accgen/accgen-web.
 
-Copyright (C) 2019  nullworks
+Copyright (C) 2020  nullworks
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
