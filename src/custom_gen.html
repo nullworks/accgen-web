@@ -168,11 +168,11 @@
                       Free SubIDs to automatically add (Comma separated): <input type="text" id="settings_appids"
                         class="form-control" value="730" placeholder="730,440,570" autocomplete="off"
                         maxlength="1024"><br>
-                      <button id="help_button" type="button" onclick="settings_help('f2plist')"
+                      <button type="button" onclick="settings_help('f2plist')"
                         class="btn btn-primary btn-lg">List of F2P games</a>
                     </h6><br>
                     <h6 class="card-text">
-                      <button id="help_button" type="button" class="btn btn-primary btn-lg"
+                      <button type="button" class="btn btn-primary btn-lg"
                         onclick="selectEmailServicePressed()">Select Email
                         Provider</button>
                     </h6><br>
@@ -305,9 +305,8 @@
           Please check Help for the correct settings. Note that DNS settings might take hours to
           propagate.</strong>
       </div>
-      <div id="twocap_error" class="alert alert-warning" style="display: none"> <strong>Your Captcha Provider's key
-          is
-          invalid.</strong>
+      <div id="twocap_error" class="alert alert-warning" style="display: none"> <strong>Your captcha solving service API
+          key is invalid. Please verify the API key is correct.</strong>
       </div>
       <br>
       <h1 style=" color: white; padding-top: 3%">Steam Account Generator</h1>
@@ -592,7 +591,8 @@
           <h6 class="card-text" style="display: grid;">City:<input name="acc_city" autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);">
           </h6>
-          <h6 class="card-text" style="display: grid;">Custom Steam Profile URL: <input name="acc_profileurl" autocomplete="off"
+          <h6 class="card-text" style="display: grid;">Custom Steam Profile URL: <input name="acc_profileurl"
+              autocomplete="off"
               style="background-color: rgb(26, 29, 30); border-color: rgb(96, 96, 96); color: rgb(255, 253, 250);">
           </h6>
           <h6 class="card-text" style="display: grid;">Profile Bio: <textarea name="acc_bio" autocomplete="off"

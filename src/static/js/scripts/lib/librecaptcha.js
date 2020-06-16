@@ -1,66 +1,81 @@
-async function get2CapSolution(key, url) {
+function errorToText(error) {
+    // Capmonster may add a space after certain errors
+    error = error.split(" ")[0];
+    switch (error) {
+        case "ERROR_WRONG_USER_KEY":
+        case "ERROR_KEY_DOES_NOT_EXIST":
+            return "Your captcha solving service API key is invalid. Please verify the API key is correct.";
+        case "ERROR_ZERO_BALANCE":
+            return "Zero balance at captcha solving service. Please add funds.";
+        case "ERROR_CAPTCHA_UNSOLVABLE":
+        case "ERROR_RECAPTCHA_TIMEOUT":
+            return "Your captcha solving service was unable to solve the captcha.";
+        default:
+            return "Captcha solving service sent: " + error;
+    }
+}
+
+async function checkBalance(url, key, fetch) {
     try {
         var balance_res = await fetch(`${url}/res.php?key=${key}&action=getbalance&header_acao=1`);
     } catch (error) {
-        return { success: false, error: "Failed to connect to captcha provider" }
+        return { success: false, error: "Failed to connect to captcha solving service" }
     }
 
     if (!balance_res.ok)
-        return { success: false, message: "Error getting balance" }
+        return { success: false, error: "Error getting captcha solving service balance." };
 
     balance_res = await balance_res.text();
 
-    if (balance_res == "ERROR_KEY_DOES_NOT_EXIST")
-        return { success: false, error: "Invalid captcha key" }
+    if (isNaN(balance_res))
+        return { success: false, error: errorToText(balance_res) };
 
     if (balance_res == "0")
-        return { success: false, error: "Zero balance at captcha provider" }
+        return { success: false, error: errorToText("ERROR_ZERO_BALANCE") };
+
+    return false;
+}
+
+async function get2CapSolution(key, url, fetch) {
+    var balcheck = await checkBalance(url, key, fetch);
+    if (balcheck)
+        return balcheck;
 
     try {
         var solve_req = await fetch(`${url}/in.php?key=${key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`);
     } catch (error) {
-        return { success: false, error: "Failed to connect to captcha provider" }
+        return { success: false, error: "Failed to connect to captcha solving service." }
     }
 
     if (!solve_req.ok)
-        return { success: false, error: "Error sending captcha solving request" }
+        return { success: false, error: "Error sending captcha solving request." }
 
     try {
-        solve_req = await solve_req.json()
+        solve_req = await solve_req.clone().json()
     } catch (e) {
         solve_req = await solve_req.text();
-        switch (solve_req) {
-            case "ERROR_CAPTCHA_UNSOLVABLE":
-                return { success: false, error: 'Captcha "unsolvable"' }
-            default:
-                return { success: false, error: "Captcha service sent invalid json!" }
-        }
+        return { success: false, error: errorToText(solve_req) }
     }
 
     if (!solve_req.request)
-        return { success: false, error: "Captcha service send invalid json!" }
+        return { success: false, error: "Captcha solving service sent invalid json!" }
 
     for (var i = 0; i < 30; i++) {
         await sleep(5000);
         try {
             var polling_res = await fetch(`${url}/res.php?key=${key}&action=get&id=${solve_req.request}&json=1&header_acao=1`);
         } catch (error) {
-            return { success: false, error: "Failed to connect to captcha provider" }
+            return { success: false, error: "Failed to connect to captcha solving service." }
         }
         try {
-            polling_res = await polling_res.json()
+            polling_res = await polling_res.clone().json()
         } catch (e) {
             polling_res = await polling_res.text();
-            switch (polling_res) {
-                case "ERROR_CAPTCHA_UNSOLVABLE":
-                    return { success: false, error: "Captcha Unsolvable" }
-                default:
-                    return { success: false, error: "Captcha service sent invalid json!" }
-            }
+            return { success: false, error: errorToText(solve_req) }
         }
 
         if (!polling_res.request)
-            return { success: false, error: "Captcha service sent invalid json!" }
+            return { success: false, error: "Captcha solving service sent invalid json!" }
 
         if (polling_res.status == 0)
             continue;
@@ -69,26 +84,75 @@ async function get2CapSolution(key, url) {
     if (polling_res.status == 1)
         return { success: true, solution: polling_res.request }
     else
-        return { success: false, error: "Captcha service failed to solve!" }
+        return { success: false, error: "Your captcha solving service failed to solve the captcha!" }
+}
+
+// Compatibility mode essentially. Tries to use the basic 2captcha API for maximum compatibility.
+async function getGenericSolution(key, url, fetch) {
+    var balcheck = await checkBalance(url, key, fetch);
+    if (balcheck)
+        return balcheck;
+
+    try {
+        var solve_req = await fetch(`${url}/in.php?key=${key}&method=userrecaptcha&googlekey=6LerFqAUAAAAABMeByEoQX9u10KRObjwHf66-eya&pageurl=https://store.steampowered.com/join/&header_acao=1`);
+    } catch (error) {
+        return { success: false, error: "Failed to connect to captcha solving service" }
+    }
+
+    if (!solve_req.ok)
+        return { success: false, error: "Error sending captcha solving request" }
+
+    solve_req = await solve_req.text();
+
+    if (solve_req.startsWith("OK|"))
+        solve_req = { status: solve_req.split("|")[0], request: solve_req.split("|")[1] }
+    else
+        return { success: false, error: errorToText(solve_req) };
+
+    for (var i = 0; i < 30; i++) {
+        await sleep(5000);
+
+        try {
+            var polling_res = await fetch(`${url}/res.php?key=${key}&action=get&id=${solve_req.request}&json=1&header_acao=1`);
+        } catch (error) {
+            return { success: false, error: "Failed to connect to captcha solving service" }
+        }
+
+        polling_res = await polling_res.text();
+
+        if (polling_res == "CAPCHA_NOT_READY")
+            continue; // wait some more
+
+        if (polling_res.startsWith("OK|"))
+            polling_res = polling_res.substring(3); // wtf?
+
+        if (polling_res.startsWith("03")) // an actual token
+            return { success: true, solution: polling_res }
+        else
+            return { success: false, error: errorToText(polling_res) }
+    }
+    return { success: false, error: "Your captcha solving service failed to solve the captcha!" }
 }
 
 exports.CaptchaAPI = function (host, key) {
     return {
-        getRecapSolution: async function () {
+        getRecapSolution: async function (_fetch) {
+            if (!_fetch)
+                _fetch = fetch;
             if (!key || key == "") {
-                return { success: false, error: { message: "Captcha key empty!" } };
+                return { success: false, error: "Captcha key empty!" };
             }
             if (!host || host == "") {
-                return { success: false, error: { message: "Host empty!" } };
+                return { success: false, error: "Host empty!" };
             }
             var hostname = new URL(host).hostname;
             var res;
             switch (hostname) {
                 case "2captcha.com":
-                    res = await get2CapSolution(key, "https://2captcha.com");
+                    res = await get2CapSolution(key, "https://2captcha.com", _fetch);
                     break;
                 default:
-                    res = await get2CapSolution(key, host);
+                    res = await getGenericSolution(key, host, _fetch);
                     break;
             }
             if (res.success)

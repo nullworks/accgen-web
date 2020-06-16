@@ -8,7 +8,7 @@ global.accgen_settings = settings;
 const dynamic = require("./dynamicloading.js");
 const generation = require("./generation.js");
 const gmail = require("./gmail.js");
-const CaptchaAPI = require("./lib/librecaptcha").CaptchaAPI;
+const CaptchaAPI = require("./lib/librecaptcha.js").CaptchaAPI;
 
 global.extend = function (obj, src) {
     for (var key in src) {

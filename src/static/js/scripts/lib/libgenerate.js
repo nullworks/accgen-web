@@ -56,7 +56,7 @@ class Generator {
         // Librecaptcha compatibility
         if (typeof recaptcha_solution == "object") {
             update("Getting captcha solution... This may take some time.");
-            var res = await recaptcha_solution.getRecapSolution();
+            var res = await recaptcha_solution.getRecapSolution(steamfetch);
             if (res.error) {
                 ret.error.message = "Error while getting captcha solution! " + res.error;
                 return ret;
