@@ -94,7 +94,7 @@ function init() {
     }
 
     $.ajax({
-        url: '/patreon/check',
+        url: '/userapi/patreon/check',
         type: 'GET'
     }).done(function (data) {
         /*  0 - success
