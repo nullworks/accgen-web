@@ -488,7 +488,7 @@ async function isvalidmx(domain) {
         return false;
     var res = await new Promise(function (resolve, reject) {
         $.ajax({
-            url: "/userapi/generator/isvalidmx/" + domain,
+            url: "/userapi/generator/mxcheck/" + domain,
             success: function (returnData) {
                 resolve(returnData);
             },
