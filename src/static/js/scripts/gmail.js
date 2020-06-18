@@ -1,6 +1,7 @@
 async function getGmail() {
     return await httpRequest({
         url: "https://mail.google.com/mail/feed/atom",
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }, //supress http basic auth popup
         xhrFields: {
             withCredentials: true
         },
