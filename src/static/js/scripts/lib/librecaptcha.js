@@ -113,7 +113,7 @@ async function getGenericSolution(key, url, fetch) {
         await sleep(5000);
 
         try {
-            var polling_res = await fetch(`${url}/res.php?key=${key}&action=get&id=${solve_req.request}&json=1&header_acao=1`);
+            var polling_res = await fetch(`${url}/res.php?key=${key}&action=get&id=${solve_req.request}&header_acao=1`);
         } catch (error) {
             return { success: false, error: "Failed to connect to captcha solving service" }
         }
@@ -149,6 +149,7 @@ exports.CaptchaAPI = function (host, key) {
             var res;
             switch (hostname) {
                 case "2captcha.com":
+                case "rucaptcha.com":
                     res = await get2CapSolution(key, "https://2captcha.com", _fetch);
                     break;
                 default:
