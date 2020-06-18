@@ -84,7 +84,7 @@ global.proxylist_edit = function () {
 global.copyDetails = async function (id) {
     var data;
     data = $(`#${id}`).text();
-    if(data == "Copied!")
+    if (data == "Copied!")
         return
     var $temp = $("<input>");
     $("body").append($temp);
@@ -571,7 +571,7 @@ async function setupGmail() {
     var address = await gmail.getGmailAddress();
     if (!address) {
         $("#email_service_progress").hide('slow');
-        $("#email_service_message > strong").text(`There was an issue setting up automated Gmail: Communication with gmail failed. Firefox users should disable "enhanced privacy protection" for this page.`);
+        $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Firefox users should disable "enhanced privacy protection" for this page.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using Your Gmail address with forwarding</a>`);
         lock_email_service_selection = false;
         return;
     }
