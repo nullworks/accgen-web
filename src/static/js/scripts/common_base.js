@@ -61,7 +61,7 @@ function change_gen_status_text(text, priority) {
 function displayerror(errortext) {
     if (errortext) {
         $("#generic_error").show("slow");
-        $("#generic_error").text(errortext);
+        $("#generic_error > strong").text(errortext);
     } else
         $("#generic_error").hide("slow");
 }
@@ -486,22 +486,19 @@ async function isvalidmx(domain) {
     var patt = new RegExp("^([a-z0-9]+([\-a-z0-9]*[a-z0-9]+)?\.){0,}([a-z0-9]+([\-a-z0-9]*[a-z0-9]+)?){1,63}(\.[a-z0-9]{2,7})+$");
     if (!patt.test(domain))
         return false;
-    var res = await new Promise(function (resolve, reject) {
-        $.ajax({
-            url: "/userapi/generator/mxcheck/" + domain,
-            success: function (returnData) {
-                resolve(returnData);
-            },
-            error: function () {
-                reject();
-            }
-        });
-    }).catch(function () {
-        console.error('DNS lookup failed!');
-    })
-    if (!res || !res.valid)
-        return false;
-    return true;
+    var out = await fetch(`/userapi/generator/mxcheck/${encodeURIComponent(domain)}`).catch(() => { });
+    if (!out || !out.ok) {
+        return "Unknown error while chcking domain validity!";
+    }
+    try {
+        var json = await out.json();
+        if (json.valid) {
+            return true;
+        }
+        return json.error;
+    } catch (error) {
+        return "Unknown error while chcking domain validity!";
+    }
 }
 
 function appSettingsInfo() {
@@ -798,15 +795,16 @@ global.save_domain = async function () {
         $("#email_service_progress").hide('slow');
         settings.set("email_domain", custom_domain);
     } else {
-        if (!custom_domain.includes("@"))
-            if (await isvalidmx(custom_domain)) {
-            } else {
+        if (!custom_domain.includes("@")) {
+            var mxcheck = await isvalidmx(custom_domain)
+            if (mxcheck !== true) {
                 $("#settings_custom_domain").val("");
                 lock_email_service_selection = false;
-                $("#email_service_message > strong").text("Your MX Settings are invalid. Check help for the correct settings. Please make sure that you only have 1 mx entry. You can verify your settings using a utility like mxtoolbox.");
+                $("#email_service_message > strong").text(mxcheck);
                 $("#email_service_progress").hide('slow');
                 return false;
             }
+        }
         $("#email_service_progress").hide('slow');
         settings.set("email_domain", custom_domain);
         $("#email_service_message > strong").text("Custom domain set up.");
@@ -825,7 +823,6 @@ global.save_clicked = async function () {
         if (check) {
             $("#twocap_error > strong").text("Captcha service setup error: " + check.error);
             $("#twocap_error").show("slow");
-            $("#settings_twocap").val("");
             return;
         }
         $("#twocap_error").hide("slow");
