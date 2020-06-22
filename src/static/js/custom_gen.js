@@ -64,10 +64,6 @@ function generate_pressed() {
 }
 
 function change_visibility(status) {
-    if (status == 1)
-        $('custom_gen_form').show('hide');
-    else if (!status)
-        $('custom_gen_form').show('slow');
     commonChangeVisibility(status);
 }
 
@@ -90,7 +86,6 @@ function init() {
         $('#gameDetails_priv').val(data.gameDetails_priv);
         $('#playtime_priv').val(data.playtime_priv);
         $('#friendsList_priv').val(data.friendsList_priv);
-
     }
 
     $.ajax({

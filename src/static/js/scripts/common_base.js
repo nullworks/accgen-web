@@ -331,7 +331,7 @@ global.mass_generate_clicked = async function () {
         });
     }
 
-    var captcha = CaptchaAPI(settings.get("captcha_host"), settings.get("captcha_key"));
+    var captcha = CaptchaAPI(settings.get("captcha_host"), settings.get("captcha_key"), isElectron && document.sagelectron.nodefetch ? document.sagelectron.nodefetch : fetch);
 
     function generationcallback(account, id) {
         var error = parseErrors(account, settings.get("email_provider") == "accgen");
@@ -821,19 +821,12 @@ global.save_clicked = async function () {
     var captcha_key = $("#settings_twocap").val();
     var captcha_host = ($("#settings_caphost").val() != '') ? $("#settings_caphost").val() : "https://2captcha.com";
     if (captcha_key != "") {
-        // TODO: move to librecaptcha
-        var res = await httpRequest({
-            url: `${captcha_host}/res.php?key=${captcha_key}&action=getbalance&header_acao=1`
-        }).catch(function (err_response, error) {
+        var check = await CaptchaAPI(captcha_host, captcha_key, isElectron && document.sagelectron.nodefetch ? document.sagelectron.nodefetch : fetch).isValidKey()
+        if (check) {
+            $("#twocap_error > strong").text("Captcha service setup error: " + check.error);
             $("#twocap_error").show("slow");
             $("#settings_twocap").val("");
-        });
-        if (!res)
-            return false;
-        if (res == "ERROR_KEY_DOES_NOT_EXIST") {
-            $("#twocap_error").show("slow");
-            $("#settings_twocap").val("");
-            return false;
+            return;
         }
         $("#twocap_error").hide("slow");
         settings.set("captcha_key", captcha_key);

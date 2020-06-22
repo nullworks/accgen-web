@@ -19,7 +19,7 @@ async function checkBalance(url, key, fetch) {
     try {
         var balance_res = await fetch(`${url}/res.php?key=${key}&action=getbalance&header_acao=1`);
     } catch (error) {
-        return { success: false, error: "Failed to connect to captcha solving service" }
+        return { success: false, error: "Failed to connect to captcha solving service." };
     }
 
     if (!balance_res.ok)
@@ -134,11 +134,9 @@ async function getGenericSolution(key, url, fetch) {
     return { success: false, error: "Your captcha solving service failed to solve the captcha!" }
 }
 
-exports.CaptchaAPI = function (host, key) {
+exports.CaptchaAPI = function (host, key, _fetch) {
     return {
-        getRecapSolution: async function (_fetch) {
-            if (!_fetch)
-                _fetch = fetch;
+        getRecapSolution: async function () {
             if (!key || key == "") {
                 return { success: false, error: "Captcha key empty!" };
             }
@@ -160,6 +158,9 @@ exports.CaptchaAPI = function (host, key) {
                 return { success: res.success, solution: res.solution }
             else
                 return { success: res.success, error: res.error }
+        },
+        async isValidKey() {
+            return await checkBalance(host, key, _fetch);
         }
     }
 }
