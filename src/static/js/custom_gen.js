@@ -2,31 +2,36 @@
 
 async function post_generate(account, update) {
     update("Applying custom generator settings...");
+    var profile_data = {
+        name: $("input[name=acc_username]").val(),
+        realName: $("input[name=acc_realname]").val(),
+        summary: $("textarea[name=acc_bio]").val(),
+        country: $("select[name=acc_country]").val(),
+        state: $("input[name=acc_state]").val(),
+        city: $("input[name=acc_city]").val(),
+        customURL: $("input[name=acc_profileurl]").val()
+    }
+    var privacy_data = {
+        profile: $("select[name=profile_privacy]").val(),
+        comments: $("select[name=comments_privacy]").val(),
+        inventory: $("select[name=inv_privacy]").val(),
+        inventoryGifts: $('#invgifts_priv').val() == "true",
+        gameDetails: $('#gameDetails_priv').val(),
+        playtime: $('#playtime_priv').val() == "true",
+        friendsList: $('#friendsList_priv').val()
+    }
+    //clear out empty or undefined values
+    Object.keys(profile_data).forEach((key) => { if (profile_data[key] === "") { delete profile_data[key] } })
+    Object.keys(privacy_data).forEach((key) => { if (privacy_data[key] === "") { delete privacy_data[key] } })
+
     await httpRequest({
         url: `/userapi/patreon/customacc/${account.account.login}/${account.account.password}`,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            profile: {
-                name: $("input[name=acc_username]").val(),
-                realName: $("input[name=acc_realname]").val(),
-                summary: $("textarea[name=acc_bio]").val(),
-                country: $("select[name=acc_country]").val(),
-                state: $("input[name=acc_state]").val(),
-                city: $("input[name=acc_city]").val(),
-                customURL: $("input[name=acc_profileurl]").val()
-            },
+            profile: profile_data,
             image: $("input[name=acc_profileimage]").val(),
-            privacy:
-            {
-                profile: $("select[name=profile_privacy]").val(),
-                comments: $("select[name=comments_privacy]").val(),
-                inventory: $("select[name=inv_privacy]").val(),
-                inventoryGifts: $('#invgifts_priv').val() == "true",
-                gameDetails: $('#gameDetails_priv').val(),
-                playtime: $('#playtime_priv').val() == "true",
-                friendsList: $('#friendsList_priv').val()
-            }
+            privacy: privacy_data
         }),
         dataType: 'json'
     }).catch(function (resp) {
