@@ -52,6 +52,7 @@ function baseSettings() {
     exports.set("captcha_key_type", "2captcha");
     exports.set("acc_apps", "303386");
     exports.set("acc_steamguard", true);
+    exports.set("email_provider", "accgen");
     console.log("Base settings configured!");
 }
 
