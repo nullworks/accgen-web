@@ -1,11 +1,15 @@
 async function getGmail() {
-    return await httpRequest({
-        url: "https://mail.google.com/mail/feed/atom",
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }, //supress http basic auth popup
-        xhrFields: {
-            withCredentials: true
-        },
-    }, null, null).catch(function () { });
+    try {
+        var req = await fetch("https://mail.google.com/mail/feed/atom", {
+            credentials: "include",
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (req.status != 200)
+            return { error: req.status }
+        return await req.text();
+    } catch (error) {
+        return;
+    }
 }
 
 async function getEmailByID(id) {
@@ -21,15 +25,17 @@ exports.getGmailAddress = async function () {
     var xml = await getGmail();
     if (!xml)
         return null;
-    xml = $(xml);
+    if (xml.error)
+        return xml;
+    xml = $($.parseXML(xml));
     return xml.find("feed>title")[0].innerHTML.split("for ")[1];
 }
 
 async function getGmailIndex() {
     var xml = await getGmail();
-    if (!xml)
+    if (!xml || xml.error)
         return null;
-    return $(xml).find("feed>entry");
+    return $($.parseXML(xml)).find("feed>entry");
 }
 
 var latestdate = Date.now();
@@ -42,6 +48,8 @@ exports.updateTimeStamp = function () {
 async function anyNewEmails() {
     var index = (await getGmailIndex());
     var ret = [];
+    if (!index)
+        return [];
     for (var i = index.length; i--;) {
         var elem = $(index[i]);
         var date = new Date(elem.children("modified")[0].innerHTML);

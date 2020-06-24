@@ -351,7 +351,7 @@ global.mass_generate_clicked = async function () {
     }
 
     var valid_accounts = [];
-    var accounts = await generation.generateAccounts(max_count, captcha, concurrency, statuscb, generationcallback, change_gen_status_text, $("#proxy_check:checked").val() && typeof document.sagelectron != "undefined");
+    var accounts = await generation.generateAccounts(max_count, captcha, concurrency, statuscb, generationcallback, change_gen_status_text, $("#proxy_check:checked").val() && isElectron);
     for (var i = 0; i < max_count; i++) {
         var account = accounts[i];
         var error = parseErrors(account, false);
@@ -566,15 +566,22 @@ async function setupGmail() {
         return;
     }
     var address = await gmail.getGmailAddress();
-    if (!address) {
-        $("#email_service_progress").hide('slow');
-        $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Firefox users should disable "enhanced privacy protection" for this page.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using Your Gmail address with forwarding</a>`);
+    $("#email_service_progress").hide('slow');
+    if (!address || address.error) {
+        if (address && address.error == 401) {
+            $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Failed to login. Please open <a href="https://mail.google.com">mail.google.com</a>, wait for it to load (and login if necessary), then try again.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+        } else {
+            if (GetBrowser() == "Firefox")
+                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Please disable "enhanced privacy protection" for this page (shield icon next to the padlock in the address bar).<br>If the issue persists, follow this guide to manually set up gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+            else
+                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+        }
         lock_email_service_selection = false;
         return;
     }
     settings.set("email_gmail", address);
     setProvider("gmailv2");
-    $("#email_service_progress").hide('slow');
+
     $("#email_service_message > strong").text(`Automated gmail forwarding was set up for ${address}.`)
 }
 
