@@ -705,7 +705,7 @@ function displayhistorylist(data, showdownloadhistory) {
         $("#genned_accs").empty();
         $.each(data.reverse(), function (i, item) {
             $('<tr class="table-primary">').html(
-                "<td>" + "<a href=\"https://steamcommunity.com/profiles/" + item.steamid + "\">" + item.login + "</a></td><td>" + item.password + "</td>").appendTo('#genned_accs');
+                "<td>" + "<a target=\"_blank\" href=\"https://steamcommunity.com/profiles/" + item.steamid + "\">" + item.login + "</a></td><td>" + item.password + "</td>").appendTo('#genned_accs');
         })
     }
     if (shouldshow) {

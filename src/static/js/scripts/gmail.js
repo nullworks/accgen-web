@@ -2,7 +2,7 @@ async function getGmail() {
     try {
         var req = await fetch("https://mail.google.com/mail/feed/atom", {
             credentials: "include",
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            headers: { "Authorization": "BasicCustom" }
         });
         if (req.status != 200)
             return { error: req.status }
