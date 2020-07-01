@@ -138,7 +138,8 @@ async function accgen_doAdditional(username, password, email, doSteamGuard, apps
             // Signal to worker that it should not expect steam guard disable emails in it's inbox, since these are handled on the client
             // True with gmailv2
             noCheckInbox: settings.get("email_provider") == "gmailv2",
-            activateApps: apps ? apps.map(a => parseInt(a)) : null
+            activateApps: apps ? apps.map(a => parseInt(a)) : null,
+            patreon: typeof additionalPatreonInfo !== "undefined" ? additionalPatreonInfo() : undefined
         }),
         headers: {
             'Content-Type': 'application/json',
@@ -222,5 +223,5 @@ exports.generateAccounts = async function (count, captcha, multigen, statuscb, g
     var getProxy = null;
     if (useproxy)
         getProxy = (await import(/* webpackChunkName: "proxy" */ "./proxy.js")).getProxy;
-    return await generator.generateAccounts(fetch, handleErrors, count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, { acc_steamguard: settings.get("acc_steamguard"), acc_apps: settings.get("acc_apps") }, getProxy, typeof post_generate != "undefined" ? post_generate : null);
+    return await generator.generateAccounts(fetch, handleErrors, count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, { acc_steamguard: settings.get("acc_steamguard"), acc_apps: settings.get("acc_apps") }, getProxy);
 }

@@ -1,7 +1,6 @@
 "let strict";
 
-async function post_generate(account, update) {
-    update("Applying custom generator settings...");
+function additionalPatreonInfo(account, update) {
     var profile_data = {
         name: $("input[name=acc_username]").val(),
         realName: $("input[name=acc_realname]").val(),
@@ -12,38 +11,23 @@ async function post_generate(account, update) {
         customURL: $("input[name=acc_profileurl]").val()
     }
     var privacy_data = {
-        profile: $("select[name=profile_privacy]").val(),
-        comments: $("select[name=comments_privacy]").val(),
-        inventory: $("select[name=inv_privacy]").val(),
+        profile: parseInt($("select[name=profile_privacy]").val()),
+        comments: parseInt($("select[name=comments_privacy]").val()),
+        inventory: parseInt($("select[name=inv_privacy]").val()),
         inventoryGifts: $('#invgifts_priv').val() == "true",
-        gameDetails: $('#gameDetails_priv').val(),
+        gameDetails: parseInt($('#gameDetails_priv').val()),
         playtime: $('#playtime_priv').val() == "true",
-        friendsList: $('#friendsList_priv').val()
+        friendsList: parseInt($('#friendsList_priv').val())
     }
     //clear out empty or undefined values
     Object.keys(profile_data).forEach((key) => { if (profile_data[key] === "") { delete profile_data[key] } })
     Object.keys(privacy_data).forEach((key) => { if (privacy_data[key] === "") { delete privacy_data[key] } })
 
-    await httpRequest({
-        url: `/userapi/patreon/customacc/${account.account.login}/${account.account.password}`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            profile: profile_data,
-            image: $("input[name=acc_profileimage]").val(),
-            privacy: privacy_data
-        }),
-        dataType: 'json'
-    }).catch(function (resp) {
-        if (resp.error) {
-            account.error.message = resp.error;
-            account.account = null;
-        } else {
-            account.error.message = "Unknown error!";
-            account.account = null;
-        }
-    });
-    return account;
+    return {
+        profile: profile_data,
+        privacy: privacy_data,
+        image: $("input[name=acc_profileimage]").val(),
+    };
 }
 
 function generate_pressed() {

@@ -35,7 +35,7 @@ class Generator {
     }
 
     // Should be considered as a "private" function. Don't call directly. Use generateAccounts instead.
-    async generateAccount(recaptcha_solution, statuscb, id, settings, steamfetch, usingproxy, post_generate) {
+    async generateAccount(recaptcha_solution, statuscb, id, settings, steamfetch, usingproxy) {
         function update(msg, ret) {
             statuscb(msg, id, ret);
         }
@@ -197,10 +197,6 @@ class Generator {
                 login: acc_data.username
             };
         }
-
-        if (ret.account && post_generate) {
-            ret = await post_generate(ret, update);
-        }
         if (ret.account) {
             update("Success!");
             ret.success = true;
@@ -215,7 +211,7 @@ class Generator {
     change_mass_gen_status: function taking text as paramter. Should be displayed to the user somewhere. Required if count > 1
     settings: object containing properties acc_steamguard and acc_apps
     */
-    async generateAccounts(fetch, handleErrors, count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, settings, getProxy, post_generate) {
+    async generateAccounts(fetch, handleErrors, count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, settings, getProxy) {
         if (!multigen)
             multigen = 1;
 
@@ -258,7 +254,7 @@ class Generator {
             }
             concurrent++;
             statuscb("Starting...", i);
-            this.generateAccount(captcha, statuscb, i, settings, proxy ? proxy.fetch : fetch, proxy ? true : false, post_generate).then(function (res) {
+            this.generateAccount(captcha, statuscb, i, settings, proxy ? proxy.fetch : fetch, proxy ? true : false).then(function (res) {
                 if (generationcallback)
                     generationcallback(res, res.id);
                 accounts[res.id] = res;
