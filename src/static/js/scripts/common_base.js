@@ -620,7 +620,7 @@ global.common_init = async function () {
     // Check addon install status and version of addon and take appropriate action
     // Enable extra electron features
     if (isElectron) {
-        var ipc = document.ipc || (document.sagelectron ? document.sagelectron.ipc : null);
+        var ipc = (document.sagelectron ? document.sagelectron.ipc : null) || document.ipc || ipc;
         if (ipc) {
             ipc.on('alert-msg', (event, arg) => {
                 on_status_received(arg);
