@@ -2,7 +2,7 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: "production",
+  mode: "development",
   entry: {
     common: './src/static/js/scripts/common_base.js',
   },

@@ -549,11 +549,12 @@ global.setUseAccgenMail = function () {
 }
 
 global.setUseGmail = async function () {
+    if (isElectron)
+        return;
     if (lock_email_service_selection)
         return;
     lock_email_service_selection = true;
     console.log("Setup gmail clicked");
-    // TODO: check for consent
     //show progress bar
     $("#email_service_progress").show('slow');
     $("#email_service_message > strong").text("Setting up gmail forwarding...");
