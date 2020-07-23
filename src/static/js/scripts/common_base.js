@@ -2,7 +2,7 @@
 
 global.$ = require("jquery");
 require("bootstrap");
-const isElectron = typeof document.ipc !== 'undefined' || typeof document.sagelectron !== 'undefined';
+const isElectron = typeof (document.sagelectron || document.ipc || window.ipc) !== 'undefined';
 const settings = require("./settings.js");
 global.accgen_settings = settings;
 const dynamic = require("./dynamicloading.js");
@@ -621,7 +621,7 @@ global.common_init = async function () {
     // Check addon install status and version of addon and take appropriate action
     // Enable extra electron features
     if (isElectron) {
-        var ipc = (document.sagelectron ? document.sagelectron.ipc : null) || document.ipc || ipc;
+        var ipc = (document.sagelectron ? document.sagelectron.ipc : null) || document.ipc || window.ipc;
         if (ipc) {
             ipc.on('alert-msg', (event, arg) => {
                 on_status_received(arg);
