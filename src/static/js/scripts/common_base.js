@@ -234,12 +234,12 @@ function AddonsNotSupported() {
     window.location = "legacy.html";
 }
 
-function changeText(isinstalled) {
-    if (isinstalled) {
+function changeText(is_electron) {
+    if (is_electron) {
         $("#email_service_option_gmail > img")
             .css("opacity", "0.4")
             .css("filter", "alpha(opacity=40)");
-        $("#email_service_option_gmail > figcaption > p").text("You need addon version 5.0 or above to enable gmail support.");
+        $("#email_service_option_gmail > figcaption > p").html('Automated Gmail support is not available. <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Guide for manually using gmail.</a>');
         return;
     }
     switch (GetBrowser()) {
@@ -538,6 +538,7 @@ async function setProvider(provider) {
     }, 3000);
 }
 
+// TODO: These globals are terrible. Fix this shit, probably move it to another js file.
 global.setUseAccgenMail = function () {
     if (lock_email_service_selection)
         return;
@@ -547,7 +548,7 @@ global.setUseAccgenMail = function () {
     setProvider("accgen");
 }
 
-async function setupGmail() {
+global.setUseGmail = async function () {
     if (lock_email_service_selection)
         return;
     lock_email_service_selection = true;
@@ -569,12 +570,12 @@ async function setupGmail() {
     $("#email_service_progress").hide('slow');
     if (!address || address.error) {
         if (address && address.error == 401) {
-            $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Failed to login. Please open <a href="https://mail.google.com">mail.google.com</a>, wait for it to load (and login if necessary), then try again.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+            $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Failed to login. Please open <a href="https://mail.google.com">mail.google.com</a>, wait for it to load (and login if necessary), then try again.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
         } else {
             if (GetBrowser() == "Firefox")
-                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Please disable "enhanced privacy protection" for this page (shield icon next to the padlock in the address bar).<br>If the issue persists, follow this guide to manually set up gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Please disable "enhanced privacy protection" for this page (shield icon next to the padlock in the address bar).<br>If the issue persists, follow this guide to manually set up gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
             else
-                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://gitlab.com/nullworks/accgen/accgen-web/-/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
         }
         lock_email_service_selection = false;
         return;
@@ -650,10 +651,6 @@ global.common_init = async function () {
         ]);
         if (addoncheck) {
             console.log("Version 3.0 or above found!")
-            if (!addoncheck.apiversion || addoncheck.apiversion < 2)
-                changeText(true);
-            else
-                $("#email_service_option_gmail > img").click(setupGmail);
         }
         // Version older than 3.0 or not installed and not electron
         else {
@@ -757,7 +754,7 @@ global.history_download_pressed = function () {
 global.settings_help = function (page) {
     switch (page) {
         case "gmail":
-            window.open("https://github.com/nullworks/accgen-web/wiki/Using-Your-Gmail-address-with-Steam-Account-Generator");
+            window.open("https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator");
             break;
         case "mx":
             window.open("https://telegra.ph/file/ef5bf460819c458292671.png");
