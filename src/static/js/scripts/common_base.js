@@ -239,7 +239,7 @@ function changeText(is_electron) {
         $("#email_service_option_gmail > img")
             .css("opacity", "0.4")
             .css("filter", "alpha(opacity=40)");
-        $("#email_service_option_gmail > figcaption > p").html('Automated Gmail support is not available. <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Guide for manually using gmail.</a>');
+        $("#email_service_option_gmail > figcaption > p").html('Automated Gmail support is not available on the electron app. <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator" target="_blank">Guide for manually using gmail.</a>');
         return;
     }
     switch (GetBrowser()) {
@@ -571,12 +571,12 @@ global.setUseGmail = async function () {
     $("#email_service_progress").hide('slow');
     if (!address || address.error) {
         if (address && address.error == 401) {
-            $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Failed to login. Please open <a href="https://mail.google.com">mail.google.com</a>, wait for it to load (and login if necessary), then try again.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+            $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Failed to login. Please open <a href="https://mail.google.com">mail.google.com</a>, wait for it to load (and login if necessary), then try again.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator" target="_blank">Using your Gmail address with forwarding</a>`);
         } else {
             if (GetBrowser() == "Firefox")
-                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Please disable "enhanced privacy protection" for this page (shield icon next to the padlock in the address bar).<br>If the issue persists, follow this guide to manually set up gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed. Please disable "enhanced privacy protection" for this page (shield icon next to the padlock in the address bar).<br>If the issue persists, follow this guide to manually set up gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator" target="_blank">Using your Gmail address with forwarding</a>`);
             else
-                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator">Using your Gmail address with forwarding</a>`);
+                $("#email_service_message > strong").html(`There was an issue setting up automated Gmail: Communication with gmail failed.<br>If the issue persists, follow this guide to manually setup gmail forwarding: <a href="https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator" target="_blank">Using your Gmail address with forwarding</a>`);
         }
         lock_email_service_selection = false;
         return;
