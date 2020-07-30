@@ -192,10 +192,9 @@ class Generator {
             }
 
         } else {
-            ret.account = {
-                ...acc_data,
-                login: acc_data.username
-            };
+            acc_data.login = acc_data.username;
+            delete acc_data.username;
+            ret.account = acc_data;
         }
         if (ret.account) {
             update("Success!");
