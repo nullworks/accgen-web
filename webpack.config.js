@@ -12,12 +12,14 @@ module.exports = {
     path: path.resolve(__dirname, 'public/'),
   },
   plugins: [
-    new CopyPlugin([
-      { from: '*', context: "src/"},
-      { from: 'static/*', context: "src/"},
-      { from: 'static/css/*', context: "src/"},
-      { from: 'static/js/*', context: "src/"},
-    ]),
+    new CopyPlugin({
+      patterns: [
+        { from: '*', context: "src/" },
+        { from: 'static/*', context: "src/" },
+        { from: 'static/css/*', context: "src/" },
+        { from: 'static/js/*', context: "src/" },
+      ]
+    }),
   ],
   module: {
     rules: [
