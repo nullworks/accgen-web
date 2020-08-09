@@ -27,7 +27,7 @@ function getBaseResponse() {
             this.error.type = "http";
             this.error.httpcode = code;
         },
-        networkError: function (code) {
+        networkError: function () {
             this.success = false;
             this.error.type = "network";
         }

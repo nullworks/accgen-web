@@ -231,10 +231,10 @@ class Generator {
         for (var i = 0; i < count; i++) {
             while (concurrent >= multigen && !stopped)
                 await sleep(500);
-            var proxy;
+            var proxy = null;
             if (getProxy && !stopped) {
                 statuscb("Waiting for valid proxy...", i);
-                var proxy = await getProxy();
+                proxy = await getProxy();
                 if (!proxy)
                     stopped = "No available proxies found.";
             }
@@ -259,10 +259,9 @@ class Generator {
                 accounts[res.id] = res;
                 if (change_mass_gen_status)
                     change_mass_gen_status(`Mass generation in progress... ${accounts.filter(String).length}/${count}`);
-                console.log(res);
                 // Handle any errors that may appear, ban proxies and cancel generation if necessary
                 var cancel = handleErrors(res, proxy ? proxy.proxy : null);
-                if (cancel) {
+                if (cancel && !stopped) {
                     stopped = cancel;
                     if (change_mass_gen_status)
                         change_mass_gen_status("Stopping account generation...");
@@ -281,10 +280,60 @@ class Generator {
         }
         while (concurrent > 0)
             await sleep(500);
-        console.log(accounts);
         this.activegeneration = false;
         this.events.removeAllListeners("stopgeneration");
         return accounts;
+    }
+
+    // Functiono intended to be used for generating accounts automatically in a nodejs context
+    async autogen(fetch, handleErrors, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, settings, getProxy) {
+        if (!multigen)
+            multigen = 1;
+
+        var concurrent = 0;
+        if (change_mass_gen_status)
+            change_mass_gen_status(`Automatic generation in progress...`);
+
+        // Complete hack. TODO: Replace with less hacky code in the future.
+        var stopped = false;
+        this.activegeneration = true;
+
+        var i = -1;
+
+        while (!stopped) {
+            i++;
+            while (concurrent >= multigen)
+                await sleep(500);
+            var proxy = null;
+            if (getProxy && !stopped) {
+                statuscb("Waiting for valid proxy...", i);
+                proxy = await getProxy();
+                if (!proxy)
+                    stopped = "No available proxies found.";
+            }
+            concurrent++;
+            statuscb("Starting...", i);
+            this.generateAccount(captcha, statuscb, i, settings, proxy ? proxy.fetch : fetch, proxy ? true : false).then(function (res) {
+                if (generationcallback)
+                    generationcallback(res, res.id);
+                // Handle any errors that may appear, ban proxies and cancel generation if necessary
+                var cancel = handleErrors(res, proxy ? proxy.proxy : null);
+                if (cancel && !stopped) {
+                    stopped = cancel;
+                    if (change_mass_gen_status)
+                        change_mass_gen_status("Stopping account generation...");
+                }
+                concurrent--;
+            }, function (err) {
+                console.error(err);
+                concurrent--;
+            })
+            await sleep(1000);
+        }
+        while (concurrent > 0)
+            await sleep(500);
+            change_mass_gen_status("Stopped account generation. Reason: " + stopped);
+        this.activegeneration = false;
     }
 }
 
