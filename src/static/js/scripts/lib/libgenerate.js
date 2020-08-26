@@ -54,7 +54,8 @@ class Generator {
         }
 
         // Librecaptcha compatibility
-        if (typeof recaptcha_solution == "object") {
+        // TODO: FIXME
+        /*if (typeof recaptcha_solution.getRecapSolution == "function") {
             update("Getting captcha solution... This may take some time.");
             var res = await recaptcha_solution.getRecapSolution();
             if (res.error) {
@@ -62,13 +63,15 @@ class Generator {
                 return ret;
             }
             recaptcha_solution = res.solution;
-        }
+        }*/
 
-        update("Getting GID...");
-        var gid = await this.steam_getGid(steamfetch);
+        // TODO: FIXME
+        //update("Getting GID...");
+        //var gid = await this.steam_getGid(steamfetch);
 
+        // TODO: FIXME
         // no gid? error out
-        if (!gid.success) {
+        /*if (!gid.success) {
             switch (gid.error.type) {
                 case "network":
                     ret.error.message = "Connection to steam failed.";
@@ -80,9 +83,7 @@ class Generator {
                     break;
             }
             return ret;
-        }
-
-        gid = gid.response.gid;
+        }*/
 
         update("Getting registration data...");
         var acc_data = await this.gen_getData();
@@ -97,7 +98,7 @@ class Generator {
 
         update("Waiting for confirmation from steam...");
         {
-            var response = await this.steam_requestVerify(steamfetch, email, gid, recaptcha_solution);
+            var response = await this.steam_requestVerify(steamfetch, email, recaptcha_solution.gid, recaptcha_solution.token);
             if (!response.success) {
                 switch (response.error.type) {
                     case "network":
