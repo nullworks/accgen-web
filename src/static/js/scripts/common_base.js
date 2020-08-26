@@ -637,7 +637,7 @@ global.common_init = async function () {
             console.log("Ready sent!");
         }
         // Electron app needs to be updated to continue
-        if (typeof document.sagelectron === "undefined" || typeof document.sagelectron.apiversion < 4) {
+        if (typeof document.sagelectron === "undefined" || document.sagelectron.apiversion < 4) {
             $("#electron_update").show();
             $("#accgen_ui").hide();
             return;
