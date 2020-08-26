@@ -122,14 +122,17 @@ function registerevents() {
         if (typeof e.data !== 'string' || e.data.length < 200)
             return;
         // addon is out of date?
-        if (e.data.split(";").length != 2) {
-            alert("Invalid data received from addon");
+        if (e.data.split(";").length != 3) {
+            alert("Invalid data received from addon. Please update your addon and try again");
             return;
         }
 
         change_visibility(true);
-        var recap_token = e.data.split(";")[0];
-        var account = (await generation.generateAccounts(1, recap_token, null, function statuscb(msg, id, ret) {
+        var captcha_sol = {
+            'recaptcha': e.data.split(";")[0],
+            'gid': e.data.split(";")[1]
+        }
+        var account = (await generation.generateAccounts(1, captcha_sol, null, function statuscb(msg, id, ret) {
             change_gen_status_text(msg);
             if (ret)
                 displayData(ret);

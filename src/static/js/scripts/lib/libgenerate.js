@@ -35,7 +35,7 @@ class Generator {
     }
 
     // Should be considered as a "private" function. Don't call directly. Use generateAccounts instead.
-    async generateAccount(recaptcha_solution, statuscb, id, settings, steamfetch, usingproxy) {
+    async generateAccount(captcha_sol, statuscb, id, settings, steamfetch, usingproxy) {
         function update(msg, ret) {
             statuscb(msg, id, ret);
         }
@@ -54,35 +54,25 @@ class Generator {
         }
 
         // Librecaptcha compatibility
-        if (typeof recaptcha_solution == "object") {
+        if (captcha_sol.getRecapSolution) {
             update("Getting captcha solution... This may take some time.");
-            var res = await recaptcha_solution.getRecapSolution();
+            var res = await captcha_sol.getRecapSolution();
             if (res.error) {
                 ret.error.message = "Error while getting captcha solution! " + res.error;
                 return ret;
             }
-            recaptcha_solution = res.solution;
+            captcha_sol = res.solution;
         }
 
         update("Getting GID...");
-        var gid = await this.steam_getGid(steamfetch);
+        var gid = captcha_sol.gid
+        var recaptcha_solution = captcha_sol.recaptcha
 
         // no gid? error out
-        if (!gid.success) {
-            switch (gid.error.type) {
-                case "network":
-                    ret.error.message = "Connection to steam failed.";
-                    break;
-                case "http":
-                    ret.error.message = "Error returned by steam on GID refresh.";
-                    break;
-                default:
-                    break;
-            }
+        if (!gid) {
+            ret.error.message = "GID Not supplied.";
             return ret;
         }
-
-        gid = gid.response.gid;
 
         update("Getting registration data...");
         var acc_data = await this.gen_getData();
@@ -204,7 +194,7 @@ class Generator {
     }
     /*
     count: Number of accounts to generate
-    captcha: Either text (single gen) or an object containing a function called getRecapSolution
+    captcha: Either an object with gid and recaptcha solution (single gen) or an object containing a function called getRecapSolution
     multigen: amount of accounts to generate concurrently
     generationcallback: function taking parameter "account" and "id", optional
     change_mass_gen_status: function taking text as paramter. Should be displayed to the user somewhere. Required if count > 1
@@ -332,7 +322,7 @@ class Generator {
         }
         while (concurrent > 0)
             await sleep(500);
-            change_mass_gen_status("Stopped account generation. Reason: " + stopped);
+        change_mass_gen_status("Stopped account generation. Reason: " + stopped);
         this.activegeneration = false;
     }
 }

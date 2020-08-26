@@ -218,6 +218,9 @@ var generator = new Generator(libsteam.steam_getGid, libsteam.steam_requestVerif
 exports.generator = generator;
 
 exports.generateAccounts = async function (count, captcha, multigen, statuscb, generationcallback, change_mass_gen_status, useproxy) {
+    if (!captcha.gid || !captcha.recaptcha) {
+        return Error("GID/Recaptcha solutuion Not supplied")
+    }
     if (settings.get("email_provider") == "gmailv2")
         gmail.updateTimeStamp();
     var getProxy = null;
