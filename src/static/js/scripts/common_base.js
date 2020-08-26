@@ -388,12 +388,12 @@ global.mass_generate_clicked = async function () {
 /*Automatic generation end*/
 
 global.commonGeneratePressed = async function () {
-    if (settings.get("captcha_key")) //2captcha key is set
+    /*if (settings.get("captcha_key")) //2captcha key is set
     {
         change_visibility(2);
         $("#mass_generator").modal('show');
         return;
-    }
+    }*/
     if ($("#steam_iframe").is(":hidden")) {
         change_visibility(2);
         document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
@@ -779,8 +779,10 @@ global.settings_help = function (page) {
 global.settings_pressed = function () {
     change_visibility(2);
     $("#settings_custom_domain").val(settings.get("email_domain"));
-    $("#settings_twocap").val(settings.get("captcha_key"));
-    $("#settings_caphost").val(settings.get("captcha_host"));
+    $("#settings_twocap").val("The mass generator is disabled until further notice.");
+    $("#settings_twocap").prop('disabled', true);
+    $("#settings_caphost").val("The mass generator is disabled until further notice.");
+    $("#settings_caphost").prop('disabled', true);
     $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steamguard"));
     $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps"));
     $("#settings_appids").trigger("input");
@@ -827,7 +829,7 @@ global.save_clicked = async function () {
     settings.set("acc_steamguard", $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked"));
     settings.set("acc_apps", $("#acc_apps_setting > input[type=\"text\"]").val());
 
-    var captcha_key = $("#settings_twocap").val();
+    /*var captcha_key = $("#settings_twocap").val();
     var captcha_host = ($("#settings_caphost").val() != '') ? $("#settings_caphost").val() : "https://2captcha.com";
     if (captcha_key != "") {
         var check = await CaptchaAPI(captcha_host, captcha_key, isElectron && document.sagelectron.nodefetch ? document.sagelectron.nodefetch : fetch).isValidKey()
@@ -842,7 +844,7 @@ global.save_clicked = async function () {
     } else {
         $("#twocap_error").hide("slow");
         settings.set("captcha_key", null);
-    }
+    }*/
     $("#saved_success").show("slow");
     return false;
 }
