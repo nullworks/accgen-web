@@ -11,10 +11,10 @@
   "dependencies": {
     "autolinker": "^3.14.1",
     "await-to-js": "^2.1.1",
-    "bootstrap": "^4.5.0",
+    "bootstrap": "^4.5.2",
     "bootstrap-table": "^1.17.1",
-    "copy-webpack-plugin": "^6.0.3",
-    "css-loader": "^4.1.1",
+    "copy-webpack-plugin": "^6.1.0",
+    "css-loader": "^4.2.2",
     "escape-html": "^1.0.3",
     "jquery": "^3.5.1",
     "popper.js": "^1.15.0",
