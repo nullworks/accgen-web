@@ -121,15 +121,21 @@ function registerevents() {
             return;
         if (typeof e.data !== 'string' || e.data.length < 200)
             return;
+
+        var output = null;
         // addon is out of date?
-        if (e.data.split(";").length != 2) {
+        try {
+            output = JSON.parse(e.data);
+        } catch (error) {
+        }
+
+        if (!output || !output.token) {
             alert("Invalid data received from addon");
             return;
         }
 
         change_visibility(true);
-        var recap_token = e.data.split(";")[0];
-        var account = (await generation.generateAccounts(1, recap_token, null, function statuscb(msg, id, ret) {
+        var account = (await generation.generateAccounts(1, output, null, function statuscb(msg, id, ret) {
             change_gen_status_text(msg);
             if (ret)
                 displayData(ret);
@@ -631,7 +637,7 @@ global.common_init = async function () {
             console.log("Ready sent!");
         }
         // Electron app needs to be updated to continue
-        if (typeof document.sagelectron === "undefined") {
+        if (typeof document.sagelectron === "undefined" || typeof document.sagelectron.apiversion < 4) {
             $("#electron_update").show();
             $("#accgen_ui").hide();
             return;

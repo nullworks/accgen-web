@@ -54,35 +54,38 @@ class Generator {
         }
 
         // Librecaptcha compatibility
-        if (typeof recaptcha_solution == "object") {
+        if (typeof recaptcha_solution.getRecapSolution == "function") {
             update("Getting captcha solution... This may take some time.");
             var res = await recaptcha_solution.getRecapSolution();
             if (res.error) {
                 ret.error.message = "Error while getting captcha solution! " + res.error;
                 return ret;
             }
-            recaptcha_solution = res.solution;
+
+            recaptcha_solution = { token: res.solution };
         }
 
-        update("Getting GID...");
-        var gid = await this.steam_getGid(steamfetch);
 
-        // no gid? error out
-        if (!gid.success) {
-            switch (gid.error.type) {
-                case "network":
-                    ret.error.message = "Connection to steam failed.";
-                    break;
-                case "http":
-                    ret.error.message = "Error returned by steam on GID refresh.";
-                    break;
-                default:
-                    break;
+        if (typeof recaptcha_solution.gid == "undefined") {
+            update("Getting GID...");
+            var gid = await this.steam_getGid(steamfetch);
+
+            // no gid? error out
+            if (!gid.success) {
+                switch (gid.error.type) {
+                    case "network":
+                        ret.error.message = "Connection to steam failed.";
+                        break;
+                    case "http":
+                        ret.error.message = "Error returned by steam on GID refresh.";
+                        break;
+                    default:
+                        break;
+                }
+                return ret;
             }
-            return ret;
+            recaptcha_solution.gid = gid.response.gid;
         }
-
-        gid = gid.response.gid;
 
         update("Getting registration data...");
         var acc_data = await this.gen_getData();
@@ -97,7 +100,7 @@ class Generator {
 
         update("Waiting for confirmation from steam...");
         {
-            var response = await this.steam_requestVerify(steamfetch, email, gid, recaptcha_solution);
+            var response = await this.steam_requestVerify(steamfetch, email, recaptcha_solution.gid, recaptcha_solution.token);
             if (!response.success) {
                 switch (response.error.type) {
                     case "network":
@@ -332,7 +335,7 @@ class Generator {
         }
         while (concurrent > 0)
             await sleep(500);
-            change_mass_gen_status("Stopped account generation. Reason: " + stopped);
+        change_mass_gen_status("Stopped account generation. Reason: " + stopped);
         this.activegeneration = false;
     }
 }
