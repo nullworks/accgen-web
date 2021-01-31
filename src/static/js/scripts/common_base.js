@@ -422,7 +422,7 @@ global.commonGeneratePressed = async function () {
         return;
     }
     // Check if we support the new feature or not
-    if (state.addon.apiversion >= 5 && settings.get("captcha_mode") === "native") {
+    if (state.addon.apiversion >= 6 && settings.get("captcha_mode") === "native") {
         change_visibility(true);
         var account = (await generation.generateAccounts(1, {
             getRecapSolution: async () => {
