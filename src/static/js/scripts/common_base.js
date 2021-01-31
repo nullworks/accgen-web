@@ -10,6 +10,12 @@ const generation = require("./generation.js");
 const gmail = require("./gmail.js");
 const CaptchaAPI = require("./lib/librecaptcha.js").CaptchaAPI;
 
+var state = {
+    addon: {
+        apiversion: 0
+    }
+}
+
 global.extend = function (obj, src) {
     for (var key in src) {
         if (src.hasOwnProperty(key)) obj[key] = src[key];
@@ -43,6 +49,8 @@ function messageAddon(data) {
         });
     });
 }
+
+global.messageAddon = messageAddon;
 
 var gen_status_text_priority = 0;
 
@@ -151,6 +159,25 @@ function registerevents() {
         }
         displayData(account);
     }, false);
+}
+
+global.accgen_debug_gen = async function (token) {
+    change_visibility(true);
+    var account = (await generation.generateAccounts(1, { token }, null, function statuscb(msg, id, ret) {
+        change_gen_status_text(msg);
+        if (ret)
+            displayData(ret);
+    }))[0];
+    // Find errors and report banned domain if accgen email service in use
+    var error = parseErrors(account, settings.get("email_provider") == "accgen");
+    if (error) {
+        displayData({
+            parsederror: error,
+            done: true
+        });
+        return;
+    }
+    displayData(account);
 }
 
 async function doRecapV3(action) {
@@ -394,13 +421,42 @@ global.commonGeneratePressed = async function () {
         $("#mass_generator").modal('show');
         return;
     }
-    if ($("#steam_iframe").is(":hidden")) {
-        change_visibility(2);
-        document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
+    // Check if we support the new feature or not
+    if (state.addon.apiversion >= 5 && settings.get("captcha_mode") === "native") {
+        change_visibility(true);
+        var account = (await generation.generateAccounts(1, {
+            getRecapSolution: async () => {
+                // Token + GID returned by this
+                // TODO: Handle tab close, so we aren't waiting forever
+                var out = JSON.parse(await messageAddon({ task: "nativeCaptcha" }));
+                return out;
+            },
+            message: "Waiting for you to solve the captcha..."
+        }, null, function statuscb(msg, id, ret) {
+            change_gen_status_text(msg);
+            if (ret)
+                displayData(ret);
+        }))[0];
+        // Find errors and report banned domain if accgen email service in use
+        var error = parseErrors(account, settings.get("email_provider") == "accgen");
+        if (error) {
+            displayData({
+                parsederror: error,
+                done: true
+            });
+            return;
+        }
+        displayData(account);
     }
-    else
-        document.getElementById('steam_iframe_innerdiv').src = "about:blank";
-    $("#steam_iframe").toggle("slow");
+    else {
+        if ($("#steam_iframe").is(":hidden")) {
+            change_visibility(2);
+            document.getElementById('steam_iframe_innerdiv').src = "https://store.steampowered.com/join/";
+        }
+        else
+            document.getElementById('steam_iframe_innerdiv').src = "about:blank";
+        $("#steam_iframe").toggle("slow");
+    }
 }
 
 global.selectEmailServicePressed = function () {
@@ -658,6 +714,7 @@ global.common_init = async function () {
         ]);
         if (addoncheck) {
             console.log("Version 3.0 or above found!")
+            state.addon.apiversion = addoncheck.apiversion;
         }
         // Version older than 3.0 or not installed and not electron
         else {
@@ -784,6 +841,7 @@ global.settings_pressed = function () {
     $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked", settings.get("acc_steamguard"));
     $("#acc_apps_setting > input[type=\"text\"]").val(settings.get("acc_apps"));
     $("#settings_appids").trigger("input");
+    $("#settings_captchamode").prop('selectedIndex', settings.get("captcha_mode") === "native" ? 0 : 1);
     return false;
 }
 
@@ -826,6 +884,7 @@ global.save_domain = async function () {
 global.save_clicked = async function () {
     settings.set("acc_steamguard", $("#acc_steam_guard > input[type=\"checkbox\"]").prop("checked"));
     settings.set("acc_apps", $("#acc_apps_setting > input[type=\"text\"]").val());
+    settings.set("captcha_mode", $("#settings_captchamode").prop('selectedIndex') === 0 ? "native" : "iframe");
 
     var captcha_key = $("#settings_twocap").val();
     var captcha_host = ($("#settings_caphost").val() != '') ? $("#settings_caphost").val() : "https://2captcha.com";

@@ -175,7 +175,7 @@ exports.parseSteamError = function (code) {
         case 2:
         case 101:
             return {
-                message: 'Captcha solved incorrectly or IP address blacklisted! <a target="_blank" href="/gitlab/wikis/reCAPTCHA-Enterprise#manual-generator">Learn more</a>'
+                message: 'ReCAPTCHA verification failed! <a target="_blank" href="/gitlab/wikis/reCAPTCHA-Enterprise#manual-generator">Click here to find out why</a>'
             };
         case 105:
             return {

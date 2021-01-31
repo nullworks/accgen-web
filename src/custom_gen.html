@@ -170,7 +170,7 @@
                     <h6 id="acc_apps_setting" class="card-text">
                       <div class="alert alert-success">Detected <span>0</span>/5 apps</div>
                       Free SubIDs to automatically add (Comma separated): <input type="text" id="settings_appids"
-                        class="form-control" value="730" placeholder="730,440,570" autocomplete="off"
+                        class="form-control" value="303386" placeholder="303386,111111,99999" autocomplete="off"
                         maxlength="1024"><br>
                       <button type="button" onclick="settings_help('f2plist')" class="btn btn-primary btn-lg">List of
                         F2P games</a>
@@ -189,6 +189,14 @@
                         placeholder="Enter the Captcha host (Must match 2captcha's API)" autocomplete="off"
                         value="https://2captcha.com"><br>
                     </h6>
+                    <br>
+                    <div>
+                      <label>Manual Captcha Method: </label>
+                      <select class="form-control" id="settings_captchamode">
+                        <option>Popup</option>
+                        <option>IFrame</option>
+                      </select>
+                    </div>
                     <br>
                     <h6 class="card-text">
                       Using Proxies:<br><button type="button" onclick="window.open('gitlab/wikis/How-to-use-proxies');"
@@ -880,7 +888,7 @@
           class="btn btn-primary btn-lg">History</button>
       </div>
       <div id="steam_iframe" style="display: none;">
-        <iframe id="steam_iframe_innerdiv" height="700px" width="400px" scrolling="no" style="padding-left: 3rem;"
+        <iframe id="steam_iframe_innerdiv" height="1000px" width="100%" scrolling="no" style="padding-top: 3rem;"
           frameborder="0" src="about:blank"></iframe>
       </div>
       <div id="generate_progress" style="display: none;">

@@ -84,7 +84,8 @@ exports.steam_requestVerify = async function (fetch, email, gid, recaptcha_solut
         body: new URLSearchParams({
             email: email,
             captchagid: gid,
-            captcha_text: recaptcha_solution
+            captcha_text: recaptcha_solution,
+            elang: 0
         }).toString(),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

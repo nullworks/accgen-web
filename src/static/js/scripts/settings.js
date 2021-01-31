@@ -52,6 +52,7 @@ function baseSettings() {
     exports.set("captcha_key_type", "2captcha");
     exports.set("acc_apps", "303386");
     exports.set("acc_steamguard", true);
+    exports.set("captcha_mode", "native");
     //exports.set("email_provider", "accgen");
     console.log("Base settings configured!");
 }
@@ -96,6 +97,11 @@ exports.convert = function () {
             exports.unset("acc_steam_guard");
             exports.unset("acc_apps_setting");
             console.log("Migrated from version 5 to version 6!");
+        }
+        if (exports.get("version") == 6) {
+            exports.set("version", 7);
+            exports.set("captcha_mode", "native");
+            console.log("Migrated from version 6 to version 7!");
         }
     }
 }

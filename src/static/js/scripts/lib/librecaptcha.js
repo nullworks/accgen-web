@@ -42,7 +42,7 @@ async function get2CapSolution(key, url, fetch) {
         return balcheck;
 
     try {
-        var solve_req = await fetch(`${url}/in.php?key=${key}&method=userrecaptcha&googlekey=6LdIFr0ZAAAAAO3vz0O0OQrtAefzdJcWQM2TMYQH&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1`);
+        var solve_req = await fetch(`${url}/in.php?key=${key}&method=userrecaptcha&googlekey=6LdIFr0ZAAAAAO3vz0O0OQrtAefzdJcWQM2TMYQH&pageurl=https://store.steampowered.com/join/&header_acao=1&soft_id=2370&json=1&enterprise=1`);
     } catch (error) {
         return { success: false, error: "Failed to connect to captcha solving service." }
     }
@@ -94,7 +94,7 @@ async function getGenericSolution(key, url, fetch) {
         return balcheck;
 
     try {
-        var solve_req = await fetch(`${url}/in.php?key=${key}&method=userrecaptcha&googlekey=6LdIFr0ZAAAAAO3vz0O0OQrtAefzdJcWQM2TMYQH&pageurl=https://store.steampowered.com/join/&header_acao=1`);
+        var solve_req = await fetch(`${url}/in.php?key=${key}&method=userrecaptcha&googlekey=6LdIFr0ZAAAAAO3vz0O0OQrtAefzdJcWQM2TMYQH&pageurl=https://store.steampowered.com/join/&header_acao=1&enterprise=1`);
     } catch (error) {
         return { success: false, error: "Failed to connect to captcha solving service" }
     }
@@ -155,7 +155,7 @@ exports.CaptchaAPI = function (host, key, _fetch) {
                     break;
             }
             if (res.success)
-                return { success: res.success, solution: res.solution }
+                return { success: res.success, token: res.solution }
             else
                 return { success: res.success, error: res.error }
         },

@@ -9,17 +9,17 @@
     "build": "rm -r public || true && webpack"
   },
   "dependencies": {
-    "autolinker": "^3.14.1",
+    "autolinker": "^3.14.2",
     "await-to-js": "^2.1.1",
-    "bootstrap": "^4.5.2",
-    "bootstrap-table": "^1.17.1",
-    "copy-webpack-plugin": "^6.1.0",
-    "css-loader": "^4.2.2",
+    "bootstrap": "^4.6.0",
+    "bootstrap-table": "^1.18.2",
+    "copy-webpack-plugin": "^7.0.0",
+    "css-loader": "^5.0.1",
     "escape-html": "^1.0.3",
     "jquery": "^3.5.1",
     "popper.js": "^1.15.0",
-    "style-loader": "^1.2.1",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "style-loader": "^2.0.0",
+    "webpack": "^5.19.0",
+    "webpack-cli": "^4.4.0"
   }
 }

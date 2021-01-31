@@ -55,14 +55,18 @@ class Generator {
 
         // Librecaptcha compatibility
         if (typeof recaptcha_solution.getRecapSolution == "function") {
-            update("Getting captcha solution... This may take some time.");
+            if (typeof recaptcha_solution.message == "string") {
+                update(recaptcha_solution.message);
+            }
+            else
+                update("Getting captcha solution... This may take some time.");
             var res = await recaptcha_solution.getRecapSolution();
             if (res.error) {
                 ret.error.message = "Error while getting captcha solution! " + res.error;
                 return ret;
             }
 
-            recaptcha_solution = { token: res.solution };
+            recaptcha_solution = { token: res.token, gid: res.gid };
         }
 
 
