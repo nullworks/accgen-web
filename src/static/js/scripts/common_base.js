@@ -823,8 +823,8 @@ global.settings_help = function (page) {
         case "mx":
             window.open("https://telegra.ph/file/ef5bf460819c458292671.png");
             break;
-        case "f2plist":
-            window.open("https://steamdb.info/instantsearch/?refinementList%5Btags%5D%5B0%5D=Free%20to%20Play&refinementList%5BappType%5D%5B0%5D=Game");
+        case "f2pgames":
+            window.open("https://accgen.cathook.club/gitlab/wikis/How-to-use-SubIDs");
             break;
         default:
             console.log("Invalid settings page");
