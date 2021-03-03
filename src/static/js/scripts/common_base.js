@@ -115,7 +115,7 @@ function parseErrors(data, report) {
     // Wether or not to show the email provider switch button option
     var emailprovider = false;
     if (data.error && data.error.emailprovider)
-        emailprovider = out.emailprovider == true;
+        emailprovider = true;
 
     if (data.error && data.error.message)
         returnvalue = data.error.message;
