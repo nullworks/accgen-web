@@ -79,7 +79,8 @@ function parseSteamError(code, report, proxy, account) {
     if (res.reportemail && report)
         report_email(account.email);
     return {
-        error: proxy ? res.proxymessage || res.message : res.message
+        error: proxy ? res.proxymessage || res.message : res.message,
+        emailprovider: res.reportemail == true
     }
 }
 
@@ -106,15 +107,28 @@ global.copyDetails = async function (id) {
 
 function parseErrors(data, report) {
     if (!data || (!data.success && !data.error.message && !data.error.steamerror)) {
-        return "Unknown error!"
+        return "Unknown error!";
     }
     if (data.success == true)
         return;
+    var returnvalue = "Unknown error!";
+    // Wether or not to show the email provider switch button option
+    var emailprovider = false;
+    if (data.error && data.error.emailprovider)
+        emailprovider = out.emailprovider == true;
+
     if (data.error && data.error.message)
-        return data.error.message;
-    if (data.error && data.error.steamerror)
-        return parseSteamError(data.error.steamerror, report, data.proxy, data.account).error;
-    return "Unknown error!"
+        returnvalue = data.error.message;
+    else if (data.error && data.error.steamerror) {
+        var out = parseSteamError(data.error.steamerror, report, data.proxy, data.account);
+        returnvalue = out.error;
+        if (!emailprovider)
+            emailprovider = out.emailprovider == true;
+    }
+
+    if (emailprovider)
+        $("#generate_error_emailprovider").show();
+    return returnvalue;
 }
 
 function registerevents() {

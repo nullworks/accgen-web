@@ -47,7 +47,8 @@ class Generator {
             account: null,
             error: {
                 steamerror: null,
-                message: null
+                message: null,
+                emailprovider: false
             },
             id: id,
             proxy: usingproxy
@@ -128,6 +129,8 @@ class Generator {
             var response = await this.gen_getVerify(email);
             if (!response.success) {
                 ret.error.message = response.error.message || 'Error returned by SAG backend! Check console for details!';
+                if (response.error.type == "email")
+                    ret.error.emailprovider = true;
                 return ret;
             }
             verifydata = response.response;

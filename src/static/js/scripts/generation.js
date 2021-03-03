@@ -117,6 +117,7 @@ async function accgen_getVerify(email) {
         var ret = libsteam.getBaseResponse();
         if (email.error) {
             ret.error.message = email.error;
+            ret.error.type = "email"
         }
         else {
             ret.success = true;
