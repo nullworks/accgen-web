@@ -169,39 +169,54 @@
                     </h6><br>
                     <h6 id="acc_apps_setting" class="card-text">
                       <div class="alert alert-success">Detected <span>0</span>/5 apps</div>
-                      Free SubIDs to automatically add (Comma separated): <input type="text"
-                        id="settings_appids" class="form-control" value="303386" placeholder="303386,111111,99999"
-                        autocomplete="off" maxlength="1024"></input><br>
-                      <button type="button" onclick="settings_help('f2pgames')"
-                        class="btn btn-primary btn-lg">F2P games guide</button>
-                    </h6><br>
+                      Free SubIDs to automatically add (Comma separated): <input type="text" id="settings_appids"
+                        class="form-control" value="303386" placeholder="303386,111111,99999" autocomplete="off"
+                        maxlength="1024"></input><br>
+                      <button type="button" onclick="settings_help('f2pgames')" class="btn btn-primary btn-lg">F2P games
+                        guide</button>
+                    </h6>
                     <h6 class="card-text">
                       <button type="button" class="btn btn-primary btn-lg" onclick="selectEmailServicePressed()">Select
                         Email
                         Provider</button>
-                    </h6><br>
-                    <h6 class="card-text">
-                      Captcha Key: <input type="text" id="settings_twocap" class="form-control"
-                        placeholder="Enter your Captcha key" autocomplete="off"><br>
                     </h6>
-                    <h6 class="card-text">
-                      Captcha Host: <input type="text" id="settings_caphost" class="form-control"
-                        placeholder="Enter the Captcha host (Must match 2captcha's API)" autocomplete="off"
-                        value="https://2captcha.com"><br>
-                    </h6>
-                    <br>
-                    <div>
-                      <label>Manual Captcha Method: </label>
-                      <select class="form-control" id="settings_captchamode">
-                        <option>Popup</option>
-                        <option>IFrame</option>
-                      </select>
+
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <button class="btn btn-primary btn-lg" data-toggle="collapse"
+                              data-target="#advancedSettings" type="button">Advanced Settings</button>
+                          </h4>
+                        </div>
+                        <div id="advancedSettings" class="panel-collapse collapse">
+                          <div class="panel-body">
+                            <h6 class="card-text">
+                              Captcha Key: <input type="text" id="settings_twocap" class="form-control"
+                                placeholder="Enter your Captcha key" autocomplete="off"><br>
+                            </h6>
+                            <h6 class="card-text">
+                              Captcha Host: <input type="text" id="settings_caphost" class="form-control"
+                                placeholder="Enter the Captcha host (Must match 2captcha's API)" autocomplete="off"
+                                value="https://2captcha.com"><br>
+                            </h6>
+                            <div>
+                              <label>Manual Captcha Method: </label>
+                              <select class="form-control" id="settings_captchamode">
+                                <option>Popup</option>
+                                <option>IFrame</option>
+                              </select>
+                            </div>
+                            <br>
+                            <h6 class="card-text">
+                              Using Proxies:<br><button type="button"
+                                onclick="window.open('gitlab/wikis/How-to-use-proxies');"
+                                class="btn btn-primary btn-lg">Proxy setup guide</button><br>
+                            </h6>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <br>
-                    <h6 class="card-text">
-                      Using Proxies:<br><button type="button" onclick="window.open('gitlab/wikis/How-to-use-proxies');"
-                        class="btn btn-primary btn-lg">Proxy setup guide</button><br>
-                    </h6>
                   </form>
                 </div>
               </div>
