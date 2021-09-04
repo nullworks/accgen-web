@@ -835,7 +835,7 @@ global.settings_help = function (page) {
             window.open("https://accgen.cathook.club/gitlab/wikis/Using-Your-Gmail-address-with-Steam-Account-Generator");
             break;
         case "mx":
-            window.open("https://telegra.ph/file/ef5bf460819c458292671.png");
+            window.open("https://accgen.cathook.club/gitlab/wikis/How-to-set-up-a-Custom-Domain");
             break;
         case "f2pgames":
             window.open("https://accgen.cathook.club/gitlab/wikis/How-to-use-SubIDs");
