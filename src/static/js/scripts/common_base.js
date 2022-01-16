@@ -878,7 +878,11 @@ global.save_domain = async function () {
         $("#email_service_progress").hide('slow');
         settings.set("email_domain", custom_domain);
     } else {
-        if (!custom_domain.includes("@")) {
+        if (custom_domain.includes("@")) {
+            $("#email_service_message > strong").text("That's an email - not a domain.");
+            $("#email_service_progress").hide('slow');
+            return false;
+        } else {
             var mxcheck = await isvalidmx(custom_domain)
             if (mxcheck !== true) {
                 $("#settings_custom_domain").val("");
